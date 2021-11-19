@@ -15,12 +15,17 @@ namespace toio.AI.meicu.Training
         public UIBoard uiBoard;
         public UIQuest uIQuest;
 
-        public Paras paras;
+        public EnvParas paras;
+
+        [Header("For Test")]
+        public float[] accuracies;
 
         private Env env = new Env();
+        private int[] questCounts;
+        private int[] successCounts;
 
 
-        bool isRendering { get { return SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null;} }
+        bool isRendering { get { return SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null;} }
 
 
         public void Start()
@@ -28,16 +33,30 @@ namespace toio.AI.meicu.Training
             uIQuest?.Reset();
             uIQuest?.HideP();
             uIQuest?.HideA();
+
+            // Not training
+            if (!Academy.Instance.IsCommunicatorOn)
+            {
+                accuracies = new float[9];
+                questCounts = new int[9];
+                successCounts = new int[9];
+            }
         }
 
         public override void OnEpisodeBegin()
         {
             // Get Environment Parameters
             paras.Fetch();
-            var questSize = Random.Range(paras.questMinScale, Mathf.Max(paras.questMinScale, paras.questMaxScale));
+            var questSize = Random.Range(paras.questMinScale, paras.questMaxScale+1);
+            int startRow = 4; int startCol = 4;
+            if (paras.randomStart)
+            {
+                startRow = Random.Range(0, 9);
+                startCol = startRow % 2 == 0 ? Random.Range(0, 5) * 2 : Random.Range(0, 4) * 2 + 1;
+            }
 
             // Reset Environment
-            env.Reset(4, 4);
+            env.Reset(startRow, startCol);
 
             // Generate Quest
             MeiQuest quest = env.GenerateQuest(questSize);
@@ -103,6 +122,7 @@ namespace toio.AI.meicu.Training
             if (res == Env.Response.Goal)
             {
                 SetReward(1);
+                CountResult(true);
                 EndEpisode();
             }
             else if (
@@ -111,12 +131,28 @@ namespace toio.AI.meicu.Training
                 res == Env.Response.FailWrong ||
                 res == Env.Response.FailEarlyGoal)
             {
+                CountResult(false);
                 EndEpisode();
             }
             else if (res == Env.Response.StepColor)
             {
                 SetReward(paras.colorReward);
             }
+        }
+
+        private void CountResult(bool success)
+        {
+            if (Academy.Instance.IsCommunicatorOn) return;
+
+            int len = env.quest.Length;
+            questCounts[len] += 1;
+            if (success)
+                successCounts[len] += 1;
+            accuracies[len] = (float)successCounts[len] / questCounts[len];
+        }
+
+        public override void Heuristic(in ActionBuffers actionsOut)
+        {
         }
     }
 
