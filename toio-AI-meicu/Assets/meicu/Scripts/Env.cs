@@ -21,24 +21,22 @@ namespace toio.AI.meicu
             {Env.Space.W, Env.Space.R, Env.Space.W, Env.Space.G, Env.Space.W, Env.Space.Y, Env.Space.W, Env.Space.G, Env.Space.W},
         };
 
-        public Board board; // TODO deprecated
-
         protected Env.Space[,] state;
         public Response response { get; protected set; } = Response.None;
         public MeiQuest quest = null;
 
         [HideInInspector]
-        public int row { get; protected set; } = 5;
+        public int row { get; protected set; } = 4;
         [HideInInspector]
-        public int col { get; protected set; } = 5;
+        public int col { get; protected set; } = 4;
 
         [HideInInspector]
-        public Env.Space spaceColor { get {return defaultState[row, col];} }
+        public Env.Space spaceBoard { get {return defaultState[row, col];} }
         [HideInInspector]
         public Env.Space spaceState { get {return this.state[row, col];} }
         [HideInInspector]
 
-        public int passedColorSpaceCnt = 0;
+        public int passedColorSpaceCnt { get; private set; } = 0;
 
 
         public Env Clone()
@@ -54,15 +52,10 @@ namespace toio.AI.meicu
 
         public void Reset(int row=4, int col=4)
         {
-            this.board?.SetDefaultBoard();
-
             this.row = Mathf.Clamp(row, 0, 8);
             this.col = Mathf.Clamp(col, 0, 8);
 
-            if (this.board != null)
-                this.state = (Env.Space[,]) this.board.GetState();
-            else
-                this.state = (Env.Space[,]) defaultState.Clone();
+            this.state = (Env.Space[,]) defaultState.Clone();
             this.state[this.row, this.col] = Env.Space.Passed;
 
             this.passedColorSpaceCnt = 0;
@@ -91,12 +84,12 @@ namespace toio.AI.meicu
                 (row, col) = Translate(action ,row, col);
 
                 this.state[row, col] = Env.Space.Passed;
-                if (spaceColor != Env.Space.W)
+                if (spaceBoard != Env.Space.W)
                 {
                     passedColorSpaceCnt ++;
 
                     // Stepped Wrong color
-                    if (passedColorSpaceCnt > quest.Length || spaceColor != quest.colors[passedColorSpaceCnt-1])
+                    if (passedColorSpaceCnt > quest.Length || spaceBoard != quest.colors[passedColorSpaceCnt-1])
                         this.response = Response.FailWrong;
                     // Reach at Goal
                     else if (row == quest.goalRow && col == quest.goalCol)
@@ -113,8 +106,6 @@ namespace toio.AI.meicu
                 else
                     this.response = Response.StepWhite;
             }
-
-            ApplyToBoard();
 
             return this.response;
         }
@@ -134,11 +125,6 @@ namespace toio.AI.meicu
             // if (spaceColor != MeiEnv.Space.W)
             //     passedColorSpaceCnt ++;
             return true;
-        }
-
-        public void ApplyToBoard()
-        {
-            this.board?.SetBoard(this.state);
         }
 
         public bool IsInside(int actionCode)
@@ -240,9 +226,9 @@ namespace toio.AI.meicu
 
                 refActions.Add(action);
                 env.Move(action);
-                if (env.spaceColor != Env.Space.W)
+                if (env.spaceBoard != Env.Space.W)
                 {
-                    colors.Add(env.spaceColor);
+                    colors.Add(env.spaceBoard);
                 }
             }
 
