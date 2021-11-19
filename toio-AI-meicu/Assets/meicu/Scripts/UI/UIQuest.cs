@@ -25,7 +25,8 @@ namespace toio.AI.meicu
 
         internal void ShowQuest(Env.Space[] colors)
         {
-            for (int i = 0; i < colors.Length*2-1; i++)
+            int spaces = colors.Length*2 - 1;
+            for (int i = 0; i < Mathf.Min(13, spaces); i++)
             {
                 var tr = transform.Find($"Q ({i})");
                 tr.gameObject.SetActive(true);
@@ -41,18 +42,18 @@ namespace toio.AI.meicu
                     }
                 tr.GetComponent<RawImage>().color = color;
             }
-            for (int i = colors.Length*2-1; i < 13; i++)
+            for (int i = spaces; i < 13; i++)
             {
                 var tr = transform.Find($"Q ({i})");
                 tr.gameObject.SetActive(false);
             }
 
             var line = transform.Find("Line") as RectTransform;
-            line.sizeDelta = new Vector2(35 * (colors.Length*2-1), 5);
+            line.sizeDelta = new Vector2(35 * spaces, 5);
 
             var goal = transform.Find("Goal") as RectTransform;
             goal.gameObject.SetActive(true);
-            goal.anchoredPosition = new Vector2(35 * (colors.Length*2-1) - 5, 0);
+            goal.anchoredPosition = new Vector2(35 * spaces - 5, 0);
         }
         internal void ShowQuest(MeiQuest quest)
         {
