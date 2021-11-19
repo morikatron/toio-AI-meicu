@@ -20,7 +20,8 @@ namespace toio.AI.meicu
         private static readonly Vector2Int BiasA = new Vector2Int(-2, -2);
 
 
-        public float heatmapMinOpacity = 0.1f;
+        public float heatmapZeroOpacity = 0.1f;
+        public float heatmapMinOpacity = 0.2f;
 
         private List<GameObject> trajPObjs = new List<GameObject>();
         private List<GameObject> trajAObjs = new List<GameObject>();
@@ -178,13 +179,23 @@ namespace toio.AI.meicu
                     if (heatmap !=null && r < heatmap.GetLength(0) && c < heatmap.GetLength(1))
                     {
                         var color = img.color;
-                        color.a = heatmap[r, c] * (1-heatmapMinOpacity) + heatmapMinOpacity;   // Mapping to [heatmapMinOpacity, 1]
+                        var a = heatmap[r, c];
+                        if (a == 0)
+                        {
+                            color.a = heatmapZeroOpacity;
+                        }
+                        else
+                        {
+                            a = Mathf.Pow(a, 0.8f);     // Easier to see
+                            a = a * (1-heatmapMinOpacity) + heatmapMinOpacity;   // Mapping to [heatmapMinOpacity, 1]
+                            color.a = a;
+                        }
                         img.color = color;
                     }
                     else
                     {
                         var color = img.color;
-                        color.a = heatmapMinOpacity;
+                        color.a = heatmapZeroOpacity;
                         img.color = color;
                     }
                 }
