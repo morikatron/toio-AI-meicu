@@ -145,9 +145,10 @@ namespace toio.AI.meicu
 
                 var subEnv = env.Clone();
                 var res = subEnv.Step((Env.Action)actionCode);
+
+                heatmapBuffer[subEnv.row, subEnv.col] += parentProb * p;
                 if (res == Env.Response.None || res == Env.Response.StepWhite || res == Env.Response.StepColor)
                 {
-                    heatmapBuffer[subEnv.row, subEnv.col] += parentProb * p;
                     yield return IE_PredictHeatmap(subEnv, maxSteps, parentProb * p, step+1);
                 }
             }
