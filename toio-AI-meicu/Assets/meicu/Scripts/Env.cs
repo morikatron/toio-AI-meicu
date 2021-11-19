@@ -77,7 +77,10 @@ namespace toio.AI.meicu
             if (!IsInside(action))
                 this.response = Response.FailOut;
             else if (IsPassed(action))
+            {
                 this.response = Response.FailPassed;
+                (row, col) = Translate(action ,row, col);
+            }
             else
             {
                 // Move
