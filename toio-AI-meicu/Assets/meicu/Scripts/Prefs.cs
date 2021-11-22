@@ -36,7 +36,7 @@ namespace toio.AI.meicu
                 return PlayerPrefs.GetInt(KeyLevel, 1);
             }
             set {
-                value = Mathf.Clamp(value, 1, 5);
+                value = Mathf.Clamp(value, 1, Config.nLevels);
                 PlayerPrefs.SetInt(KeyLevel, value);
             }
         }

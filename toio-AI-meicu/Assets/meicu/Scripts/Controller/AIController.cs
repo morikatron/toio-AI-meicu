@@ -19,7 +19,8 @@ namespace toio.AI.meicu
         // internal float[,] heatmap { get; private set; }
         internal event Action heatmapCallback;
         internal bool isPause = false;
-        internal float speedFactor = 0.1f;
+        internal float intervalBegin = 3f;
+        internal float intervalEnd = 1f;
         internal ref readonly float[,] Heatmap => ref heatmap;
 
         Cube cube;
@@ -59,6 +60,15 @@ namespace toio.AI.meicu
             }
         }
 
+        internal void LoadModelByLevel(int lv)
+        {
+            agent.LoadModelByName(Config.levelSettings[lv-1].modelName);
+        }
+        internal void LoadBestModel()
+        {
+            agent.LoadModelByName(Config.bestModelName);
+        }
+
         IEnumerator IE_Think()
         {
             while (true)
@@ -79,7 +89,8 @@ namespace toio.AI.meicu
                 this.isPredicting = false;
 
                 // Interval
-                var interval = Mathf.Max(0.3f, (game.envA.quest.Length - game.envA.passedColorSpaceCnt) * (0.8f + 0.3f * (1 - speedFactor)) + 2f * (1 - speedFactor) - 2f);
+                var interval = (float) game.envA.passedColorSpaceCnt / game.envA.quest.Length;
+                interval = interval * intervalEnd + (1-interval) * intervalBegin;
                 yield return new WaitForSecondsRealtime(interval);
                 if (isPause) continue;
 
@@ -125,15 +136,19 @@ namespace toio.AI.meicu
 
             var feature = features[agent.m_additionalOutputNames[0]];
             float[] ps = new float[4];
-            var e0 = Mathf.Exp(feature[0]);
-            var e1 = Mathf.Exp(feature[1]);
-            var e2 = Mathf.Exp(feature[2]);
-            var e3 = Mathf.Exp(feature[3]);
+            float maxLogit = Mathf.Max(feature[0], feature[1], feature[2], feature[3]);
+            var e0 = Mathf.Exp(feature[0] - maxLogit + 10);
+            var e1 = Mathf.Exp(feature[1] - maxLogit + 10);
+            var e2 = Mathf.Exp(feature[2] - maxLogit + 10);
+            var e3 = Mathf.Exp(feature[3] - maxLogit + 10);
             var sum = e0+e1+e2+e3;
             ps[0] = e0 / sum;
             ps[1] = e1 / sum;
             ps[2] = e2 / sum;
             ps[3] = e3 / sum;
+            // Debug.Log($"feature: {feature[0]}, {feature[1]}, {feature[2]}, {feature[3]}");
+            // Debug.Log($"e: {e0}, {e1}, {e2}, {e3}");
+            // Debug.Log($"p: {ps[0]}, {ps[1]}, {ps[2]}, {ps[3]}");
 
             for (int actionCode = 0; actionCode < 4; actionCode++)
             {

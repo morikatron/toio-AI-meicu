@@ -33,6 +33,7 @@ namespace toio.AI.meicu
                 uiBoard.Reset();
 
                 AIController.ins.heatmapCallback += OnHeatmap;
+                AIController.ins.LoadBestModel();
 
                 MeiPrefs.SetLearnCleared();
                 phase = 0;
@@ -177,8 +178,8 @@ namespace toio.AI.meicu
                         uiQuest.ShowA(1);
                         for (int a = 0; a < 4; a++)
                         {
-                            if (a == action) probs[a] += 0.01f;
-                            else probs[a] -= 0.01f / 3;
+                            if (a == action) probs[a] += 0.009f;
+                            else probs[a] -= 0.003f;
                         }
                         text.text = $"試行 {t+1} 回目\n\nゴール成功\n「上」の可能性  UP ";
                     }
@@ -186,8 +187,8 @@ namespace toio.AI.meicu
                     {
                         for (int a = 0; a < 4; a++)
                         {
-                            if (a == action) probs[a] -= 0.01f;
-                            else probs[a] += 0.01f / 3;
+                            if (a == action) probs[a] -= 0.009f;
+                            else probs[a] += 0.003f;
                         }
                         string actionStr = "";
                         if (action == 1) actionStr = "右";
@@ -243,11 +244,13 @@ namespace toio.AI.meicu
                         yield return AIController.ins.PredictHeatmapOnce(env, step);
                         yield return new WaitUntil(() => isHeatmapReceived);
 
-                        uiBoard.ShowHeatmap(AIController.ins.Heatmap);
-
                         // Interval
-                        yield return new WaitForSecondsRealtime(Mathf.Max(0f, 0.5f - (Time.realtimeSinceStartup - t)));
+                        yield return new WaitForSecondsRealtime(Mathf.Max(0f, 1f - (Time.realtimeSinceStartup - t)));
+
+                        uiBoard.ShowHeatmap(AIController.ins.Heatmap);
                     }
+                    // Interval
+                    yield return new WaitForSecondsRealtime(1f);
 
                     if (i == 3)
                         btnNext.interactable = true;

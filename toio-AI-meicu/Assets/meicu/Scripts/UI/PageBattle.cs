@@ -16,7 +16,6 @@ namespace toio.AI.meicu
         public Button btnStart;
         public Text text;
         public Text textStage;
-        public int maxStages = 5;
 
         private bool isHint = false;
         private int stage = 1;
@@ -42,6 +41,7 @@ namespace toio.AI.meicu
                 btnStart.transform.GetComponentInChildren<Text>().text = "Start";
                 UpdateStageText();
                 UpdateHint();
+                LoadLevel();
             }
             else
             {
@@ -53,6 +53,24 @@ namespace toio.AI.meicu
                 game.stepCallbackP -= OnGameStepP;
                 game.stepCallbackA -= OnGameStepA;
             }
+        }
+
+        void LevelUp()
+        {
+            stage = 1;
+            if (MeiPrefs.level == Config.nLevels)
+                return;
+
+            MeiPrefs.LevelUp();
+            LoadLevel();
+        }
+        void LoadLevel()
+        {
+            AIController.ins.LoadModelByLevel(MeiPrefs.level);
+        }
+        void StageUp()
+        {
+            stage += 1;
         }
 
         void UpdateStageText()
@@ -77,15 +95,15 @@ namespace toio.AI.meicu
 
         void ProcPlayerWin()
         {
-            if (stage == maxStages)
+            if (stage == Config.levelSettings[MeiPrefs.level - 1].nStages)
             {
-                MeiPrefs.LevelUp();
+                LevelUp();
                 btnStart.transform.GetComponentInChildren<Text>().text = "Next Lv.";
                 text.text = "君の勝ちだ！\n\n次のレベルに行こう！";
             }
             else
             {
-                stage += 1;
+                StageUp();
                 btnStart.transform.GetComponentInChildren<Text>().text = "Next Stage";
                 text.text = "君の勝ちだ！\n\n次のステージに行こう！";
             }
@@ -96,8 +114,12 @@ namespace toio.AI.meicu
         {
             text.text = "私の勝ちだ！\n\nやり直しな";
 
-            if (stage > 1)
+            if (Config.levelSettings[MeiPrefs.level - 1].retryOnFail)
+            {}
+            else
+            {
                 stage = 1;
+            }
             btnStart.transform.GetComponentInChildren<Text>().text = "Restart";
             UpdateStageText();
         }
@@ -111,10 +133,16 @@ namespace toio.AI.meicu
         #region ======== UI Callbacks ========
         public void OnBtnStart()
         {
+            var lv = Config.levelSettings[MeiPrefs.level - 1];
+            var st = lv.stageSettings[stage-1];
+
             uiQuest.Reset();
             uiBoard.Reset();
-            AIController.ins.speedFactor = stage / maxStages;
-            game.InitGame(MeiPrefs.level + 2);
+
+            AIController.ins.intervalBegin = st.intervelBegin;
+            AIController.ins.intervalEnd = st.intervalEnd;
+
+            game.InitGame(lv.questSize);
             game.StartGame();
 
             UpdateStageText();

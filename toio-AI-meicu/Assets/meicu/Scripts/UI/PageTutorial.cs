@@ -40,6 +40,7 @@ namespace toio.AI.meicu
                 game.stepCallbackA += OnGameStepA;
                 game.InitGame(3);
 
+                AIController.ins.LoadBestModel();
                 RefreshUI();
             }
             else

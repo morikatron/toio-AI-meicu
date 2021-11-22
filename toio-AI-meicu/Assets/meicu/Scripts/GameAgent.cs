@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Barracuda;
 using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 using Unity.MLAgents.Actuators;
@@ -14,7 +15,27 @@ namespace toio.AI.meicu
         internal Action<Env.Action> actCallback;
 
         private Env env;
+        private string currentModelName = "";
 
+        internal void LoadModelByName(string name)
+        {
+            if (currentModelName == name)
+            {
+                Debug.LogWarning($"Model named [{name}] already loaded.");
+                return;
+            }
+
+            var model = (NNModel)Resources.Load(name);
+            if (model != null)
+            {
+                this.currentModelName = name;
+                this.SetModel("meicu", model);
+            }
+            else
+            {
+                Debug.LogError($"Model named [{name}] not found.");
+            }
+        }
 
         public void Restart()
         {

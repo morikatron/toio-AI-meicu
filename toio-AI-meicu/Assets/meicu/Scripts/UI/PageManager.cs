@@ -21,6 +21,8 @@ namespace toio.AI.meicu
         {
             ins = this;
 
+            Config.Init();
+
             // PlayerPrefs.DeleteAll();
             MeiPrefs.SetTutorialCleared();
             MeiPrefs.SetLearnCleared();
