@@ -20,6 +20,7 @@ namespace toio.AI.meicu
         }
 
         internal static bool isTwoConnected => (cubeManager.cubes.Count >= 2);
+        internal static int nConnected => cubeManager.cubes.Count;
 
         internal static bool TargetMove(int idx, int row, int col, int biasX=0, int biasY=0)
         {
