@@ -98,12 +98,14 @@ namespace toio.AI.meicu
             if (stage == Config.levelSettings[MeiPrefs.level - 1].nStages)
             {
                 LevelUp();
+                btnStart.gameObject.SetActive(true);
                 btnStart.transform.GetComponentInChildren<Text>().text = "Next Lv.";
                 text.text = "君の勝ちだ！\n\n次のレベルに行こう！";
             }
             else
             {
                 StageUp();
+                btnStart.gameObject.SetActive(true);
                 btnStart.transform.GetComponentInChildren<Text>().text = "Next Stage";
                 text.text = "君の勝ちだ！\n\n次のステージに行こう！";
             }
@@ -120,14 +122,16 @@ namespace toio.AI.meicu
             {
                 stage = 1;
             }
-            btnStart.transform.GetComponentInChildren<Text>().text = "Restart";
+            btnStart.gameObject.SetActive(true);
+            btnStart.transform.GetComponentInChildren<Text>().text = "Retry";
             UpdateStageText();
         }
 
         void ProcDraw()
         {
             text.text = "引き分けだな、もうっかいやろう";
-            btnStart.transform.GetComponentInChildren<Text>().text = "Again";
+            btnStart.gameObject.SetActive(true);
+            btnStart.transform.GetComponentInChildren<Text>().text = "Retry";
         }
 
         #region ======== UI Callbacks ========
