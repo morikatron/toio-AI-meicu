@@ -41,15 +41,11 @@ namespace toio.AI.meicu
             }
             else
             {
+                StopAllCoroutines();
                 AIController.ins.heatmapCallback -= OnHeatmap;
             }
         }
 
-        public void OnBtnHome()
-        {
-            StopAllCoroutines();
-            PageManager.SetPage(PageManager.EPage.Title);
-        }
 
         public void OnBtnHint()
         {
@@ -62,7 +58,7 @@ namespace toio.AI.meicu
 
             if (phase > 12)
             {
-                OnBtnHome();
+                PageManager.OnBtnHome();
                 return;
             }
 

@@ -40,6 +40,7 @@ namespace toio.AI.meicu
                 game.stepCallbackA += OnGameStepA;
                 game.InitGame(3);
 
+                MeiPrefs.SetTutorialCleared();  // TODO
                 AIController.ins.LoadBestModel();
                 RefreshUI();
             }
@@ -53,12 +54,6 @@ namespace toio.AI.meicu
                 game.stepCallbackP -= OnGameStepP;
                 game.stepCallbackA -= OnGameStepA;
             }
-        }
-
-        public void OnBtnHome()
-        {
-                    MeiPrefs.SetTutorialCleared();
-            PageManager.SetPage(PageManager.EPage.Title);
         }
 
         public void OnBtnNext()

@@ -29,29 +29,6 @@ namespace toio.AI.meicu
             }
         }
 
-        void Update()
-        {
-            byte c = (byte)(Mathf.Cos(Time.time*5) * 55/2 + 200+55/2);
-            if (Device.nConnected < 2)
-            {
-                if (isConnecting)
-                {
-                    (btnConnect.transform.Find("Busy") as RectTransform).eulerAngles += new Vector3(0, 0, 1);
-                }
-                else
-                {
-                    btnConnect.GetComponent<Image>().color = new Color32(c, c, c, 255);
-                }
-            }
-            else if (!MeiPrefs.isTutorialCleared)
-            {
-                btnTutorial.GetComponent<Image>().color = new Color32(c, c, c, 255);
-            }
-            else if (!MeiPrefs.isLearnCleared)
-            {
-                btnLearn.GetComponent<Image>().color = new Color32(c, c, c, 255);
-            }
-        }
 
         internal void Refresh()
         {
@@ -62,6 +39,10 @@ namespace toio.AI.meicu
                 btnBattle.interactable = false;
                 btnLearn.interactable = true;   // TODO
 
+                btnConnect.GetComponent<ButtonBlink>()?.Blink(true);
+                btnTutorial.GetComponent<ButtonBlink>()?.Blink(false);
+                btnLearn.GetComponent<ButtonBlink>()?.Blink(false);
+
                 text.text = "左上のCONNECT（コネクト）ボタンからキューブを接続してね！";
             }
             else if (Device.nConnected == 1)
@@ -71,17 +52,26 @@ namespace toio.AI.meicu
                 btnBattle.interactable = false;
                 btnLearn.interactable = true;   // TODO
 
+                btnConnect.GetComponent<ButtonBlink>()?.Blink(true);
+                btnTutorial.GetComponent<ButtonBlink>()?.Blink(false);
+                btnLearn.GetComponent<ButtonBlink>()?.Blink(false);
+
                 text.text = "もう1つ接続してね！";
             }
             else if (Device.nConnected == 2)
             {
                 btnConnect.interactable = false;
+                btnConnect.GetComponent<ButtonBlink>()?.Blink(false);
 
                 if (!MeiPrefs.isTutorialCleared)
                 {
                     btnTutorial.interactable = true;
                     btnBattle.interactable = false;
                     btnLearn.interactable = false;
+
+                    btnTutorial.GetComponent<ButtonBlink>()?.Blink(true);
+                    btnLearn.GetComponent<ButtonBlink>()?.Blink(false);
+
                     text.text = "まずは迷路パズルのルールを説明するよ！";
                 }
                 else if (!MeiPrefs.isLearnCleared)
@@ -89,6 +79,10 @@ namespace toio.AI.meicu
                     btnTutorial.interactable = false;
                     btnBattle.interactable = false;
                     btnLearn.interactable = true;
+
+                    btnTutorial.GetComponent<ButtonBlink>()?.Blink(false);
+                    btnLearn.GetComponent<ButtonBlink>()?.Blink(true);
+
                     text.text = "僕たちAIロボットが迷路パズルをどのように解いているのか、かいせつするよ！";
                 }
                 else
@@ -96,6 +90,10 @@ namespace toio.AI.meicu
                     btnTutorial.interactable = true;
                     btnBattle.interactable = true;
                     btnLearn.interactable = true;
+
+                    btnTutorial.GetComponent<ButtonBlink>()?.Blink(false);
+                    btnLearn.GetComponent<ButtonBlink>()?.Blink(false);
+
                     text.text = "では、一緒にあそぼう~";
                 }
             }
@@ -103,21 +101,13 @@ namespace toio.AI.meicu
 
         public async void OnBtnConnect()
         {
-            this.btnConnect.interactable = false;
+            btnConnect.interactable = false;
+            btnConnect.GetComponent<ButtonBlink>()?.Blink(false);
+            btnConnect.GetComponent<ButtonConnect>().SetBusy(true);
 
-            this.isConnecting = true;
-            btnConnect.transform.Find("Mask").gameObject.SetActive(true);
-            btnConnect.transform.Find("Busy").gameObject.SetActive(true);
+            await Device.Connect();
 
-            #if UNITY_WEBGL
-            await Device.cubeManager.SingleConnect();
-            #else
-            await Device.cubeManager.MultiConnect(2);
-            #endif
-
-            btnConnect.transform.Find("Mask").gameObject.SetActive(false);
-            btnConnect.transform.Find("Busy").gameObject.SetActive(false);
-            this.isConnecting = false;
+            btnConnect.GetComponent<ButtonConnect>().SetBusy(false);
 
             if (Device.nConnected == 2)
             {

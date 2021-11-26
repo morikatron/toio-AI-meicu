@@ -12,9 +12,11 @@ namespace toio.AI.meicu
         public PageTutorial pageTutorial;
         public PageBattle pageBattle;
         public PageLearn pageLearn;
+        public DialogConnect dialogConnect;
 
 
         static PageManager ins;
+        static EPage page;
 
 
         void Start()
@@ -23,6 +25,8 @@ namespace toio.AI.meicu
 
             Config.Init();
 
+            Device.connectionCallback = OnDeviceConnection;
+
             // PlayerPrefs.DeleteAll();
             MeiPrefs.SetTutorialCleared();
             MeiPrefs.SetLearnCleared();
@@ -30,6 +34,7 @@ namespace toio.AI.meicu
                 MeiPrefs.level = 3;
 
             SetPage(EPage.Title);
+            dialogConnect.gameObject.SetActive(false);
         }
 
 
@@ -39,11 +44,47 @@ namespace toio.AI.meicu
         }
         internal static void SetPage(EPage ePage)
         {
+            page = ePage;
             ins.pageTitle?.SetActive(ePage == EPage.Title);
             ins.pageTutorial?.SetActive(ePage == EPage.Tutorial);
             ins.pageBattle?.SetActive(ePage == EPage.Battle);
             ins.pageLearn?.SetActive(ePage == EPage.Learn);
+
+            if (page == EPage.Title)
+                ins.dialogConnect.gameObject.SetActive(true);
         }
+
+        public static void OnBtnHome()
+        {
+            SetPage(PageManager.EPage.Title);
+        }
+
+        void OnDeviceConnection(int cubeIdx, bool connected)
+        {
+            if (!connected)
+            {
+                Debug.Log($"Cube {cubeIdx} Disconnected! ");
+                if (page == EPage.Title)
+                {
+                    pageTitle.Refresh();
+                }
+                else
+                {
+                    dialogConnect.gameObject.SetActive(true);
+
+                    // TODO pause
+                }
+            }
+        }
+        internal static void OnReconnected()
+        {
+            if (page == EPage.Title) return;
+
+            ins.dialogConnect.gameObject.SetActive(false);
+
+            // TODO continue
+        }
+
     }
 
 }

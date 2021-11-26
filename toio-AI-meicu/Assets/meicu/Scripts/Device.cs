@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 using toio;
 
 
@@ -9,18 +11,46 @@ namespace toio.AI.meicu
 
     public class Device
     {
+        static internal Action<int, bool> connectionCallback;
+
         static CubeManager _cubeManager;
         internal static CubeManager cubeManager
         {
             get {
                 if (_cubeManager == null)
-                    _cubeManager = new CubeManager();
+                    _cubeManager = new CubeManager(ConnectType.Real);
                 return _cubeManager;
             }
         }
 
-        internal static bool isTwoConnected => (cubeManager.cubes.Count >= 2);
-        internal static int nConnected => cubeManager.cubes.Count;
+        internal static bool isCube0Connected { get {
+            if (cubeManager.cubes.Count == 0) return false;
+            return cubeManager.cubes[0].isConnected;
+        }}
+        internal static bool isCube1Connected { get {
+            if (cubeManager.cubes.Count < 2) return false;
+            return cubeManager.cubes[1].isConnected;
+        }}
+        internal static bool isBothConnected => isCube0Connected && isCube1Connected;
+
+        internal static int nConnected { get {
+            int n = 0;
+            if (isCube0Connected) n++;
+            if (isCube1Connected) n++;
+            return n;
+        }}
+
+        internal static async UniTask Connect()
+        {
+            var cube = await cubeManager.SingleConnect();
+            if (cube is CubeReal)
+            {
+                var cubeIdx = cubeManager.cubes.FindIndex(c => c == cube);
+                (cube as CubeReal).peripheral.AddConnectionListener(
+                    "meicu.Device",
+                    peri => connectionCallback?.Invoke(cubeIdx, peri.isConnected));
+            }
+        }
 
         internal static bool TargetMove(int idx, int row, int col, int biasX=0, int biasY=0)
         {

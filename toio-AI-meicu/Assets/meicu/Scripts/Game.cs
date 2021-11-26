@@ -81,7 +81,7 @@ namespace toio.AI.meicu
 
         internal void StartGame()
         {
-            if (!Device.isTwoConnected) return;
+            if (!Device.isBothConnected) return;
 
             StartCoroutine(IE_Starting());
         }

@@ -149,11 +149,6 @@ namespace toio.AI.meicu
             UpdateHint();
         }
 
-        public void OnBtnHome()
-        {
-            PageManager.SetPage(PageManager.EPage.Title);
-        }
-
         public void OnBtnHint()
         {
             this.isHint = !this.isHint;
