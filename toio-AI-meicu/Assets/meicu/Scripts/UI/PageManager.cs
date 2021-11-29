@@ -51,7 +51,7 @@ namespace toio.AI.meicu
             ins.pageLearn?.SetActive(ePage == EPage.Learn);
 
             if (page == EPage.Title)
-                ins.dialogConnect.gameObject.SetActive(true);
+                ins.dialogConnect.gameObject.SetActive(false);
         }
 
         public static void OnBtnHome()

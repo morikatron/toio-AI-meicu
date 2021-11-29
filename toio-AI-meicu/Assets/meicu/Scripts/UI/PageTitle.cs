@@ -16,8 +16,6 @@ namespace toio.AI.meicu
         public Button btnLearn;
         public Text text;
 
-        private bool isConnecting = false;
-
 
         internal void SetActive(bool active)
         {
