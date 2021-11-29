@@ -23,6 +23,7 @@ namespace toio.AI.meicu
 
         // Callbacks
         internal event Action initedCallback;
+        internal event Action<bool> readyCallback;
         internal event Action<int> startCallback;
         internal event Action<PlayerState, PlayerState> overCallbacik;
         internal event Action<PlayerState> overCallbackA;
@@ -59,6 +60,22 @@ namespace toio.AI.meicu
         }
         #endregion
 
+
+        internal void InitGame(MeiQuest quest)
+        {
+            StopGame();
+
+            envP.Reset();
+            envA.Reset();
+
+            this.quest = quest;
+
+            envP.SetQuest(quest);
+            envA.SetQuest(quest);
+
+            initedCallback?.Invoke();
+        }
+
         internal void InitGame(int size = 0, bool keepQuest = false)
         {
             StopGame();
@@ -77,6 +94,11 @@ namespace toio.AI.meicu
             envA.SetQuest(quest);
 
             initedCallback?.Invoke();
+        }
+
+        internal void WaitReady()
+        {
+            StartCoroutine(IE_WaitReady());
         }
 
         internal void StartGame()
@@ -100,25 +122,29 @@ namespace toio.AI.meicu
             stopCallback?.Invoke();
         }
 
-        IEnumerator IE_Starting()
+        IEnumerator IE_WaitReady()
         {
-            // Wait for cubes
             while (true)
             {
-                Device.TargetMove(0, 4, 4, 10, -10);
-                Device.TargetMove(1, 4, 4, -10, 10);
+                var coordA = Device.ID2SpaceCoord(Device.cubes[1].x, Device.cubes[1].y);
+                if (coordA.x == 4 && coordA.y == 4 && !Device.cubes[0].isGrounded)
+                {
+                    readyCallback?.Invoke(true);
+                    break;
+                }
+                else
+                {
+                    readyCallback?.Invoke(false);
+                }
 
                 yield return new WaitForSecondsRealtime(0.5f);
 
-                var coordP = Device.ID2SpaceCoord(Device.cubeManager.cubes[0].x, Device.cubeManager.cubes[0].y);
-                var coordA = Device.ID2SpaceCoord(Device.cubeManager.cubes[1].x, Device.cubeManager.cubes[1].y);
-
-                if (coordP.x == 4 && coordP.y == 4 && coordA.x == 4 && coordA.y == 4)
-                    break;
-                else
-                    startCallback?.Invoke(99);
+                Device.TargetMove(1, 4, 4, -10, 10);
             }
+        }
 
+        IEnumerator IE_Starting()
+        {
             // Count Down
             for (int t = 3; t >0; t--)
             {

@@ -32,6 +32,7 @@ namespace toio.AI.meicu
                 uiBoard.Reset();
                 AIController.ins.heatmapCallback += OnHeatmapCallback;
                 game.initedCallback += OnGameInited;
+                game.readyCallback += OnGameReady;
                 game.startCallback += OnGameStarted;
                 game.overCallbacik += OnGameOver;
                 game.stepCallbackP += OnGameStepP;
@@ -45,9 +46,11 @@ namespace toio.AI.meicu
             }
             else
             {
+                StopAllCoroutines();
                 game.StopGame();
                 AIController.ins.heatmapCallback -= OnHeatmapCallback;
                 game.initedCallback -= OnGameInited;
+                game.readyCallback -= OnGameReady;
                 game.startCallback -= OnGameStarted;
                 game.overCallbacik -= OnGameOver;
                 game.stepCallbackP -= OnGameStepP;
@@ -147,7 +150,7 @@ namespace toio.AI.meicu
             AIController.ins.intervalEnd = st.intervalEnd;
 
             game.InitGame(lv.questSize);
-            game.StartGame();
+            game.WaitReady();
 
             UpdateStageText();
             UpdateHint();
@@ -166,23 +169,38 @@ namespace toio.AI.meicu
         {
         }
 
-        void OnGameStarted(int countDown)
+        void OnGameReady(bool ready)
         {
-            if (countDown > 10)
+            if (ready)
             {
-                text.text = "ゲーム開始中...\n\nキューブをスタートに置いてください。";
-            }
-            else if (countDown > 0)
-            {
+                text.text = "スタート位置にタッチするとゲーム始まるよ。";
                 uiBoard.ShowKomaA(new Vector2Int(4, 4));
                 uiBoard.ShowKomaP(new Vector2Int(4, 4));
+
+                IEnumerator Wait2Start()
+                {
+                    yield return new WaitUntil(() => Device.ID2SpaceCoord(Device.cubes[0].x, Device.cubes[0].y) == new Vector2Int(4, 4) && Device.cubes[0].isGrounded); // TODO move to PlayerCon
+                    game.StartGame();
+                }
+                StartCoroutine(Wait2Start());
+            }
+            else
+            {
+                text.text = "自分のキューブを手に持ってくださいね。";
+            }
+        }
+
+        void OnGameStarted(int countDown)
+        {
+            if (countDown > 0)
+            {
+                uiQuest.ShowQuest(game.quest);
+                uiBoard.ShowGoal(new Vector2Int(game.quest.goalRow, game.quest.goalCol));
                 text.text = $"ゲーム開始まで...\n\n{countDown}";
             }
             else if (countDown == 0)
             {
                 Debug.Log("Game Started");
-                uiQuest.ShowQuest(game.quest);
-                uiBoard.ShowGoal(new Vector2Int(game.quest.goalRow, game.quest.goalCol));
                 text.text = "ゲーム開始!";
             }
         }

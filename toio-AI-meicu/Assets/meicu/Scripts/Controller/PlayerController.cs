@@ -116,7 +116,7 @@ namespace toio.AI.meicu
 
         IEnumerator IE_ChantActionP()
         {
-            for (float t = 0; t < 2; t += 0.1f)
+            for (float t = 0; t < 1; t += 0.1f)
             {
                 yield return new WaitForSecondsRealtime(0.1f);
                 if (!isGameRunning || isPause)
@@ -125,7 +125,7 @@ namespace toio.AI.meicu
                     cube.TurnLedOff();
                     yield break;
                 }
-                int rgb = (int)(t/2*255);
+                int rgb = (int)(t/1*255);   //TODO
                 cube.TurnLedOn(rgb, rgb, rgb, 200, Cube.ORDER_TYPE.Weak);
             }
 
