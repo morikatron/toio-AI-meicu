@@ -107,11 +107,9 @@ namespace toio.AI.meicu
 
             btnConnect.GetComponent<ButtonConnect>().SetBusy(false);
 
-            if (Device.nConnected == 2)
+            if (Device.isBothConnected)
             {
                 // this.btnStart.interactable = true;
-                Device.cubes[0].TurnLedOn(200,200,200,0);   // Lighted Cube is Player
-
                 Device.cubeManager.handles[0].SetBorderRect(new RectInt(545, 45, 410, 410));
                 Device.cubeManager.handles[1].SetBorderRect(new RectInt(545, 45, 410, 410));
 

@@ -14,10 +14,12 @@ namespace toio.AI.meicu
         public UIQuest uiQuest;
         public Game game;
         public Text text;
+        public Text textPhase;
         public Button btnNext;
+        public Button btnDialog;
 
         int phase = 0;
-        bool AIMoved = false;
+        int dialog = 0;
 
 
         internal void SetActive(bool active)
@@ -26,7 +28,7 @@ namespace toio.AI.meicu
             ui.SetActive(active);
 
             phase = 0;
-            AIMoved = false;
+            dialog = 0;
 
             if (active)
             {
@@ -38,11 +40,14 @@ namespace toio.AI.meicu
                 game.overCallbackA += OnGameOverA;
                 game.stepCallbackP += OnGameStepP;
                 game.stepCallbackA += OnGameStepA;
-                game.InitGame(3);
+
+                PlayerController.ins.isPause = true;
+                AIController.ins.isPause = true;
+
+                InitGame();
 
                 MeiPrefs.SetTutorialCleared();  // TODO
-                AIController.ins.LoadBestModel();
-                RefreshUI();
+                Refresh();
             }
             else
             {
@@ -53,12 +58,28 @@ namespace toio.AI.meicu
                 game.overCallbackA -= OnGameOverA;
                 game.stepCallbackP -= OnGameStepP;
                 game.stepCallbackA -= OnGameStepA;
+
+                PlayerController.ins.isPause = false;
+                AIController.ins.isPause = false;
             }
         }
 
         public void OnBtnNext()
         {
             NextPhase();
+        }
+
+        public void OnBtnDialogNext()
+        {
+            NextDialog();
+        }
+
+
+        void InitGame()
+        {
+            Env.Space[] colors = {Env.Space.G, Env.Space.G, Env.Space.B};
+            MeiQuest quest = new MeiQuest(4, 4, colors, 3, 6, null);
+            game.InitGame(quest);
         }
 
 
@@ -74,17 +95,23 @@ namespace toio.AI.meicu
         void OnGameStarted(int countDown)
         {
             if (countDown == 0)
-                RefreshUI();
+                Refresh();
         }
 
         void OnGameOverP(Game.PlayerState state)
         {
-            RefreshUI();
+            if (state == Game.PlayerState.Success)
+                dialog = 6;
+            else if (state == Game.PlayerState.Fail)
+            {
+                dialog = 5;
+                PlayerController.ins.isPause = true;
+            }
+            Refresh();
         }
 
         void OnGameOverA(Game.PlayerState state)
         {
-            RefreshUI();
         }
 
         void OnGameStepP(Env.Response res)
@@ -95,7 +122,20 @@ namespace toio.AI.meicu
             uiBoard.ShowKomaP(pos);
             uiQuest.ShowP(traj.Length);
 
-            RefreshUI();
+            if (dialog == 3)
+            {
+                if (traj.Length == 4)
+                {
+                    if (pos == new Vector2Int(2,6) || pos == new Vector2Int(3,7))
+                        dialog = 4;
+                    else
+                    {
+                        dialog = 5;
+                        PlayerController.ins.isPause = true;
+                    }
+                }
+                Refresh();
+            }
         }
 
         void OnGameStepA(Env.Response res)
@@ -105,16 +145,6 @@ namespace toio.AI.meicu
             uiBoard.ShowTrajA(traj);
             uiBoard.ShowKomaA(pos);
             uiQuest.ShowA(traj.Length);
-
-            if (phase == 3 && traj.Length == 4 ||
-                res == Env.Response.FailWrong ||
-                res == Env.Response.FailOut ||
-                res == Env.Response.FailPassed
-            ){
-                AIMoved = true;
-                AIController.ins.isPause = true;
-                RefreshUI();
-            }
         }
         #endregion
 
@@ -124,96 +154,154 @@ namespace toio.AI.meicu
             if (phase == 0)
             {
                 game.StartGame();
-                PlayerController.ins.isPause = true;
-                AIController.ins.isPause = true;
                 phase = 1;
+                dialog = 0;
             }
             else if (phase == 1)
             {
-                PlayerController.ins.isPause = true;
-                AIController.ins.isPause = true;
-                phase = 2;
-            }
-            else if (phase == 2)
-            {
-                PlayerController.ins.isPause = true;
-                AIController.ins.isPause = false;
-                phase = 3;
-            }
-            else if (phase == 3)
-            {
-                PlayerController.ins.isPause = true;
-                PlayerController.ins.isPause = false;
-                phase = 4;
-            }
-            else if (phase == 4)
-            {
-                if (game.stateP == Game.PlayerState.Fail)
-                {
-                    game.RetryP();
-                }
-                else if (game.stateP == Game.PlayerState.Success)
-                {
-                    game.StopGame();
-                    PageManager.SetPage(PageManager.EPage.Title);
-                }
+                PageManager.SetPage(PageManager.EPage.Title);
             }
 
-            RefreshUI();
+            Refresh();
         }
 
-        void RefreshUI()
+        void NextDialog()
         {
             if (phase == 0)
             {
-                text.text = "中央のマスが「スタート」で、\n旗が「ゴール」です。\n\nお題の色順通りにゴールする\nのが目標です。\n\n同じマスには1回しか入れない。";
+                dialog ++;
             }
             else if (phase == 1)
             {
-                if (!game.inGame)
+                if (dialog < 2)
                 {
-                    text.text = "2つのCubeをスタートに置かれてからゲームが開始します。";
-                    btnNext.interactable = false;
+                    dialog ++;
                 }
-                else
+                else if (dialog == 2)
                 {
-                    text.text = "2つのCubeをスタートに置かれてからゲームが開始します。";
+                    dialog = 3;
+                    PlayerController.ins.isPause = false;
+                }
+                else if (dialog == 5)
+                {
+                    dialog = 3;
+                    PlayerController.ins.isPause = false;
+                    game.RetryP();
+                    uiBoard.ShowKomaP(4, 4);
+                    uiBoard.HideTrajP();
+                    uiQuest.ShowP(0);
+                }
+            }
+
+            Refresh();
+        }
+
+        void Refresh()
+        {
+            StopAllCoroutines();
+            StartCoroutine(IE_Refresh());
+        }
+
+        IEnumerator IE_Refresh()
+        {
+            btnDialog.gameObject.SetActive(false);
+            btnNext.interactable = false;
+
+            if (phase == 0)
+            {
+                textPhase.text = "1. ゲームの紹介";
+
+                if (dialog == 0)
+                {
+                    text.text = "このゲームは、どちらが早くゴールにたどりつけるかのゲームだよ！";
+                    btnDialog.gameObject.SetActive(true);
+                }
+                else if (dialog == 1)
+                {
+                    text.text = "真ん中のマスが「スタート」、はたのマスが「ゴール」で…";    // TODO はた?
+                    // TODO 明示
+                    btnDialog.gameObject.SetActive(true);
+                }
+                else if (dialog == 2)
+                {
+                    text.text = "指定された色を順番に通ってゴールするのがルールだよ！";
+                    // TODO 明示
+                    btnDialog.gameObject.SetActive(true);
+                }
+                else if (dialog == 3)
+                {
+                    text.text = "スタートからゴールまでの道は、1つとはかぎらないよ。";
+                    // TODO 明示
+                    btnDialog.gameObject.SetActive(true);
+                }
+                else if (dialog == 4)
+                {
+                    text.text = "また、同じマスは2度通ってはダメだから注意してね！";
+                    // TODO 明示
                     btnNext.interactable = true;
                 }
             }
-            else if (phase == 2)
+            else if (phase == 1)
             {
-                text.text = "まず私の動きを見な。\n\n※念の為自分のCube（白く点灯している方）を手に持っていてください。";
-            }
-            else if (phase == 3)
-            {
-                if (!AIMoved)
+                textPhase.text = "2. あそび方の紹介";
+
+                if (dialog == 0)
                 {
-                    text.text = "......";
-                    btnNext.interactable = false;
+                    text.text = "それでは、まずは僕が動きながら説明するね。オレンジ色のキューブが僕だよ。";
+                    btnDialog.gameObject.SetActive(true);
                 }
-                else
+                else if (dialog == 1)
                 {
-                    text.text = "...あと少しだけど、\n君に譲ってあげるよ。";
-                    btnNext.interactable = true;
+                    text.text = "青色がキミのキューブだけど、今はいったん手に持っておいてね。";
+                    yield return new WaitUntil(()=>!Device.cubes[0].isGrounded);
+                    yield return new WaitForSecondsRealtime(0.5f);
+                    btnDialog.gameObject.SetActive(true);
+                    AIController.ins.Move2Center();
                 }
-            }
-            else if (phase == 4)
-            {
-                if (game.stateP == Game.PlayerState.InGame)
+                else if (dialog == 2)
                 {
-                    text.text = "行きたいマスにCubeを2秒間タッチさせてください。\n\n";
-                    btnNext.interactable = false;
+                    text.text = "まずは（みどり）";
+                    AIController.ins.RequestMove((Env.Action)1);    // right
+                    yield return new WaitUntil(()=>!AIController.ins.isMoving);
+                    yield return new WaitForSecondsRealtime(1f);
+
+                    text.text = "つぎは（しろ）...";
+                    AIController.ins.RequestMove((Env.Action)1);    // right
+                    yield return new WaitUntil(()=>!AIController.ins.isMoving);
+                    yield return new WaitForSecondsRealtime(1f);
+
+                    text.text = "つぎは（みどり）...";
+                    AIController.ins.RequestMove((Env.Action)1);    // right
+                    yield return new WaitUntil(()=>!AIController.ins.isMoving);
+                    yield return new WaitForSecondsRealtime(1f);
+
+                    text.text = "また（しろ）...";
+                    AIController.ins.RequestMove((Env.Action)0);    // up
+                    yield return new WaitUntil(()=>!AIController.ins.isMoving);
+                    yield return new WaitForSecondsRealtime(1f);
+
+                    text.text = "つぎの（あお）でゴールだけど、僕はここで待ってるから、キミも同じようにキューブを動かしてみて！";
+                    yield return new WaitForSecondsRealtime(0.1f);
+
+                    btnDialog.gameObject.SetActive(true);
                 }
-                else if (game.stateP == Game.PlayerState.Success)
+                else if (dialog == 3)
                 {
-                    text.text = "よくやりました~\n\n卒業です。";
-                    btnNext.interactable = true;
+                    text.text = "あなたのキューブでマットをタッチしてみよう！\n マットには1秒以上タッチしてください。成功すると音が鳴ります。";
+                }
+                else if (dialog == 4)
+                {
+                    text.text = "よし！じゃぁゴールしてみて！";
+                }
+                else if (dialog == 5)
+                {
+                    text.text = "あれれ？僕の動きをよく見て。もう一度最初からやってみるね。";
+                    btnDialog.gameObject.SetActive(true);
+                }
+                else if (dialog == 6)
+                {
+                    text.text = "ゴール！\n問題の色の順番通りにゴールまでの道を探す、というルールが分かったかな？\n「バトル」では僕も本気でたたかうからね！";
                     MeiPrefs.SetTutorialCleared();
-                }
-                else if (game.stateP == Game.PlayerState.Fail)
-                {
-                    text.text = "残念、やり直しです。";
                     btnNext.interactable = true;
                 }
             }

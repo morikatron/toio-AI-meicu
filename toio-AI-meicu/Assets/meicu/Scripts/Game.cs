@@ -165,12 +165,11 @@ namespace toio.AI.meicu
         internal void RetryP()
         {
             if (!inGame) return;
-            if (stateP != PlayerState.Fail) return;
+            // if (stateP != PlayerState.Fail) return;
 
             stateP = PlayerState.InGame;
             trajP.Clear();
             envP.Reset();
-            Device.TargetMove(0, 4, 4, 10, -10);
 
             retryCallbackP?.Invoke();
         }
@@ -271,7 +270,6 @@ namespace toio.AI.meicu
         IEnumerator IE_Fail(int idx)
         {
             Device.cubes[idx].Move(20, -20, 1500, Cube.ORDER_TYPE.Strong);
-            Device.cubes[idx].TurnLedOn(255, 55, 55, 1500);
             Device.cubes[idx].PlayPresetSound(2);
             yield break;
         }
@@ -279,9 +277,7 @@ namespace toio.AI.meicu
         IEnumerator IE_Success(int idx)
         {
             yield return new WaitForSecondsRealtime(0.7f);
-            Device.cubes[idx].TurnLedOn(55, 255, 55, 1500);
             Device.cubes[1-idx].Move(20, -20, 1500, Cube.ORDER_TYPE.Strong);
-            Device.cubes[1-idx].TurnLedOn(255, 55, 55, 1500);
             for (int i=0; i<4; i++)
             {
                 Device.cubes[idx].Move(30, 30, 400, Cube.ORDER_TYPE.Strong);

@@ -11,6 +11,9 @@ namespace toio.AI.meicu
 
     public class Device
     {
+        public static readonly Color32 Orange = new Color32(255, 74, 11, 255);
+        public static readonly Color32 Blue = new Color32(102, 107, 255, 255);
+
         static internal Action<int, bool> connectionCallback;
 
         static CubeManager _cubeManager;
@@ -18,7 +21,7 @@ namespace toio.AI.meicu
         {
             get {
                 if (_cubeManager == null)
-                    _cubeManager = new CubeManager(ConnectType.Real);
+                    _cubeManager = new CubeManager(ConnectType.Auto);
                 return _cubeManager;
             }
         }
@@ -43,9 +46,20 @@ namespace toio.AI.meicu
         internal static async UniTask Connect()
         {
             var cube = await cubeManager.SingleConnect();
+            var cubeIdx = cubeManager.cubes.FindIndex(c => c == cube);
+
+            if (cubeIdx == 0)
+            {
+                cube.TurnLedOn(Blue.r, Blue.g, Blue.b, 0);
+            }
+            else
+            {
+                cube.TurnLedOn(Orange.r, Orange.g, Orange.b, 0);
+            }
+
+            // Set Disconnection Callback
             if (cube is CubeReal)
             {
-                var cubeIdx = cubeManager.cubes.FindIndex(c => c == cube);
                 (cube as CubeReal).peripheral.AddConnectionListener(
                     "meicu.Device",
                     peri => connectionCallback?.Invoke(cubeIdx, peri.isConnected));
@@ -58,6 +72,7 @@ namespace toio.AI.meicu
             var pos = SpaceCoords2ID(row, col);
             cubeManager.cubes[idx].TargetMove(
                 pos.x, pos.y, 0,
+                timeOut: 2,
                 targetMoveType:Cube.TargetMoveType.RoundBeforeMove,
                 targetRotationType:Cube.TargetRotationType.NotRotate);
             return true;

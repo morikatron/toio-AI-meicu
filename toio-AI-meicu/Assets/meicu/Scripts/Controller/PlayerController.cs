@@ -125,8 +125,8 @@ namespace toio.AI.meicu
                     cube.TurnLedOff();
                     yield break;
                 }
-                int rgb = (int)(t/1*255);   //TODO
-                cube.TurnLedOn(rgb, rgb, rgb, 200, Cube.ORDER_TYPE.Weak);
+                Cube.SoundOperation sound = new Cube.SoundOperation(100, 100, (byte)(50+t*10));
+                cube.PlaySound(1, new Cube.SoundOperation[]{sound}, Cube.ORDER_TYPE.Weak);
             }
 
             game.MoveP(candidateActionP);

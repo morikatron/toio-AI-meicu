@@ -23,7 +23,15 @@ namespace toio.AI.meicu
             button.GetComponent<ButtonConnect>().SetBusy(false);
 
             if (Device.isBothConnected)
+            {
+                // this.btnStart.interactable = true;
+                Device.cubeManager.handles[0].SetBorderRect(new RectInt(545, 45, 410, 410));
+                Device.cubeManager.handles[1].SetBorderRect(new RectInt(545, 45, 410, 410));
+                PlayerController.ins.Init();
+                AIController.ins.Init();
+
                 PageManager.OnReconnected();
+            }
 
             button.interactable = true;
         }

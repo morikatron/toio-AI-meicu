@@ -22,8 +22,9 @@ namespace toio.AI.meicu
         internal float intervalBegin = 3f;
         internal float intervalEnd = 1f;
         internal ref readonly float[,] Heatmap => ref heatmap;
+        internal bool isMoving { get; private set; } = false;
 
-        Cube cube;
+        Cube cube { get { return Device.cubes.Count>1? Device.cubes[1]:null; } }
         bool isActReceived = false;
         Env.Action action;
         Vector2Int targetCoords;
@@ -52,12 +53,16 @@ namespace toio.AI.meicu
 
         internal void Init()
         {
-            if (Device.cubes.Count >= 2)
+            if (Device.isCube1Connected)
             {
-                cube = Device.cubes[1];
                 cube.idCallback.AddListener("A", OnID);
                 cube.idMissedCallback.AddListener("A", OnIDMissed);
             }
+        }
+
+        internal void Move2Center()
+        {
+            Device.TargetMove(1, 4, 4, -10, 10);
         }
 
         internal void LoadModelByLevel(int lv)
@@ -67,6 +72,15 @@ namespace toio.AI.meicu
         internal void LoadBestModel()
         {
             agent.LoadModelByName(Config.bestModelName);
+        }
+
+        internal void RequestMove(Env.Action action)
+        {
+            this.action = action;
+            (var r, var c) = Env.Translate(this.action, game.envA.row, game.envA.col);
+            this.targetCoords = new Vector2Int(r, c);
+
+            StartCoroutine(IE_Move());
         }
 
         IEnumerator IE_Think()
@@ -88,7 +102,7 @@ namespace toio.AI.meicu
                 this.heatmapCallback?.Invoke();
                 this.isPredicting = false;
 
-                // Interval
+                // Interval - simulate time of thinking
                 var interval = (float) game.envA.passedColorSpaceCnt / game.envA.quest.Length;
                 interval = interval * intervalEnd + (1-interval) * intervalBegin;
                 yield return new WaitForSecondsRealtime(interval);
@@ -98,28 +112,32 @@ namespace toio.AI.meicu
                 this.isActReceived = false;
                 agent.RequestAct(game.envA);
                 yield return new WaitUntil(()=>isActReceived);
-                yield return new WaitForSecondsRealtime(0.1f);
+                yield return new WaitForEndOfFrame();
                 if (isPause) continue;
 
-                // Wait Cube to Arrive
-                while (true)
-                {
-                    var coord = Device.ID2SpaceCoord(cube.x, cube.y);
-                    if (coord == targetCoords)
-                        break;
-                    else
-                    {
-                        MoveCube();
-                        yield return new WaitForSecondsRealtime(0.5f);
-                    }
-                }
-                yield return new WaitForSecondsRealtime(0.5f);
-                if (isPause) continue;
+                yield return new WaitUntil(()=>isMoving);
+            }
+        }
 
-                // Apply Step to game
-                game.MoveA(action);
+        IEnumerator IE_Move()
+        {
+            while (isMoving);
+            isMoving = true;
+
+            // Wait Cube to Arrive
+            while (Device.ID2SpaceCoord(cube.x, cube.y) != targetCoords)
+            {
+                yield return new WaitUntil(()=>cube.isConnected);
+
+                Device.TargetMove(1, targetCoords.x, targetCoords.y, -10, 10);
+
                 yield return new WaitForSecondsRealtime(0.5f);
             }
+            yield return new WaitForSecondsRealtime(1f);
+
+            // Apply Step to game
+            game.MoveA(action);
+            isMoving = false;
         }
 
         IEnumerator IE_PredictHeatmap(Env env, int maxSteps=6, float parentProb=1, int step=0)
@@ -226,18 +244,7 @@ namespace toio.AI.meicu
             this.isActReceived = true;
 
             if (!isPredicting)
-            {
-                this.action = action;
-                (var r, var c) = Env.Translate(this.action, game.envA.row, game.envA.col);
-                this.targetCoords = new Vector2Int(r, c);
-                MoveCube();
-            }
-        }
-
-        void MoveCube()
-        {
-            if (Device.cubes.Count < 2) return;
-            Device.TargetMove(1, targetCoords.x, targetCoords.y, -10, 10);
+                RequestMove(action);
         }
 
         void ClearHeatmap()
