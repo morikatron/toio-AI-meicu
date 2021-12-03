@@ -38,7 +38,6 @@ namespace toio.AI.meicu
         {
             var scaler = GameObject.Find("Canvas").GetComponent<CanvasScaler>();
             float canvasScale = Screen.height / scaler.referenceResolution.y;
-            Debug.Log(canvasScale);
             ins.gameObject.SetActive(true);
             (ins.transform as RectTransform).position = tr.position + new Vector3(biasX*canvasScale, biasY*canvasScale, 0);
         }
