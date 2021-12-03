@@ -64,13 +64,12 @@ namespace toio.AI.meicu
 
         public void OnBtnNext()
         {
-            phase ++;
-
-            if (phase > 12)
+            if (phase == 14)
             {
                 PageManager.OnBtnHome();
                 return;
             }
+            phase ++;
 
             Refresh();
         }
@@ -98,10 +97,11 @@ namespace toio.AI.meicu
         IEnumerator IE_Refresh()
         {
             btnNext.interactable = false;
+            btnBack.interactable = false;
 
             if (phase == 0)
             {
-                text.text = "私の「考え方」とそれをどう「学習」したかを教えるね。";
+                text.text = "僕が迷路をどう解いているのか、「AIの考え方」と「AIがどう学習したか」を教えるね。";
                 btnBack.gameObject.SetActive(false);
                 btnHint.gameObject.SetActive(false);
                 ui.transform.Find("ImgThink").gameObject.SetActive(false);
@@ -109,20 +109,20 @@ namespace toio.AI.meicu
             }
             else if (phase == 1)
             {
-                text.text = "私はお題と自分の位置などを見て、上下左右のどちらかに移動する。";
+                text.text = "僕は自分の位置と問題を見て、まずは上下左右のどこかに移動してみるんだ。";
                 btnBack.gameObject.SetActive(true);
                 yield return new WaitForSecondsRealtime(0.5f);
             }
             else if (phase == 2)
             {
-                text.text = "しかし私は人間が言う「お題」の意味も「色」の意味もわからないので、最初は適当に動くだけ。";
+                text.text = "でも僕は、最初は「色」も「問題の意味」も分からないので、てきとうに動いてみるだけなんだ。";
                 uiQuest.Reset();
                 uiBoard.Reset();
                 yield return new WaitForSecondsRealtime(0.5f);
             }
             else if (phase == 3)
             {
-                text.text = "例えばこの場合、人間は上の色がお題に合っているのがわかるが、私にはわからないので、上下左右にどちらにも動く可能性がある。";
+                text.text = "例えばこの問題の場合、キミはひとめ見ただけで、上の赤色に行けばいいかなと分かるでしょ？だから「まずはコッチかな？」って考えて動かしてみることができる。";
                 quest = new MeiQuest(4, 4, new Env.Space[]{Env.Space.R}, 3, 4);
                 uiQuest.ShowQuest(quest);
                 uiQuest.ShowA(0);
@@ -134,7 +134,7 @@ namespace toio.AI.meicu
             }
             else if (phase == 4)
             {
-                text.text = "移動するマスの可能性を明るさで表すと、こんな感じ。";
+                text.text = "でも僕はわからないので、上下左右のどこにも動く可能性がある。僕の動く可能性があるところは、明るさで表すとこんな感じ。どこもいっしょだね。";
                 float[,] heatmap = new float[9, 9];
                 heatmap[3, 4] = 0.25f; heatmap[5, 4] = 0.25f; heatmap[4, 3] = 0.25f; heatmap[4, 5] = 0.25f;
                 uiBoard.ShowHeatmap(heatmap);
@@ -144,25 +144,26 @@ namespace toio.AI.meicu
 
             else if (phase == 5)
             {
-                text.text = "たまたま上に動いてゴールした場合、ゲームから報酬を得て「上」が正しいとわかり、「上」をもっと選ぶようにするのだ。";
+                text.text = "そして、ぐうぜん「上」に動いた結果ゴールする事ができたら、「どうやら上が正しいみたいだぞ」って思うんだ。そうすると、最初に「上」に動くことをどんどん選ぶようになっていくんだ。";
                 yield return new WaitForSecondsRealtime(0.5f);
             }
             else if (phase == 6)
             {
-                text.text = "この過程は「試行錯誤」といい、何回も繰り返される。\n\n仮に100回動かしてみよう。";
+                text.text = "これを「試行錯誤（しこうさくご）」って言うんだ。じっさいに100回やってみるね！";
                 yield return new WaitForSecondsRealtime(0.5f);
             }
             else if (phase == 7)
             {
                 float[,] heatmap = new float[9, 9];
                 float[] probs = new float[4];
-                for (int i = 0; i < 4; i++) probs[i] = 0.25f;
+                for (int i = 0; i < 4; i++) probs[i] = 0.25f;   // initial uniform prob dist.
+
+                // Learning Iteration
                 for (int t = 0; t < 100; t++)
                 {
-                    // float interval = 1;
                     float interval = Mathf.Max( 1-(1f/15f)*Mathf.Min(15f, t) , 0.05f);
 
-                    text.text = $"試行 {t+1} 回目\n\n\n";
+                    text.text = $"試行 {t+1} 回目\n\n\n\n";
 
                     // Restart
                     uiBoard.HideTrajA();
@@ -171,15 +172,21 @@ namespace toio.AI.meicu
                     uiBoard.ShowHeatmap(heatmap);
                     yield return new WaitForSecondsRealtime(interval);
 
-                    // Step
+                    // Sample action
                     var action = SampleIdx(probs);
+                    if (t == 0) action = 0;
+                    if (t == 1) action = Random.Range(1, 3);
+
+                    // Env step
                     (var r, var c) = Env.Translate((Env.Action)action, 4, 4);
                     var pos = new Vector2Int(r, c);
+
+                    // Update GUI
                     uiBoard.ShowKomaA(pos);
                     uiBoard.ShowTrajA(new Vector2Int[]{pos});
 
-                    // goal
-                    if (r == 3 && c == 4)
+                    // Learn
+                    if (r == 3 && c == 4)   // Goal
                     {
                         uiQuest.ShowA(1);
                         for (int a = 0; a < 4; a++)
@@ -187,45 +194,54 @@ namespace toio.AI.meicu
                             if (a == action) probs[a] += 0.009f;
                             else probs[a] -= 0.003f;
                         }
-                        text.text = $"試行 {t+1} 回目\n\nゴール成功\n「上」の可能性  UP ";
+
+                        // Update text
+                        if (t < 2)
+                        {
+                            text.text = $"試行 {t+1} 回目\n\n「上」に行ってみたらゴールに成功したね。この時にAIは「上に行けばゴールの可能性がアップする」と学習するんだ。";
+                            interval += 2;
+                        }
+                        else
+                        {
+                            text.text = $"試行 {t+1} 回目\n\nゴール成功\n「上」の可能性  アップ";
+                        }
                     }
-                    else
+                    else    // Fail
                     {
                         for (int a = 0; a < 4; a++)
                         {
                             if (a == action) probs[a] -= 0.009f;
                             else probs[a] += 0.003f;
                         }
+
+                        // Update text
                         string actionStr = "";
                         if (action == 1) actionStr = "右";
                         if (action == 2) actionStr = "下";
                         if (action == 3) actionStr = "左";
-                        text.text = $"試行 {t+1} 回目\n\nゴール失敗\n「{actionStr}」の可能性 DOWN";
+                        if (t < 2)
+                        {
+                            text.text = $"試行 {t+1} 回目\n\n「{actionStr}」に行ってみたら今度はゴールに失敗したね。この時にAIは「左に行くとゴールの可能性がダウンする」と学習するんだ。";
+                            interval += 2;
+                        }
+                        else
+                        {
+                            text.text = $"試行 {t+1} 回目\n\nゴール失敗\n「{actionStr}」の可能性 DOWN";
+                        }
                     }
+
                     yield return new WaitForSecondsRealtime(interval);
                 }
-                text.text = "「上」のマスが明るくなってきたね。\n（「上」を選ぶ可能性が高くなってきた）";
+                text.text = "ほら「上」のマスが明るくなってきたでしょ？これは僕がまず「上のマスに移動するのが良さそうだ」ってわかってきたって事なんだ。";
+                yield return new WaitForSecondsRealtime(1f);
             }
             else if (phase == 8)
             {
-                text.text = "今は一つだけのお題の正しい動きを学習したが、実際は任意の問題に学習していくのだ。";
-                for (int i = 0; i < 10; i++)
-                {
-                    quest = Env.GenerateQuest(Random.Range(2, 5));
-                    uiBoard.ShowGoal(quest.goalRow, quest.goalCol);
-                    uiBoard.ShowKomaA(4, 4);
-                    uiBoard.HideTrajA();
-                    uiBoard.HideHeatmap();
-                    uiQuest.ShowQuest(quest);
-                    yield return new WaitForSecondsRealtime(0.5f);
-
-                    if (i == 3)
-                        btnNext.interactable = true;
-                }
+                text.text = "今は最初の一歩だけ見せたけど、じっさいはこの先も一歩一歩、同じようにうまくいくかどうかをためしてるんだ。";
             }
             else if (phase == 9)
             {
-                text.text = "次の１手の可能性は上下左右の４つしかないが、数手先の可能性考えていくと、路線が浮かぶね。";
+                text.text = "こうして、少しづつ先の「選ぶマス」の可能性を考えてゆくと、だんだん道が浮かび上がってきたでしょ？";
                 Env env = new Env();
                 env.Reset(4, 4);
                 uiBoard.ShowKomaA(4, 4);
@@ -259,29 +275,44 @@ namespace toio.AI.meicu
                     yield return new WaitForSecondsRealtime(1f);
 
                     if (i == 3)
+                    {
                         btnNext.interactable = true;
+                        btnBack.interactable = true;
+                    }
                 }
             }
             else if (phase == 10)
             {
-                text.text = "これが私たち（ＡＩ)の学習の仕方です。みんな(人間)の考え方と似てるところあるでしょ？";
+                text.text = "僕たちAI（エーアイ）はコンピュータだから、最初からゴールまでの道を知っているんじゃないかって思うかもしれないけど、実は一歩一歩コツコツと、何度も失敗して繰り返して、そしてやっと正解を見つけるんだ。なんだかキミたち人間と似てるでしょ？";
                 btnHint.gameObject.SetActive(false);
                 yield return new WaitForSecondsRealtime(0.5f);
             }
             else if (phase == 11)
             {
-                text.text = "ちなみにゲーム中は右上の「ヒント」ボタンを押すと、私の考えを覗けるよ。";
-                btnHint.gameObject.SetActive(true);
+                text.text = "僕たちAIは、何度も繰り返して学習すればするほど強くなっていくんだ。でもサボって学習しなければ弱いまま…これもキミたちと似ているね！";
                 yield return new WaitForSecondsRealtime(0.5f);
             }
             else if (phase == 12)
             {
-                text.text = "解説は以上。\n\n一緒にバトルしよ。";
+                text.text = "ちなみに、僕が今どんな道を考えているか、「ヒント」ボタンを押すとこっそり見ることができるよ！";
+                btnHint.gameObject.SetActive(true);
                 yield return new WaitForSecondsRealtime(0.5f);
+            }
+            else if (phase == 13)
+            {
+                text.text = "最初のころの僕はまだ弱いから…間違ってたり、道がなかなか見えなかったりするけどね！";
+                yield return new WaitForSecondsRealtime(0.5f);
+            }
+            else if (phase == 14)
+            {
+                text.text = "迷路バトルで僕に勝っていったら…どんどん強い、たくさん学習した僕と戦えるから、頑張ってみて！";
+                yield return new WaitForSecondsRealtime(0.5f);
+                btnNext.interactable = true;
+                yield break;
             }
 
             btnNext.interactable = true;
-            yield break;
+            btnBack.interactable = true;
         }
 
         static int SampleIdx(float[] probs)
