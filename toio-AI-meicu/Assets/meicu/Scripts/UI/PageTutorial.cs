@@ -16,7 +16,6 @@ namespace toio.AI.meicu
         public Text text;
         public Text textPhase;
         public Button btnNext;
-        public Button btnDialog;
 
         int phase = 0;
         int dialog = 0;
@@ -216,7 +215,6 @@ namespace toio.AI.meicu
 
         IEnumerator IE_Refresh()
         {
-            btnDialog.gameObject.SetActive(false);
             btnNext.interactable = false;
 
             if (phase == 0)
@@ -226,25 +224,21 @@ namespace toio.AI.meicu
                 if (dialog == 0)
                 {
                     text.text = "このゲームは、どちらが早くゴールにたどりつけるかのゲームだよ！";
-                    btnDialog.gameObject.SetActive(true);
                 }
                 else if (dialog == 1)
                 {
                     text.text = "真ん中のマスが「スタート」、はたのマスが「ゴール」で…";    // TODO はた?
                     // TODO 明示
-                    btnDialog.gameObject.SetActive(true);
                 }
                 else if (dialog == 2)
                 {
                     text.text = "指定された色を順番に通ってゴールするのがルールだよ！";
                     // TODO 明示
-                    btnDialog.gameObject.SetActive(true);
                 }
                 else if (dialog == 3)
                 {
                     text.text = "スタートからゴールまでの道は、1つとはかぎらないよ。";
                     // TODO 明示
-                    btnDialog.gameObject.SetActive(true);
                 }
                 else if (dialog == 4)
                 {
@@ -260,14 +254,12 @@ namespace toio.AI.meicu
                 if (dialog == 0)
                 {
                     text.text = "それでは、まずは僕が動きながら説明するね。オレンジ色のキューブが僕だよ。";
-                    btnDialog.gameObject.SetActive(true);
                 }
                 else if (dialog == 1)
                 {
                     text.text = "青色がキミのキューブだけど、今はいったん手に持っておいてね。";
                     yield return new WaitUntil(()=>!Device.cubes[0].isGrounded);
                     yield return new WaitForSecondsRealtime(0.5f);
-                    btnDialog.gameObject.SetActive(true);
                     AIController.ins.Move2Center();
                 }
                 else if (dialog == 2)
@@ -295,7 +287,6 @@ namespace toio.AI.meicu
                     text.text = "つぎの（あお）でゴールだけど、僕はここで待ってるから、キミも同じようにキューブを動かしてみて！";
                     yield return new WaitForSecondsRealtime(0.1f);
 
-                    btnDialog.gameObject.SetActive(true);
                 }
                 else if (dialog == 3)
                 {
@@ -308,7 +299,6 @@ namespace toio.AI.meicu
                 else if (dialog == 5)
                 {
                     text.text = "あれれ？僕の動きをよく見て。もう一度最初からやってみるね。";
-                    btnDialog.gameObject.SetActive(true);
                 }
                 else if (dialog == 6)
                 {

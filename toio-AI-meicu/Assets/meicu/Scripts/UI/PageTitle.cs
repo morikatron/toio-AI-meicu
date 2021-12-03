@@ -37,9 +37,8 @@ namespace toio.AI.meicu
                 btnBattle.interactable = false;
                 btnLearn.interactable = true;   // TODO
 
-                btnConnect.GetComponent<ButtonBlink>()?.Blink(true);
-                btnTutorial.GetComponent<ButtonBlink>()?.Blink(false);
-                btnLearn.GetComponent<ButtonBlink>()?.Blink(false);
+                // if (!MeiPrefs.isTutorialCleared)
+                    UIFinger.PointAt(btnConnect.transform, biasX:70);
 
                 text.text = "左上のCONNECT（コネクト）ボタンからキューブを接続してね！";
             }
@@ -50,16 +49,15 @@ namespace toio.AI.meicu
                 btnBattle.interactable = false;
                 btnLearn.interactable = true;   // TODO
 
-                btnConnect.GetComponent<ButtonBlink>()?.Blink(true);
-                btnTutorial.GetComponent<ButtonBlink>()?.Blink(false);
-                btnLearn.GetComponent<ButtonBlink>()?.Blink(false);
+                // if (!MeiPrefs.isTutorialCleared)
+                    UIFinger.PointAt(btnConnect.transform, biasX:70);
 
                 text.text = "もう1つ接続してね！";
             }
             else if (Device.nConnected == 2)
             {
                 btnConnect.interactable = false;
-                btnConnect.GetComponent<ButtonBlink>()?.Blink(false);
+                UIFinger.Hide();
 
                 if (!MeiPrefs.isTutorialCleared)
                 {
@@ -67,8 +65,7 @@ namespace toio.AI.meicu
                     btnBattle.interactable = false;
                     btnLearn.interactable = false;
 
-                    btnTutorial.GetComponent<ButtonBlink>()?.Blink(true);
-                    btnLearn.GetComponent<ButtonBlink>()?.Blink(false);
+                    UIFinger.PointAt(btnTutorial.transform, biasX:130);
 
                     text.text = "まずは迷路パズルのルールを説明するよ！";
                 }
@@ -78,8 +75,7 @@ namespace toio.AI.meicu
                     btnBattle.interactable = false;
                     btnLearn.interactable = true;
 
-                    btnTutorial.GetComponent<ButtonBlink>()?.Blink(false);
-                    btnLearn.GetComponent<ButtonBlink>()?.Blink(true);
+                    UIFinger.PointAt(btnLearn.transform, biasX:130);
 
                     text.text = "僕たちAIロボットが迷路パズルをどのように解いているのか、かいせつするよ！";
                 }
@@ -89,9 +85,6 @@ namespace toio.AI.meicu
                     btnBattle.interactable = true;
                     btnLearn.interactable = true;
 
-                    btnTutorial.GetComponent<ButtonBlink>()?.Blink(false);
-                    btnLearn.GetComponent<ButtonBlink>()?.Blink(false);
-
                     text.text = "では、一緒にあそぼう~";
                 }
             }
@@ -100,7 +93,6 @@ namespace toio.AI.meicu
         public async void OnBtnConnect()
         {
             btnConnect.interactable = false;
-            btnConnect.GetComponent<ButtonBlink>()?.Blink(false);
             btnConnect.GetComponent<ButtonConnect>().SetBusy(true);
 
             await Device.Connect();

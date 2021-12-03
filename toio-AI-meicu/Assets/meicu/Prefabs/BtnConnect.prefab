@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 507261835571040809}
   - component: {fileID: 507261835571040808}
   - component: {fileID: 553918074987886915}
-  - component: {fileID: 876488578146649815}
   m_Layer: 5
   m_Name: BtnConnect
   m_TagString: Untagged
@@ -150,21 +149,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mask: {fileID: 507261835982060992}
   busy: {fileID: 507261835838090802}
---- !u!114 &876488578146649815
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 507261835571040814}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1a1db2ae4f351c45bc93539dd3534b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  period: 1
-  maxValue: 255
-  minValue: 200
 --- !u!1 &507261835838090801
 GameObject:
   m_ObjectHideFlags: 0

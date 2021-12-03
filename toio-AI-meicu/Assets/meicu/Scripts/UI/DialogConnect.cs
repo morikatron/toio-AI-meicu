@@ -15,7 +15,6 @@ namespace toio.AI.meicu
         public async void OnBtnConnect()
         {
             button.interactable = false;
-            button.GetComponent<ButtonBlink>()?.Blink(false);
             button.GetComponent<ButtonConnect>().SetBusy(true);
 
             await Device.Connect();

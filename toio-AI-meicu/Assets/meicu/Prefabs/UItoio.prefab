@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 28434754922710820}
   - component: {fileID: 28434754922710821}
   m_Layer: 5
-  m_Name: ImgToio
+  m_Name: UItoio
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

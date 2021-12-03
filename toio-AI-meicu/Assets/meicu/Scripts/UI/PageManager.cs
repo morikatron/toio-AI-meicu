@@ -44,6 +44,8 @@ namespace toio.AI.meicu
         }
         internal static void SetPage(EPage ePage)
         {
+            UIFinger.Hide();
+
             page = ePage;
             ins.pageTitle?.SetActive(ePage == EPage.Title);
             ins.pageTutorial?.SetActive(ePage == EPage.Tutorial);
