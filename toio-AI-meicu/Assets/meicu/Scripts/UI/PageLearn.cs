@@ -46,6 +46,16 @@ namespace toio.AI.meicu
             }
         }
 
+        internal void Pause()
+        {
+
+        }
+
+        internal void Resume()
+        {
+            Refresh();
+        }
+
 
         public void OnBtnHint()
         {

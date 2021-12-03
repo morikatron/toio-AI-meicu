@@ -58,6 +58,19 @@ namespace toio.AI.meicu
             }
         }
 
+        internal void Pause()
+        {
+            AIController.ins.isPause = true;
+            PlayerController.ins.isPause = true;
+        }
+
+        internal void Resume()
+        {
+            AIController.ins.isPause = false;
+            PlayerController.ins.isPause = false;
+        }
+
+
         void LevelUp()
         {
             stage = 1;

@@ -64,6 +64,18 @@ namespace toio.AI.meicu
             }
         }
 
+        internal void Pause()
+        {
+            PlayerController.ins.isPause = true;
+        }
+
+        internal void Resume()
+        {
+            if (phase == 1 && (dialog == 3 || dialog == 4))
+                PlayerController.ins.isPause = false;
+            Refresh();
+        }
+
         public void OnBtnNext()
         {
             NextPhase();

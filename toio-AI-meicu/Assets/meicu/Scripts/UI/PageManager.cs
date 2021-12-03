@@ -72,7 +72,9 @@ namespace toio.AI.meicu
                 {
                     dialogConnect.gameObject.SetActive(true);
 
-                    // TODO pause
+                    if (page == EPage.Tutorial) pageTutorial?.Pause();
+                    if (page == EPage.Battle) pageBattle?.Pause();
+                    if (page == EPage.Learn) pageLearn?.Pause();
                 }
             }
         }
@@ -82,7 +84,9 @@ namespace toio.AI.meicu
 
             ins.dialogConnect.gameObject.SetActive(false);
 
-            // TODO continue
+            if (page == EPage.Tutorial) ins.pageTutorial?.Pause();
+            if (page == EPage.Battle) ins.pageBattle?.Pause();
+            if (page == EPage.Learn) ins.pageLearn?.Pause();
         }
 
     }
