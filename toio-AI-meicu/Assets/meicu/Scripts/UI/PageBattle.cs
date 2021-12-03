@@ -125,7 +125,6 @@ namespace toio.AI.meicu
                 btnStart.transform.GetComponentInChildren<Text>().text = "Next Stage";
                 text.text = "君の勝ちだ！\n\n次のステージに行こう！";
             }
-            UpdateStageText();
         }
 
         void ProcPlayerLose()
@@ -140,7 +139,6 @@ namespace toio.AI.meicu
             }
             btnStart.gameObject.SetActive(true);
             btnStart.transform.GetComponentInChildren<Text>().text = "Retry";
-            UpdateStageText();
         }
 
         void ProcDraw()
@@ -153,6 +151,8 @@ namespace toio.AI.meicu
         #region ======== UI Callbacks ========
         public void OnBtnStart()
         {
+            btnStart.gameObject.SetActive(false);
+
             var lv = Config.levelSettings[MeiPrefs.level - 1];
             var st = lv.stageSettings[stage-1];
 

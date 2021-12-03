@@ -109,7 +109,6 @@ namespace toio.AI.meicu
             {
                 StopCoroutine(ie_ChantActionP);
                 ie_ChantActionP = null;
-                cube.TurnLedOff();
             }
         }
 

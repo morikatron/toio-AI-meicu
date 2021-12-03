@@ -8,10 +8,10 @@ namespace toio.AI.meicu
 
     internal static class MeiPrefs
     {
-        internal static readonly string KeyTutorialCleared = "MeiTC";
-        internal static readonly string KeyLearnCleared = "MeiLC";
-        internal static readonly string KeyLevel = "MeiLv";
-        // internal static readonly string KeyStage = "MeiStage";
+        internal static readonly string KeyTutorialCleared = "MeicuTC";
+        internal static readonly string KeyLearnCleared = "MeicuLC";
+        internal static readonly string KeyLevel = "MeicuLv";
+        // internal static readonly string KeyStage = "MeicuStage";
 
         internal static bool isTutorialCleared
         {
