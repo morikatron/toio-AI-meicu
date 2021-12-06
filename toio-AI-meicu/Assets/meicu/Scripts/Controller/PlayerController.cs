@@ -35,6 +35,7 @@ namespace toio.AI.meicu
             isGameRunning = false;
             StopAllCoroutines();
             ie_ChantActionP = null;
+            lstCoord = new Vector2Int(-1, -1);
         }
 
         internal void Init()
@@ -47,7 +48,7 @@ namespace toio.AI.meicu
             }
         }
 
-        Vector2Int lstCoord = default;
+        Vector2Int lstCoord = new Vector2Int(-1, -1);
         void OnID(Cube c)
         {
             if (!isGameRunning) return;
@@ -103,6 +104,7 @@ namespace toio.AI.meicu
 
         void OnIDMissed(Cube c)
         {
+            lstCoord = new Vector2Int(-1, -1);
             if (!isGameRunning) return;
 
             if (ie_ChantActionP != null)
@@ -115,23 +117,20 @@ namespace toio.AI.meicu
 
         IEnumerator IE_ChantActionP()
         {
-            for (float t = 0; t < 1; t += 0.1f)
+            for (float t = 0; t < 1; t += 0.2f)
             {
-                yield return new WaitForSecondsRealtime(0.1f);
+                yield return new WaitForSecondsRealtime(0.2f);
                 if (!isGameRunning || isPause)
                 {
                     ie_ChantActionP = null;
-                    cube.TurnLedOff();
                     yield break;
                 }
-                Cube.SoundOperation sound = new Cube.SoundOperation(100, 100, (byte)(50+t*10));
+                Cube.SoundOperation sound = new Cube.SoundOperation(200, 100, (byte)(50+t*10));
                 cube.PlaySound(1, new Cube.SoundOperation[]{sound}, Cube.ORDER_TYPE.Weak);
             }
 
             game.MoveP(candidateActionP);
-
             cube.PlayPresetSound(1);
-            yield return new WaitForSecondsRealtime(0.1f);
             ie_ChantActionP = null;
         }
 
@@ -140,11 +139,15 @@ namespace toio.AI.meicu
         void OnGameStarted(int countDown)
         {
             if (countDown == 0)
+            {
                 isGameRunning = true;
+                lstCoord = new Vector2Int(-1, -1);
+            }
         }
         void OnGameRetry()
         {
             isGameRunning = true;
+            lstCoord = new Vector2Int(-1, -1);
         }
 
         void OnGameStep(Env.Response res)
