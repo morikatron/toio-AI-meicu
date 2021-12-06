@@ -15,6 +15,7 @@ namespace toio.AI.meicu
         public Game game;
         public Text text;
         public Button btnNext;
+        public Button btnBack;
 
         int phase = 0;
 
@@ -75,6 +76,11 @@ namespace toio.AI.meicu
         public void OnBtnNext()
         {
             NextPhase();
+        }
+
+        public void OnBtnBack()
+        {
+            LastPhase();
         }
 
         void InitGame()
@@ -182,6 +188,14 @@ namespace toio.AI.meicu
             Refresh();
         }
 
+        void LastPhase()
+        {
+            if (phase == 0) {}
+            else if (phase > 4) {}
+            else
+                phase --;
+        }
+
         void Refresh()
         {
             StopAllCoroutines();
@@ -191,6 +205,7 @@ namespace toio.AI.meicu
         IEnumerator IE_Refresh()
         {
             btnNext.interactable = false;
+            btnBack.interactable = false;
 
             if (phase == 0)
             {
@@ -280,6 +295,9 @@ namespace toio.AI.meicu
 
             yield return new WaitForSecondsRealtime(0.1f);
             btnNext.interactable = true;
+
+            if (phase > 0 && phase < 5)
+                btnBack.interactable = true;
         }
     }
 
