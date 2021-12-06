@@ -244,6 +244,7 @@ namespace toio.AI.meicu
             if (stateP != PlayerState.InGame) return;
             stateP = PlayerState.Success;
             this.overCallbackP?.Invoke(stateP);
+            this.overCallbackA?.Invoke(stateA);
             CheckOver();
             StartCoroutine(IE_Success(0));
         }
@@ -252,6 +253,7 @@ namespace toio.AI.meicu
             if (stateA != PlayerState.InGame) return;
             stateA = PlayerState.Success;
             this.overCallbackA?.Invoke(stateA);
+            this.overCallbackP?.Invoke(stateP);
             CheckOver();
             StartCoroutine(IE_Success(1));
         }
