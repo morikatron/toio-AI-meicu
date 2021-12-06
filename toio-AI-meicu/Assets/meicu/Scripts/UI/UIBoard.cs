@@ -67,7 +67,7 @@ namespace toio.AI.meicu
             {
                 var coords = RowCol2UICoords(rowCol);
 
-                var tr = CreateLine(trajPObjs);
+                var tr = CreateLine(trajPObjs, Device.Blue);
                 trajPObjs.Add(tr.gameObject);
 
                 tr.anchoredPosition = (coords + lstCoords) / 2 + BiasP;
@@ -113,7 +113,7 @@ namespace toio.AI.meicu
             {
                 var coords = RowCol2UICoords(rowCol);
 
-                var tr = CreateLine(trajAObjs);
+                var tr = CreateLine(trajAObjs, Device.Orange);
                 trajAObjs.Add(tr.gameObject);
 
                 tr.anchoredPosition = (coords + lstCoords) / 2 + BiasA;
@@ -219,13 +219,13 @@ namespace toio.AI.meicu
         }
 
 
-        private RectTransform CreateLine(List<GameObject> addTo)
+        private RectTransform CreateLine(List<GameObject> addTo, Color color)
         {
             GameObject go = new GameObject("traj");
             go.transform.SetParent(transform.Find("Trajs"), false);
             addTo.Add(go);
             RawImage img = go.AddComponent<RawImage>();
-            img.color = new Color32(114, 114, 114, 255);
+            img.color = color;
 
             var tr = go.GetComponent<RectTransform>();
             tr.anchorMin = new Vector2(0, 1);
