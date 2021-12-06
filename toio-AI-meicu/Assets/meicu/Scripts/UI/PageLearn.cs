@@ -43,6 +43,9 @@ namespace toio.AI.meicu
             {
                 StopAllCoroutines();
                 AIController.ins.heatmapCallback -= OnHeatmap;
+
+                PlayerController.ins.isPause = false;
+                AIController.ins.isPause = false;
             }
         }
 

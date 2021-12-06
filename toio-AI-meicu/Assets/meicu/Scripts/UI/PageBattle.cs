@@ -43,6 +43,9 @@ namespace toio.AI.meicu
                 UpdateStageText();
                 UpdateHint();
                 LoadLevel();
+
+                AIController.ins.isPause = false;
+                PlayerController.ins.isPause = false;
             }
             else
             {
