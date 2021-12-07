@@ -11,9 +11,6 @@ namespace toio.AI.meicu
 
     public class Device
     {
-        public static readonly Color32 Orange = new Color32(255, 74, 11, 255);
-        public static readonly Color32 Blue = new Color32(102, 107, 255, 255);
-
         static internal Action<int, bool> connectionCallback;
 
         static CubeManager _cubeManager;
@@ -50,11 +47,13 @@ namespace toio.AI.meicu
 
             if (cubeIdx == 0)
             {
-                cube.TurnLedOn(Blue.r, Blue.g, Blue.b, 0);
+                var color = Config.LEDBlue;
+                cube.TurnLedOn(color.r, color.g, color.b, 0);
             }
             else
             {
-                cube.TurnLedOn(Orange.r, Orange.g, Orange.b, 0);
+                var color = Config.LEDOrange;
+                cube.TurnLedOn(color.r, color.g, color.b, 0);
             }
 
             // Set Disconnection Callback

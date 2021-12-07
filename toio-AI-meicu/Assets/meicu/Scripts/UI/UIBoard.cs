@@ -67,7 +67,7 @@ namespace toio.AI.meicu
             {
                 var coords = RowCol2UICoords(rowCol);
 
-                var tr = CreateLine(trajPObjs, Device.Blue);
+                var tr = CreateLine(trajPObjs, Config.UIBlue);
                 trajPObjs.Add(tr.gameObject);
 
                 tr.anchoredPosition = (coords + lstCoords) / 2 + BiasP;
@@ -113,7 +113,7 @@ namespace toio.AI.meicu
             {
                 var coords = RowCol2UICoords(rowCol);
 
-                var tr = CreateLine(trajAObjs, Device.Orange);
+                var tr = CreateLine(trajAObjs, Config.UIOrange);
                 trajAObjs.Add(tr.gameObject);
 
                 tr.anchoredPosition = (coords + lstCoords) / 2 + BiasA;

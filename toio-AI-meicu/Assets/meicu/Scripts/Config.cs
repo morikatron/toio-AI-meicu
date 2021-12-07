@@ -8,6 +8,12 @@ namespace toio.AI.meicu
 
     public static class Config
     {
+        public static readonly Color32 UIOrange = new Color32(255, 74, 11, 255);
+        public static readonly Color32 UIBlue = new Color32(102, 107, 255, 255);
+        public static readonly Color32 LEDOrange = new Color32(222, 100, 0, 255);
+        public static readonly Color32 LEDBlue = new Color32(22, 11, 255, 255);
+
+
         public struct LevelSetting
         {
             public LevelSetting(
