@@ -34,7 +34,7 @@ namespace toio.AI.meicu
                 game.initedCallback += OnGameInited;
                 game.readyCallback += OnGameReady;
                 game.startCallback += OnGameStarted;
-                game.overCallbacik += OnGameOver;
+                game.overCallback += OnGameOver;
                 game.stepCallbackP += OnGameStepP;
                 game.stepCallbackA += OnGameStepA;
 
@@ -55,7 +55,7 @@ namespace toio.AI.meicu
                 game.initedCallback -= OnGameInited;
                 game.readyCallback -= OnGameReady;
                 game.startCallback -= OnGameStarted;
-                game.overCallbacik -= OnGameOver;
+                game.overCallback -= OnGameOver;
                 game.stepCallbackP -= OnGameStepP;
                 game.stepCallbackA -= OnGameStepA;
             }
@@ -249,7 +249,7 @@ namespace toio.AI.meicu
             uiBoard.ShowTrajP(traj);
             uiBoard.ShowKomaP(pos);
 
-            uiQuest.ShowP(traj.Length);
+            uiQuest.ShowP(traj.Length - (Env.IsResponseFail(res)?1:0));
         }
 
         void OnGameStepA(Env.Response res)
@@ -261,7 +261,7 @@ namespace toio.AI.meicu
             uiBoard.ShowTrajA(traj);
             uiBoard.ShowKomaA(pos);
 
-            uiQuest.ShowA(traj.Length);
+            uiQuest.ShowA(traj.Length - (Env.IsResponseFail(res)?1:0));
         }
         #endregion
 

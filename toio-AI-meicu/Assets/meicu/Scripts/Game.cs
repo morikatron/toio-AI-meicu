@@ -25,7 +25,7 @@ namespace toio.AI.meicu
         internal event Action initedCallback;
         internal event Action<bool> readyCallback;
         internal event Action<int> startCallback;
-        internal event Action<PlayerState, PlayerState> overCallbacik;
+        internal event Action<PlayerState, PlayerState> overCallback;
         internal event Action<PlayerState> overCallbackA;
         internal event Action<PlayerState> overCallbackP;
         internal event Action<Env.Response> stepCallbackP;
@@ -187,11 +187,7 @@ namespace toio.AI.meicu
 
             stepCallbackP?.Invoke(res);
 
-            if (res == Env.Response.FailOut ||
-                res == Env.Response.FailPassed ||
-                res == Env.Response.FailWrong ||
-                res == Env.Response.FailEarlyGoal
-            )
+            if (Env.IsResponseFail(res))
                 FailP();
             else if (res == Env.Response.Goal)
                 SuccessP();
@@ -209,11 +205,7 @@ namespace toio.AI.meicu
 
             stepCallbackA?.Invoke(res);
 
-            if (res == Env.Response.FailOut ||
-                res == Env.Response.FailPassed ||
-                res == Env.Response.FailWrong ||
-                res == Env.Response.FailEarlyGoal
-            )
+            if (Env.IsResponseFail(res))
                 FailA();
             else if (res == Env.Response.Goal)
                 SuccessA();
@@ -265,7 +257,7 @@ namespace toio.AI.meicu
                 stateA == PlayerState.Fail && stateP == PlayerState.Fail)
             {
                 inGame = false;
-                overCallbacik?.Invoke(stateP, stateA);
+                overCallback?.Invoke(stateP, stateA);
             }
         }
 

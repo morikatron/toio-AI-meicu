@@ -71,7 +71,7 @@ namespace toio.AI.meicu
         {
             if (quest == null)
                 return Response.None;
-            if (response == Response.FailOut || response == Response.Goal || response == Response.FailPassed)
+            if (Env.IsResponseFail(this.response))
                 return this.response;
 
             if (!IsInside(action))
@@ -92,7 +92,7 @@ namespace toio.AI.meicu
                     passedColorSpaceCnt ++;
 
                     // Stepped Wrong color
-                    if (passedColorSpaceCnt > quest.Length || spaceBoard != quest.colors[passedColorSpaceCnt-1])
+                    if (spaceBoard != quest.colors[passedColorSpaceCnt-1])
                         this.response = Response.FailWrong;
                     // Reach at Goal
                     else if (row == quest.goalRow && col == quest.goalCol)
@@ -102,6 +102,9 @@ namespace toio.AI.meicu
                         // Before complete quest
                         else
                             this.response = Response.FailEarlyGoal;
+                    // Not Reach Goal
+                    else if (passedColorSpaceCnt == quest.Length)
+                        this.response = Response.FailNotGoal;
                     // Other (Stepped correct color)
                     else
                         this.response = Response.StepColor;
@@ -257,7 +260,12 @@ namespace toio.AI.meicu
 
         public enum Response
         {
-            None, StepWhite, StepColor, Goal, FailOut, FailPassed, FailWrong, FailEarlyGoal
+            None, StepWhite, StepColor, Goal, FailOut, FailPassed, FailWrong, FailEarlyGoal, FailNotGoal
+        }
+
+        public static bool IsResponseFail(Response res)
+        {
+            return res == Response.FailOut || res == Response.FailPassed || res == Response.FailEarlyGoal || res == Response.FailWrong || res == Response.FailNotGoal;
         }
     }
 
