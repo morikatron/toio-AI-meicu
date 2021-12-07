@@ -39,7 +39,11 @@ namespace toio.AI.meicu
                 game.stepCallbackA += OnGameStepA;
 
                 stage = 1;
+
+                text.text = "";
+                btnStart.gameObject.SetActive(true);
                 btnStart.transform.GetComponentInChildren<Text>().text = "Start";
+
                 UpdateStageText();
                 UpdateHint();
                 LoadLevel();
