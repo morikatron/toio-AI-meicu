@@ -125,11 +125,7 @@ namespace toio.AI.meicu.Training
                 CountResult(true);
                 EndEpisode();
             }
-            else if (
-                res == Env.Response.FailOut ||
-                res == Env.Response.FailPassed ||
-                res == Env.Response.FailWrong ||
-                res == Env.Response.FailEarlyGoal)
+            else if (Env.IsResponseFail(res))
             {
                 CountResult(false);
                 EndEpisode();
