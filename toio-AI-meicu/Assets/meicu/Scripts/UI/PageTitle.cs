@@ -16,6 +16,8 @@ namespace toio.AI.meicu
         public Button btnLearn;
         public Text text;
 
+        private bool isHiSaid = false;
+
 
         internal void SetActive(bool active)
         {
@@ -30,24 +32,36 @@ namespace toio.AI.meicu
 
         internal void Refresh()
         {
+            StopAllCoroutines();
+            StartCoroutine(IE_Refresh());
+        }
+
+        IEnumerator IE_Refresh()
+        {
             if (Device.nConnected == 0)
             {
                 btnConnect.interactable = true;
                 btnTutorial.interactable = false;
                 btnBattle.interactable = false;
-                btnLearn.interactable = true;   // TODO
+                btnLearn.interactable = false;
 
-                // if (!MeiPrefs.isTutorialCleared)
+                if (!isHiSaid)
+                {
+                    text.text = "こんにちは！\n僕の名前は「迷キュー」";
+                    yield return new WaitForSecondsRealtime(2f);
+                    isHiSaid = true;
+                }
+                text.text = "左上の「接続」ボタンから\nキューブを接続してね！";
+
+                if (!MeiPrefs.isTutorialCleared)
                     UIFinger.PointAt(btnConnect.transform, biasX:70);
-
-                text.text = "左上のCONNECT（コネクト）ボタンからキューブを接続してね！";
             }
             else if (Device.nConnected == 1)
             {
                 btnConnect.interactable = true;
                 btnTutorial.interactable = false;
                 btnBattle.interactable = false;
-                btnLearn.interactable = true;   // TODO
+                btnLearn.interactable = false;
 
                 // if (!MeiPrefs.isTutorialCleared)
                     UIFinger.PointAt(btnConnect.transform, biasX:70);
@@ -67,7 +81,7 @@ namespace toio.AI.meicu
 
                     UIFinger.PointAt(btnTutorial.transform, biasX:130);
 
-                    text.text = "まずは迷路パズルのルールを説明するよ！";
+                    text.text = "まずは迷路パズルのルールを\n説明するよ！";
                 }
                 else if (!MeiPrefs.isLearnCleared)
                 {
@@ -77,7 +91,7 @@ namespace toio.AI.meicu
 
                     UIFinger.PointAt(btnLearn.transform, biasX:130);
 
-                    text.text = "僕たちAIロボットが迷路パズルをどのように解いているのか、かいせつするよ！";
+                    text.text = "僕たちAIロボットが迷路パズルを\nどのように解いているのか、\nかいせつするよ！";
                 }
                 else
                 {
@@ -85,7 +99,13 @@ namespace toio.AI.meicu
                     btnBattle.interactable = true;
                     btnLearn.interactable = true;
 
-                    text.text = "では、一緒にあそぼう~";
+                    while (true)
+                    {
+                        text.text = "みんなは迷路が好きかな？";
+                        yield return new WaitForSecondsRealtime(2f);
+                        text.text = "僕と迷路パズルでバトルしよう！";
+                        yield return new WaitForSecondsRealtime(2f);
+                    }
                 }
             }
         }
