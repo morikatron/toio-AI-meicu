@@ -31,6 +31,8 @@ namespace toio.AI.meicu
         float[,] heatmap = new float[9, 9];
         float[,] heatmapBuffer = new float[9, 9];
 
+        private IEnumerator ie_Move = null;
+
 
         void OnEnable()
         {
@@ -45,6 +47,7 @@ namespace toio.AI.meicu
         void Stop()
         {
             StopAllCoroutines();
+            ie_Move = null;
             isPredicting = false;
             isActReceived = false;
             ClearHeatmap();
@@ -77,11 +80,39 @@ namespace toio.AI.meicu
         internal void RequestMove(Env.Action action)
         {
             this.action = action;
-            (var r, var c) = Env.Translate(this.action, game.envA.row, game.envA.col);
+            (var r, var c) = Env.Translate(action, game.envA.row, game.envA.col);
+
+            if (ie_Move != null && this.targetCoords.x == r && this.targetCoords.y == c)
+                return;
+
             this.targetCoords = new Vector2Int(r, c);
 
-            StartCoroutine(IE_Move());
+            StopMove();
+            ie_Move = IE_Move();
+            StartCoroutine(ie_Move);
         }
+
+        internal void RequestMove(int row, int col)
+        {
+            if (ie_Move != null && this.targetCoords.x == row && this.targetCoords.y == col)
+                return;
+
+            this.targetCoords = new Vector2Int(row, col);
+
+            StopMove();
+            ie_Move = IE_Move();
+            StartCoroutine(ie_Move);
+        }
+
+        internal void StopMove()
+        {
+            if (ie_Move != null)
+            {
+                StopCoroutine(ie_Move);
+                ie_Move = null;
+            }
+        }
+
 
         IEnumerator IE_Think()
         {
@@ -96,6 +127,8 @@ namespace toio.AI.meicu
                 // Predicting Heatmap
                 this.isPredicting = true;
                 ClearHeatmapBuffer();
+
+                Debug.Log("AICon.IE_Think : predict heatmap");
                 yield return IE_PredictHeatmap(game.envA.Clone(), this.predictSteps);
                 Array.Copy(this.heatmapBuffer, this.heatmap, this.heatmap.Length);
                 if (isPause) continue;
@@ -111,28 +144,50 @@ namespace toio.AI.meicu
                 // Request Agent Action
                 this.isActReceived = false;
                 agent.RequestAct(game.envA);
+                Debug.Log("AICon.IE_Think : RequestAct");
                 yield return new WaitUntil(()=>isActReceived);
                 yield return new WaitForEndOfFrame();
                 if (isPause) continue;
 
-                yield return new WaitUntil(()=>isMoving);
+                Debug.Log("AICon.IE_Think : wait moving");
+                yield return new WaitUntil(()=>!isMoving);
+
+                Debug.Log("AICon.IE_Think : end");
             }
         }
 
         IEnumerator IE_Move()
         {
-            while (isMoving);
+            Debug.Log($"AICon.IE_Move : Begin");
             isMoving = true;
+
+            Debug.Log($"AICon.IE_Move : TargetMove({targetCoords.x}, {targetCoords.y})");
+            Device.TargetMove(1, targetCoords.x, targetCoords.y, -10, 10);
+
+            float retryTime = 0;
 
             // Wait Cube to Arrive
             while (Device.ID2SpaceCoord(cube.x, cube.y) != targetCoords)
             {
-                yield return new WaitUntil(()=>cube.isConnected);
-
-                Device.TargetMove(1, targetCoords.x, targetCoords.y, -10, 10);
-
                 yield return new WaitForSecondsRealtime(0.5f);
+                retryTime += 0.5f;
+
+
+                if (!cube.isConnected)
+                {
+                    yield return new WaitUntil(()=>cube.isConnected);
+                    Debug.Log($"AICon.IE_Move : TargetMove({targetCoords.x}, {targetCoords.y}) again on reconnection");
+                    Device.TargetMove(1, targetCoords.x, targetCoords.y, -10, 10);
+                }
+                else if (retryTime > 10)
+                {
+                    retryTime = 10;
+                    Debug.Log($"AICon.IE_Move : TargetMove({targetCoords.x}, {targetCoords.y}) again on timeout(10s)");
+                    Device.TargetMove(1, targetCoords.x, targetCoords.y, -10, 10);
+                }
             }
+
+            // Simulate Chant time 1s
             yield return new WaitForSecondsRealtime(1f);
 
             // Apply Step to game
@@ -189,7 +244,8 @@ namespace toio.AI.meicu
 
         internal IEnumerator PredictHeatmapOnce(Env env, int steps)
         {
-            yield return new WaitUntil(() => !this.isPredicting);
+            if (this.isPredicting)
+                yield return new WaitUntil(() => !this.isPredicting);
             agent.Restart();
             this.isPause = true;
             this.isPredicting = true;
@@ -217,6 +273,7 @@ namespace toio.AI.meicu
         {
             if (countDown == 0)
             {
+                Debug.LogWarning($"AICon.OnGameStarted. pause={isPause}");
                 agent.Restart();
                 StartCoroutine(IE_Think());
             }

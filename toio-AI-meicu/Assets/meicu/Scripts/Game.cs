@@ -124,6 +124,9 @@ namespace toio.AI.meicu
 
         IEnumerator IE_WaitReady()
         {
+            // AI go home
+            AIController.ins.RequestMove(4, 4);
+
             while (true)
             {
                 var coordA = Device.ID2SpaceCoord(Device.cubes[1].x, Device.cubes[1].y);
@@ -138,8 +141,6 @@ namespace toio.AI.meicu
                 }
 
                 yield return new WaitForSecondsRealtime(0.5f);
-
-                Device.TargetMove(1, 4, 4, -10, 10);
             }
         }
 
