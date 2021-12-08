@@ -16,8 +16,8 @@ namespace toio.AI.meicu
         public static readonly Color BoardGreen = new Color32(158, 255, 162, 255);
         public static readonly Color BoardYellow = new Color32(255, 234, 129, 255);
 
-        private static readonly Vector2Int BiasP = new Vector2Int(2, 2);
-        private static readonly Vector2Int BiasA = new Vector2Int(-2, -2);
+        internal Vector2Int biasP = new Vector2Int(2, 2);
+        internal Vector2Int biasA = new Vector2Int(-2, -2);
 
 
         public float heatmapZeroOpacity = 0.1f;
@@ -70,7 +70,7 @@ namespace toio.AI.meicu
                 var tr = CreateLine(trajPObjs, Config.UIBlue);
                 trajPObjs.Add(tr.gameObject);
 
-                tr.anchoredPosition = (coords + lstCoords) / 2 + BiasP;
+                tr.anchoredPosition = (coords + lstCoords) / 2 + biasP;
                 var w = Mathf.Max(0.5f, Mathf.Abs(coords.x - lstCoords.x));
                 var h = Mathf.Max(0.5f, Mathf.Abs(coords.y - lstCoords.y));
                 tr.sizeDelta = new Vector2(w, h);
@@ -87,15 +87,15 @@ namespace toio.AI.meicu
 
         internal void ShowKomaP(Vector2Int rowCol)
         {
-            var coords = RowCol2UICoords(rowCol);
-
-            var tr = transform.Find("KomaP") as RectTransform;
-            tr.gameObject.SetActive(true);
-            tr.anchoredPosition = coords + BiasP;
+            ShowKomaP(rowCol.x, rowCol.y);
         }
         internal void ShowKomaP(int row, int col)
         {
-            ShowKomaP(new Vector2Int(row, col));
+            var coords = RowCol2UICoords(row, col);
+
+            var tr = transform.Find("KomaP") as RectTransform;
+            tr.gameObject.SetActive(true);
+            tr.anchoredPosition = coords + biasP;
         }
         internal void HideKomaP()
         {
@@ -116,7 +116,7 @@ namespace toio.AI.meicu
                 var tr = CreateLine(trajAObjs, Config.UIOrange);
                 trajAObjs.Add(tr.gameObject);
 
-                tr.anchoredPosition = (coords + lstCoords) / 2 + BiasA;
+                tr.anchoredPosition = (coords + lstCoords) / 2 + biasA;
                 var w = Mathf.Max(0.5f, Mathf.Abs(coords.x - lstCoords.x));
                 var h = Mathf.Max(0.5f, Mathf.Abs(coords.y - lstCoords.y));
                 tr.sizeDelta = new Vector2(w, h);
@@ -131,17 +131,18 @@ namespace toio.AI.meicu
             trajAObjs.Clear();
         }
 
-        internal void ShowKomaA(Vector2Int rowCol)
+        internal void ShowKomaA(Vector2Int rowCol, float scale=1)
         {
-            var coords = RowCol2UICoords(rowCol);
+            ShowKomaA(rowCol.x, rowCol.y, scale);
+        }
+        internal void ShowKomaA(int row, int col, float scale=1)
+        {
+            var coords = RowCol2UICoords(row, col);
 
             var tr = transform.Find("KomaA") as RectTransform;
             tr.gameObject.SetActive(true);
-            tr.anchoredPosition = coords + BiasA;
-        }
-        internal void ShowKomaA(int row, int col)
-        {
-            ShowKomaA(new Vector2Int(row, col));
+            tr.localScale = new Vector3(scale, scale, scale);
+            tr.anchoredPosition = coords + biasA;
         }
         internal void HideKomaA()
         {
@@ -151,15 +152,15 @@ namespace toio.AI.meicu
 
         internal void ShowGoal(Vector2Int rowCol)
         {
-            var coords = RowCol2UICoords(rowCol);
+            ShowGoal(rowCol.x, rowCol.y);
+        }
+        internal void ShowGoal(int row, int col)
+        {
+            var coords = RowCol2UICoords(row, col);
 
             var goal = transform.Find("Goal") as RectTransform;
             goal.gameObject.SetActive(true);
             goal.anchoredPosition = coords;
-        }
-        internal void ShowGoal(int row, int col)
-        {
-            ShowGoal(new Vector2Int(row, col));
         }
         internal void HideGoal()
         {
@@ -236,6 +237,10 @@ namespace toio.AI.meicu
         internal Vector2Int RowCol2UICoords(Vector2Int rowCol)
         {
             return new Vector2Int(rowCol.y * 10 + 5, -rowCol.x * 10 - 5);
+        }
+        internal Vector2Int RowCol2UICoords(int row, int col)
+        {
+            return new Vector2Int(col * 10 + 5, -row * 10 - 5);
         }
     }
 
