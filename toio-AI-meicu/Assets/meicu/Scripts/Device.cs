@@ -79,6 +79,13 @@ namespace toio.AI.meicu
 
         internal static List<Cube> cubes => cubeManager.cubes;
 
+        public static bool IsAtSpace(int idx, int row, int col)
+        {
+            if (idx == 0 && !isCube0Connected || idx == 1 && !isCube1Connected) return false;
+            if (!cubes[idx].isGrounded) return false;
+            var rowCol = ID2SpaceCoord(cubes[idx].x, cubes[idx].y);
+            return rowCol.x == row && rowCol.y == col;
+        }
         public static Vector2Int SpaceCoords2ID(int row, int col)
         {
             return new Vector2Int(750 + (col-4)*44, 250 + (row-4)*44);
