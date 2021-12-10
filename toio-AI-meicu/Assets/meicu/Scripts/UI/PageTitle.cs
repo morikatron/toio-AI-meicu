@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -115,7 +116,14 @@ namespace toio.AI.meicu
             btnConnect.interactable = false;
             btnConnect.GetComponent<ButtonConnect>().SetBusy(true);
 
-            await Device.Connect();
+            try
+            {
+                await Device.Connect();
+            }
+            catch (Exception e)     // Error occurs when user cancels connection request dialog
+            {
+                Debug.LogError(e.Message);
+            }
 
             btnConnect.GetComponent<ButtonConnect>().SetBusy(false);
 
