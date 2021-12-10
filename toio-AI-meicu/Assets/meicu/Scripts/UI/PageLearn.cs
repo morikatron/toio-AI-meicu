@@ -18,6 +18,9 @@ namespace toio.AI.meicu
         public Button btnBack;
         public Button btnHint;
 
+        public VideoPlayer videoPlayer;
+
+
         int phase = 0;
         MeiQuest quest = default;
         bool isHeatmapReceived = false;
@@ -110,6 +113,8 @@ namespace toio.AI.meicu
                 ui.transform.Find("ImgThink").gameObject.SetActive(false);
                 ui.transform.Find("Illust").gameObject.SetActive(false);
                 ui.transform.Find("Video").gameObject.SetActive(false);
+                uiBoard.gameObject.SetActive(true);
+                uiQuest.gameObject.SetActive(true);
                 uiBoard.HideHeatmap();
 
                 quest = new MeiQuest(4, 4, new Env.Space[]{Env.Space.R}, 3, 4);
@@ -171,6 +176,8 @@ namespace toio.AI.meicu
                 float[,] heatmap = new float[9, 9];
                 float[] probs = new float[4];
                 for (int i = 0; i < 4; i++) probs[i] = 0.25f;   // initial uniform prob dist.
+
+                btnNext.interactable = true; // TODO
 
                 // Learning Iteration
                 for (int t = 0; t < 100; t++)
@@ -275,26 +282,32 @@ namespace toio.AI.meicu
 
                 // Show Video
                 ui.transform.Find("Video").gameObject.SetActive(true);
-                VideoPlayer vid = ui.transform.Find("Video").GetComponentInChildren<VideoPlayer>();
-                vid.frame = 0;
+                videoPlayer.Stop();
+                videoPlayer.StepForward();
 
                 text.text = "長い問題で、正しい道を探す時はこんな感じ…";
-                yield return new WaitForSecondsRealtime(1.5f);
-                vid.Play();
+                // yield return new WaitForSecondsRealtime(1.5f);
+                yield return new WaitForSecondsRealtime(1f);
+                videoPlayer.Play();
 
-                yield return new WaitUntil(() => vid.time > 3);
+                if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 3);
+                else yield return new WaitForSecondsRealtime(2f);
                 text.text = "最初はぜんぜんゴールできない…";
 
-                yield return new WaitUntil(() => vid.time > 7);
+                if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 7);
+                else yield return new WaitForSecondsRealtime(2f);
                 text.text = "1000回くらいがんばってもまだまだ…";
 
-                yield return new WaitUntil(() => vid.time > 14);
+                if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 13);
+                else yield return new WaitForSecondsRealtime(2f);
                 text.text = "2000回くらいで、やっとゴールできはじめたよ！";
 
-                yield return new WaitUntil(() => vid.time > 21);
+                if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 20);
+                else yield return new WaitForSecondsRealtime(2f);
                 text.text = "3000回こえたら、ほとんどゴールできるようになってきたね！";
 
-                yield return new WaitUntil(() => vid.time > 28);
+                if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 27);
+                else yield return new WaitForSecondsRealtime(2f);
                 text.text = "ほぼカンペキにゴールできるようになるまで、僕は4000回くらいチャレンジしたんだよ！";
 
                 yield return new WaitForSecondsRealtime(0.5f);
@@ -331,6 +344,8 @@ namespace toio.AI.meicu
             {
                 // Back
                 btnHint.gameObject.SetActive(false);
+                uiBoard.gameObject.SetActive(false);
+                uiQuest.gameObject.SetActive(false);
                 ui.transform.Find("Illust").gameObject.SetActive(true);
 
                 text.text = "これもキミたちと似ているね！";
@@ -340,6 +355,10 @@ namespace toio.AI.meicu
             {
                 // Hide Illust
                 ui.transform.Find("Illust").gameObject.SetActive(false);
+
+                // Show Board
+                uiBoard.gameObject.SetActive(true);
+                uiQuest.gameObject.SetActive(true);
 
                 // Show hint
                 btnHint.gameObject.SetActive(true);
