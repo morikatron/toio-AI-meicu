@@ -121,7 +121,7 @@ namespace toio.AI.meicu
             }
             else if (phase == 1)
             {
-                text.text = "少し難しく言うと、「AIの考え方」「AIがどのように学習するか」についてだよ。";
+                text.text = "少し難しく言うと、\n「AIの考え方」\n「AIがどのように学習するか」\nについてだよ。";
             }
             else if (phase == 2)
             {
@@ -133,11 +133,11 @@ namespace toio.AI.meicu
             }
             else if (phase == 4)
             {
-                text.text = "つまり、最初は「てきとうに動いてみる」だけなんだ。";
+                text.text = "つまり、最初は\n「てきとうに動いてみる」\nだけなんだ。";
             }
             else if (phase == 5)
             {
-                text.text = "例えばこの問題の場合、キミはすぐに「上に動けばいい」ってわかるでしょ？";
+                text.text = "例えばこの問題の場合、キミはすぐに\n「上に動けばいい」ってわかるでしょ？";
             }
             else if (phase == 6)
             {
@@ -177,7 +177,7 @@ namespace toio.AI.meicu
                 {
                     float interval = Mathf.Max( 1-(1f/15f)*Mathf.Min(15f, t) , 0.02f);
 
-                    text.text = $"試行 {t+1} 回目\n\n\n\n";
+                    text.text = $"　　　　　　試行 {t+1} 回目\n\n\n\n";
 
                     // Restart
                     uiBoard.HideTrajA();
@@ -212,12 +212,12 @@ namespace toio.AI.meicu
                         // Update text
                         if (t < 2)
                         {
-                            text.text = $"試行 {t+1} 回目\n\n「上」に行ってみたらゴールに成功したね。この時にAIは「上に行けばゴールの可能性がアップする」と学習するんだ。";
+                            text.text = $"　　　　　　試行 {t+1} 回目\n\n「上」に行ってみたらゴールに成功したね。この時にAIは「上に行けばゴールの可能性がアップする」と学習するんだ。";
                             interval += 3;
                         }
                         else
                         {
-                            text.text = $"試行 {t+1} 回目\n\nゴール成功\n「上」の可能性  アップ\n";
+                            text.text = $"　　　　　　試行 {t+1} 回目\n\nゴール成功\n「上」の可能性  アップ\n";
                         }
                     }
                     else    // Fail
@@ -235,12 +235,12 @@ namespace toio.AI.meicu
                         if (action == 3) actionStr = "左";
                         if (t < 2)
                         {
-                            text.text = $"試行 {t+1} 回目\n\n「{actionStr}」に行ってみたら今度はゴールに失敗したね。この時にAIは「左に行くとゴールの可能性がダウンする」と学習するんだ。";
+                            text.text = $"　　　　　　試行 {t+1} 回目\n\n「{actionStr}」に行ってみたら今度はゴールに失敗したね。この時にAIは「左に行くとゴールの可能性がダウンする」と学習するんだ。";
                             interval += 3;
                         }
                         else
                         {
-                            text.text = $"試行 {t+1} 回目\n\nゴール失敗\n「{actionStr}」の可能性 ダウン\n";
+                            text.text = $"　　　　　　試行 {t+1} 回目\n\nゴール失敗\n「{actionStr}」の可能性 ダウン\n";
                         }
                     }
 
@@ -313,7 +313,7 @@ namespace toio.AI.meicu
             }
             else if (phase == 16)
             {
-                text.text = "実は、こうやって何度も何度も失敗しながら、それでも繰り返しチャレンジして、やっと正解を見つけるんだ！";
+                text.text = "実は、こうやって何度も失敗しながら、それでも繰り返しチャレンジして、\nやっと正解を見つけるんだ！";
             }
             else if (phase == 17)
             {
@@ -325,7 +325,7 @@ namespace toio.AI.meicu
             }
             else if (phase == 19)
             {
-                text.text = "でも…サボって学習しなければ弱いまま…";
+                text.text = "でも…サボって学習しなければ\n弱いまま…";
             }
             else if (phase == 20)
             {
