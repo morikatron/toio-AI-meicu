@@ -14,6 +14,8 @@ namespace toio.AI.meicu
         public PageLearn pageLearn;
         public DialogConnect dialogConnect;
 
+        public VideoPlayer videoPlayer;
+
 
         static PageManager ins;
         static EPage page;
@@ -32,6 +34,9 @@ namespace toio.AI.meicu
             MeiPrefs.SetLearnCleared();
             if (MeiPrefs.level <= 2)
                 MeiPrefs.level = 3;
+            // Load video
+            videoPlayer.url = Application.streamingAssetsPath + "/training.mp4";
+            videoPlayer.Prepare();
 
             SetPage(EPage.Title);
             dialogConnect.gameObject.SetActive(false);
@@ -51,6 +56,8 @@ namespace toio.AI.meicu
             ins.pageTutorial?.SetActive(ePage == EPage.Tutorial);
             ins.pageBattle?.SetActive(ePage == EPage.Battle);
             ins.pageLearn?.SetActive(ePage == EPage.Learn);
+
+            AudioPlayer.ins.PlayBGM(ePage);
 
             if (page == EPage.Title)
                 ins.dialogConnect.gameObject.SetActive(false);
