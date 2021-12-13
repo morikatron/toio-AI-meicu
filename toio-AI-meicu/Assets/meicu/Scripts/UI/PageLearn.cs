@@ -24,6 +24,8 @@ namespace toio.AI.meicu
         int phase = 0;
         MeiQuest quest = default;
         bool isHeatmapReceived = false;
+        float[,] heatmap;
+        bool isHint = false;
 
 
         internal void SetActive(bool active)
@@ -66,7 +68,17 @@ namespace toio.AI.meicu
 
         public void OnBtnHint()
         {
-
+            isHint = !isHint;
+            if (isHint)
+            {
+                uiBoard.ShowHeatmap(heatmap);
+                ui.transform.Find("BtnHint").GetComponent<Image>().color = Color.white;
+            }
+            else
+            {
+                uiBoard.HideHeatmap();
+                ui.transform.Find("BtnHint").GetComponent<Image>().color = new Color(0.8f, 0.8f, 0.8f);
+            }
         }
 
         public void OnBtnNext()
@@ -110,6 +122,7 @@ namespace toio.AI.meicu
             {
                 text.text = "ここでは、僕が「どのように正しい道を見つけているのか」についてかいせつするよ。";
                 btnHint.gameObject.SetActive(false);
+                ui.transform.Find("Indicators").Find("Hint").gameObject.SetActive(false);
                 ui.transform.Find("ImgThink").gameObject.SetActive(false);
                 ui.transform.Find("Illust").gameObject.SetActive(false);
                 ui.transform.Find("Video").gameObject.SetActive(false);
@@ -153,7 +166,7 @@ namespace toio.AI.meicu
             else if (phase == 7)
             {
                 text.text = "明るさで表現すると、こんな感じ。\nどのマスも同じ明るさ、どこも同じだけ可能性があるってこと。";
-                float[,] heatmap = new float[9, 9];
+                heatmap = new float[9, 9];
                 heatmap[3, 4] = 0.25f; heatmap[5, 4] = 0.25f; heatmap[4, 3] = 0.25f; heatmap[4, 5] = 0.25f;
                 uiBoard.ShowHeatmap(heatmap);
                 ui.transform.Find("ImgThink").gameObject.SetActive(true);
@@ -173,7 +186,7 @@ namespace toio.AI.meicu
             }
             else if (phase == 11)
             {
-                float[,] heatmap = new float[9, 9];
+                heatmap = new float[9, 9];
                 float[] probs = new float[4];
                 for (int i = 0; i < 4; i++) probs[i] = 0.25f;   // initial uniform prob dist.
 
@@ -347,6 +360,7 @@ namespace toio.AI.meicu
                 uiBoard.gameObject.SetActive(false);
                 uiQuest.gameObject.SetActive(false);
                 ui.transform.Find("Illust").gameObject.SetActive(true);
+                ui.transform.Find("Indicators").Find("Hint").gameObject.SetActive(false);
 
                 text.text = "これもキミたちと似ているね！";
             }
@@ -362,6 +376,10 @@ namespace toio.AI.meicu
 
                 // Show hint
                 btnHint.gameObject.SetActive(true);
+                ui.transform.Find("Indicators").Find("Hint").gameObject.SetActive(true);
+                ui.transform.Find("BtnHint").GetComponent<Image>().color = new Color(0.8f, 0.8f, 0.8f);
+                uiBoard.HideHeatmap();
+                isHint = false;
 
                 text.text = "ちなみに、このボタンに気付いた？";
             }
@@ -385,49 +403,6 @@ namespace toio.AI.meicu
             {
                 text.text = "迷路バトルで僕に勝っていったら…\nどんどん強い、たくさん学習した僕と戦えるから、頑張ってみて！";
             }
-
-            // else if (phase == 9)
-            // {
-            //     text.text = "こうして、少しづつ先の「選ぶマス」の可能性を考えてゆくと、だんだん道が浮かび上がってきたでしょ？";
-            //     Env env = new Env();
-            //     env.Reset(4, 4);
-            //     uiBoard.ShowKomaA(4, 4);
-            //     for (int i = 0; i < 10; i++)
-            //     {
-            //         // New Quest
-            //         quest = env.GenerateQuest(Random.Range(4, 7));
-            //         env.SetQuest(quest);
-
-            //         uiQuest.ShowQuest(quest);
-            //         uiBoard.ShowGoal(quest.goalRow, quest.goalCol);
-            //         uiBoard.HideTrajA();
-            //         uiBoard.ShowHeatmap();
-            //         yield return new WaitForSecondsRealtime(0.1f);
-
-            //         for (int step = 0; step < quest.Length*2-2; step++)
-            //         {
-            //             float t = Time.realtimeSinceStartup;
-
-            //             // Get Heatmap for step
-            //             isHeatmapReceived = false;
-            //             yield return AIController.ins.PredictHeatmapOnce(env, step);
-            //             yield return new WaitUntil(() => isHeatmapReceived);
-
-            //             // Interval
-            //             yield return new WaitForSecondsRealtime(Mathf.Max(0f, 1f - (Time.realtimeSinceStartup - t)));
-
-            //             uiBoard.ShowHeatmap(AIController.ins.Heatmap);
-            //         }
-            //         // Interval
-            //         yield return new WaitForSecondsRealtime(1f);
-
-            //         if (i == 3)
-            //         {
-            //             btnNext.interactable = true;
-            //             btnBack.interactable = true;
-            //         }
-            //     }
-            // }
 
             yield return new WaitForSecondsRealtime(0.1f);
             btnNext.interactable = true;
