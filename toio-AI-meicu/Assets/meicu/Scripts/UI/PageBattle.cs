@@ -200,6 +200,8 @@ namespace toio.AI.meicu
                 IEnumerator Wait2Start()
                 {
                     yield return new WaitUntil(() => Device.ID2SpaceCoord(Device.cubes[0].x, Device.cubes[0].y) == new Vector2Int(4, 4) && Device.cubes[0].isGrounded); // TODO move to PlayerCon
+                    AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StartConfirm);
+                    yield return new WaitForSecondsRealtime(0.3f);
                     game.StartGame();
                 }
                 StartCoroutine(Wait2Start());
@@ -217,11 +219,15 @@ namespace toio.AI.meicu
                 uiQuest.ShowQuest(game.quest);
                 uiBoard.ShowGoal(new Vector2Int(game.quest.goalRow, game.quest.goalCol));
                 text.text = $"ゲーム開始まで...\n\n{countDown}";
+
+                AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StartCount);
             }
             else if (countDown == 0)
             {
                 Debug.Log("Game Started");
                 text.text = "ゲーム開始!";
+
+                AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Start);
             }
         }
 

@@ -125,12 +125,11 @@ namespace toio.AI.meicu
                     ie_ChantActionP = null;
                     yield break;
                 }
-                Cube.SoundOperation sound = new Cube.SoundOperation(200, 100, (byte)(50+t*10));
-                cube.PlaySound(1, new Cube.SoundOperation[]{sound}, Cube.ORDER_TYPE.Weak);
+                AudioPlayer.ins.PlaySound((byte)(50+t*10), 0.2f, volume:0.5f);
             }
 
             game.MoveP(candidateActionP);
-            cube.PlayPresetSound(1);
+            AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StepConfirm, volume:0.5f);
             ie_ChantActionP = null;
         }
 

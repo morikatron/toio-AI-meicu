@@ -351,7 +351,8 @@ namespace toio.AI.meicu
             {
                 text.text = "まずは「スタート」のマスに、\nキミのキューブでタッチしてみて！\n「ピコン」と音が鳴ったらOKだよ！";
                 yield return new WaitUntil(()=>Device.IsAtSpace(0, 4, 4));
-                Device.cubes[0].PlayPresetSound(1);  // TODO
+                AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StartConfirm);
+
                 PlayerController.ins.isPause = false;
                 phase = 14;
                 Refresh();
