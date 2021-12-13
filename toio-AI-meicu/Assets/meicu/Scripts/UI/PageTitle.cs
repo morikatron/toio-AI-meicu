@@ -64,7 +64,7 @@ namespace toio.AI.meicu
                 btnBattle.interactable = false;
                 btnLearn.interactable = false;
 
-                // if (!MeiPrefs.isTutorialCleared)
+                if (!MeiPrefs.isTutorialCleared)
                     UIFinger.PointAt(btnConnect.transform, biasX:70);
 
                 text.text = "もう1つ接続してね！";
@@ -115,6 +115,7 @@ namespace toio.AI.meicu
         {
             btnConnect.interactable = false;
             btnConnect.GetComponent<ButtonConnect>().SetBusy(true);
+            UIFinger.Hide();
 
             try
             {
