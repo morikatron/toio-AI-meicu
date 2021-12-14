@@ -16,6 +16,10 @@ namespace toio.AI.meicu
         public Button btnStart;
         public Text text;
         public Text textStage;
+        public GameObject resultObj;
+        public Text textResult;
+        public Text textResultQuit;
+        public Text textTag;
 
         private bool isHint = false;
         private int stage = 1;
@@ -41,10 +45,11 @@ namespace toio.AI.meicu
 
                 stage = 1;
 
-                text.text = "それじゃぁ、僕とたたかってみよう！\n最初は、僕もまだまだ弱いけど…";
                 btnStart.gameObject.SetActive(true);
                 btnStart.transform.GetComponentInChildren<Text>().text = "スタート";
+                resultObj.SetActive(false);
 
+                UpdateTextIntro();
                 UpdateStageText();
                 UpdateHint();
                 LoadLevel();
@@ -93,14 +98,36 @@ namespace toio.AI.meicu
         {
             AIController.ins.LoadModelByLevel(MeiPrefs.level);
         }
-        void StageUp()
+
+
+        string[] classNames = new string[]{"", "ビギナー", "ジュニア", "シニア", "プロ", "サブリーダー", "リーダー", "サブトレーナー", "トレーナー", "スター", "スーパースター", "マスター"};
+        void UpdateTextIntro()
         {
-            stage += 1;
+            if (stage > 1)
+            {
+                text.text = "つぎのステージやろう!\n僕はもっと早くなるぞ！";
+            }
+            else if (MeiPrefs.level == 1)
+            {
+                text.text = "それじゃぁ、僕とたたかってみよう！\n\n最初の僕は【ビギナー】、\nまだまだ弱いけど…";
+            }
+            else
+            {
+                int n = new int[]{0, 1, 10, 50, 100, 200, 500, 700, 900, 1000, 1500, 2000}[MeiPrefs.level];
+                text.text = "僕は迷キュー【プロ】だよ。\n試行錯誤を{}万回以上したんだ。\nどうだい？勝てるかな？";
+
+                if (MeiPrefs.level == 3)
+                    text.text += "\n（ここからリセットボタン使えないから\n間違えないように気をつけてね）";
+            }
+
+            textTag.text = classNames[MeiPrefs.level];
+
+            UpdateStageText();
         }
 
         void UpdateStageText()
         {
-            textStage.text = $"レベル {MeiPrefs.level} - ステージ {stage}";
+            textStage.text = $"レベル {MeiPrefs.level}/{Config.nLevels} ・ ステージ {stage}/5";
         }
         void UpdateHint()
         {
@@ -120,47 +147,92 @@ namespace toio.AI.meicu
 
         void ProcPlayerWin()
         {
+            // Level Clear
             if (stage == Config.levelSettings[MeiPrefs.level - 1].nStages)
             {
+                // TODO Audio level clear
+
                 if (MeiPrefs.level == Config.nLevels)
                 {
-                    text.text = "おめでとう！すべてクリアだよ！\n今の僕はキミにかなわない…\n僕ももっと「学習」して、もっと強くなったら、また勝負してね！";
+                    textResult.text = "おめでとう！すべてクリアだよ！\n今の僕はキミにかなわない…\n僕ももっと「学習」して、もっと強くなったら、また勝負してね！";
                 }
                 else
                 {
-                    text.text = $"おめでとう！レベル {MeiPrefs.level} クリアだよ！";
+                    textResult.text = $"おめでとう！レベル {MeiPrefs.level} クリアだよ！";
                 }
+
+                IEnumerator IE()
+                {
+                    if (MeiPrefs.level == 1)
+                    {
+                        resultToTitle = true;
+                        textResultQuit.text = "「かいせつ」が開放されたよ。\n見てみよう！\n\n（タップして戻る）";
+                    }
+                    else
+                    {
+                        textResultQuit.text = "（タップして戻る）";
+                    }
+                    yield break;
+                }
+                StartCoroutine(IE());
+
                 LevelUp();
-                btnStart.gameObject.SetActive(true);
-                btnStart.transform.GetComponentInChildren<Text>().text = "つぎ";
             }
+            // Stage Clear
             else
             {
-                StageUp();
-                btnStart.gameObject.SetActive(true);
-                btnStart.transform.GetComponentInChildren<Text>().text = "つぎ";
-                text.text = "おめでとう！きみの勝ち－！！次は負けないぞ！";
+                stage += 1;
+                textResult.text = "おめでとう！きみの勝ち－！！次は負けないぞ！";
+
+                IEnumerator IE()
+                {
+                    textResultQuit.text = "（タップして戻る）";
+                    yield break;
+                }
+                StartCoroutine(IE());
             }
+
+            resultObj.SetActive(true);
+            text.text = "";
+            btnStart.transform.GetComponentInChildren<Text>().text = "スタート";
         }
 
         void ProcPlayerLose()
         {
-            text.text = "どうだっ！僕の勝ちだよ！";
+            textResult.text = "どうだっ！僕の勝ちだよ！";
 
+            IEnumerator IE()
+            {
+                textResultQuit.text = "（タップして戻る）";
+                yield break;
+            }
+            StartCoroutine(IE());
+
+            // Back to Stage 1 or not
             if (Config.levelSettings[MeiPrefs.level - 1].retryOnFail)
             {}
             else
             {
                 stage = 1;
             }
-            btnStart.gameObject.SetActive(true);
+
+            resultObj.SetActive(true);
+            text.text = "";
             btnStart.transform.GetComponentInChildren<Text>().text = "リトライ";
         }
 
         void ProcDraw()
         {
-            text.text = "うわっ、まちがえた･･･\n引き分けだね、もういっかいやろう";
-            btnStart.gameObject.SetActive(true);
+            textResult.text = "うわっ、まちがえた･･･\n引き分けだね、もういっかいやろう";
+            IEnumerator IE()
+            {
+                textResultQuit.text = "（タップして戻る）";
+                yield break;
+            }
+            StartCoroutine(IE());
+
+            resultObj.SetActive(true);
+            text.text = "";
             btnStart.transform.GetComponentInChildren<Text>().text = "リトライ";
         }
 
@@ -192,6 +264,22 @@ namespace toio.AI.meicu
             this.isHint = !this.isHint;
             UpdateHint();
         }
+
+        bool resultToTitle = false;
+        public void OnBtnResult()
+        {
+            if (resultToTitle)
+            {
+                resultToTitle = false;
+                PageManager.SetPage(PageManager.EPage.Title);
+            }
+            else
+            {
+                resultObj.SetActive(false);
+                btnStart.gameObject.SetActive(true);
+                UpdateTextIntro();
+            }
+        }
         #endregion
 
 
@@ -213,7 +301,7 @@ namespace toio.AI.meicu
                 {
                     yield return new WaitUntil(() => Device.ID2SpaceCoord(Device.cubes[0].x, Device.cubes[0].y) == new Vector2Int(4, 4) && Device.cubes[0].isGrounded); // TODO move to PlayerCon
                     Debug.Log("PageBattle.OnGameReady: Touched, Call game.StartGame");
-                    AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StartConfirm);
+                    AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StartConfirmed);
                     yield return new WaitForSecondsRealtime(0.3f);
                     game.StartGame();
                 }
@@ -242,9 +330,9 @@ namespace toio.AI.meicu
 
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Start);
 
-                if (MeiPrefs.level < 3 && game.inGame)
+                if (MeiPrefs.level < 3)
                 {
-                    btnStart.gameObject.SetActive(false);
+                    btnStart.gameObject.SetActive(true);
                     btnStart.transform.GetComponentInChildren<Text>().text = "リセット";
                 }
             }
