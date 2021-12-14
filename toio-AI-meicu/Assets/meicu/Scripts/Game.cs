@@ -266,8 +266,8 @@ namespace toio.AI.meicu
         {
             yield return new WaitForSecondsRealtime(0.5f);
             Device.cubes[idx].Move(20, -20, 1500, Cube.ORDER_TYPE.Strong);
-            if (idx == 0)
-                AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Lose);
+            // if (idx == 0)
+            //     AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Lose);
             yield break;
         }
 
@@ -276,8 +276,8 @@ namespace toio.AI.meicu
             if (stateA == PlayerState.InGame || stateP == PlayerState.InGame)
                 StartCoroutine(IE_Fail(1-idx));
             yield return new WaitForSecondsRealtime(0.5f);
-            if (idx == 0)
-                AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Win);
+            // if (idx == 0)
+            //     AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Win);
             for (int i=0; i<4; i++)
             {
                 Device.cubes[idx].Move(30, 30, 400, Cube.ORDER_TYPE.Strong);

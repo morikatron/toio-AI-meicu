@@ -44,7 +44,7 @@ namespace toio.AI.meicu
                 btnConnect.interactable = true;
                 btnTutorial.interactable = false;
                 btnBattle.interactable = false;
-                btnLearn.interactable = true; // TODO
+                btnLearn.interactable = true; // TODO debug
 
                 if (!isHiSaid)
                 {

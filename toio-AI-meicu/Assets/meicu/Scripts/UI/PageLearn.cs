@@ -176,24 +176,14 @@ namespace toio.AI.meicu
                 // Back
                 uiBoard.HideHeatmap();
 
-                text.text = "でも僕は、最初はそれすら分からない。\nだから、上下左右のどこにも動く可能性があるんだ。";
-                btnNext.gameObject.SetActive(true);
-
-                // Blink Arrow
-                for (int i=0; i < 5; i++)
-                {
-                    ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(true);
-                    yield return new WaitForSecondsRealtime(0.5f);
-                    ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(false);
-                    yield return new WaitForSecondsRealtime(0.5f);
-                }
-
-            }
-            else if (phase == 7)
-            {
                 // Hide Arrow
                 ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(false);
 
+                text.text = "でも僕は、最初はそれすら分からない。\nだから、上下左右のどこにも動く可能性があるんだ。";
+                btnNext.gameObject.SetActive(true);
+            }
+            else if (phase == 7)
+            {
                 text.text = "明るさで表現すると、こんな感じ。\nどのマスも同じ明るさ、どこも同じだけ可能性があるってこと。";
 
                 // Show heatmap
@@ -326,8 +316,8 @@ namespace toio.AI.meicu
 
                 // Show Video
                 ui.transform.Find("Video").gameObject.SetActive(true);
-                videoPlayer.Stop();
-                videoPlayer.StepForward();
+                videoPlayer.frame = 1;
+                videoPlayer.Pause();
 
                 text.text = "長い問題で、正しい道を探す時はこんな感じ…";
                 // yield return new WaitForSecondsRealtime(1.5f);
@@ -337,41 +327,41 @@ namespace toio.AI.meicu
                 if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 3);
                 else yield return new WaitForSecondsRealtime(2f);
                 videoPlayer.Pause();
-                yield return new WaitForSecondsRealtime(0.1f);
+                yield return new WaitForSecondsRealtime(0.2f);
                 text.text = "最初はぜんぜんゴールできない…";
-                yield return new WaitForSecondsRealtime(0.1f);
+                yield return new WaitForSecondsRealtime(0.2f);
                 videoPlayer.Play();
 
                 if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 7);
                 else yield return new WaitForSecondsRealtime(2f);
                 videoPlayer.Pause();
-                yield return new WaitForSecondsRealtime(0.1f);
+                yield return new WaitForSecondsRealtime(0.2f);
                 text.text = "1000回くらいがんばってもまだまだ…";
-                yield return new WaitForSecondsRealtime(0.1f);
+                yield return new WaitForSecondsRealtime(0.2f);
                 videoPlayer.Play();
 
                 if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 13);
                 else yield return new WaitForSecondsRealtime(2f);
                 videoPlayer.Pause();
-                yield return new WaitForSecondsRealtime(0.1f);
+                yield return new WaitForSecondsRealtime(0.2f);
                 text.text = "2000回くらいで、やっとゴールできはじめたよ！";
-                yield return new WaitForSecondsRealtime(0.1f);
+                yield return new WaitForSecondsRealtime(0.2f);
                 videoPlayer.Play();
 
                 if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 20);
                 else yield return new WaitForSecondsRealtime(2f);
                 videoPlayer.Pause();
-                yield return new WaitForSecondsRealtime(0.1f);
+                yield return new WaitForSecondsRealtime(0.2f);
                 text.text = "3000回こえたら、ほとんどゴールできるようになってきたね！";
-                yield return new WaitForSecondsRealtime(0.1f);
+                yield return new WaitForSecondsRealtime(0.2f);
                 videoPlayer.Play();
 
                 if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 27);
                 else yield return new WaitForSecondsRealtime(2f);
                 videoPlayer.Pause();
-                yield return new WaitForSecondsRealtime(0.1f);
+                yield return new WaitForSecondsRealtime(0.2f);
                 text.text = "ほぼカンペキにゴールできるようになるまで、僕は4000回くらいチャレンジしたんだよ！";
-                yield return new WaitForSecondsRealtime(0.1f);
+                yield return new WaitForSecondsRealtime(0.2f);
                 videoPlayer.Play();
 
                 yield return new WaitForSecondsRealtime(0.5f);

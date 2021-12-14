@@ -114,7 +114,7 @@ namespace toio.AI.meicu
             else
             {
                 int n = new int[]{0, 1, 10, 50, 100, 200, 500, 700, 900, 1000, 1500, 2000}[MeiPrefs.level];
-                text.text = "僕は迷キュー【プロ】だよ。\n試行錯誤を{}万回以上したんだ。\nどうだい？勝てるかな？";
+                text.text = $"僕は迷キュー\n【{classNames[MeiPrefs.level]}】だよ。\n試行錯誤を{n}万回以上したんだ。\nどうだい？勝てるかな？";
 
                 if (MeiPrefs.level == 3)
                     text.text += "\n（ここからリセットボタン使えないから\n間違えないように気をつけてね）";
@@ -150,7 +150,7 @@ namespace toio.AI.meicu
             // Level Clear
             if (stage == Config.levelSettings[MeiPrefs.level - 1].nStages)
             {
-                // TODO Audio level clear
+                AudioPlayer.ins.PlaySE(AudioPlayer.ESE.LevelUp);
 
                 if (MeiPrefs.level == Config.nLevels)
                 {
@@ -181,6 +181,8 @@ namespace toio.AI.meicu
             // Stage Clear
             else
             {
+                AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Win);
+
                 stage += 1;
                 textResult.text = "おめでとう！きみの勝ち－！！次は負けないぞ！";
 
@@ -199,6 +201,8 @@ namespace toio.AI.meicu
 
         void ProcPlayerLose()
         {
+            AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Lose);
+
             textResult.text = "どうだっ！僕の勝ちだよ！";
 
             IEnumerator IE()
@@ -223,6 +227,8 @@ namespace toio.AI.meicu
 
         void ProcDraw()
         {
+            AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Draw);
+
             textResult.text = "うわっ、まちがえた･･･\n引き分けだね、もういっかいやろう";
             IEnumerator IE()
             {
@@ -319,14 +325,14 @@ namespace toio.AI.meicu
             {
                 uiQuest.ShowQuest(game.quest);
                 uiBoard.ShowGoal(new Vector2Int(game.quest.goalRow, game.quest.goalCol));
-                text.text = $"{countDown}";
+                text.text = $"　　　　　　　　　{countDown}";
 
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StartCount);
             }
             else if (countDown == 0)
             {
                 Debug.Log("Game Started");
-                text.text = "ゲームスタート！\n上の順番に合わせてキューブを動かそう！";
+                text.text = "　　　　　ゲームスタート！\n\n上の順番に合わせてキューブを動かそう！";
 
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Start);
 
