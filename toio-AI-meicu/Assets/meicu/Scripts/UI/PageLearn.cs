@@ -329,7 +329,11 @@ namespace toio.AI.meicu
 
                 if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 20);
                 else yield return new WaitForSecondsRealtime(2f);
+                videoPlayer.Pause();
+                yield return new WaitForSecondsRealtime(0.1f);
                 text.text = "3000回こえたら、ほとんどゴールできるようになってきたね！";
+                yield return new WaitForSecondsRealtime(0.1f);
+                videoPlayer.Play();
 
                 if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 27);
                 else yield return new WaitForSecondsRealtime(2f);
