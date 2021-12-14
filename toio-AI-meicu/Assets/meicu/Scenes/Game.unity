@@ -1296,6 +1296,17 @@ MonoBehaviour:
   bgmTutorial: {fileID: 1898734568}
   bgmBattle: {fileID: 1328032970}
   sound: {fileID: 1098205630}
+  o9: {fileID: 8300000, guid: de22ad47084389044a6e3dad3bfbc9cc, type: 3}
+  o21: {fileID: 8300000, guid: 618ce6628779e774ea0eb82b9450038d, type: 3}
+  o33: {fileID: 8300000, guid: 1b920761b77956044b53e75d6c87a07b, type: 3}
+  o45: {fileID: 8300000, guid: 01ba4907e005d3843bf192f719e67417, type: 3}
+  o57: {fileID: 8300000, guid: 961c6908f11897a458b01b7766bc69b3, type: 3}
+  o69: {fileID: 8300000, guid: 1d7fac76e16ad014e926640fb69ffeff, type: 3}
+  o81: {fileID: 8300000, guid: 340cd6e9c626b984e9b54e2d2badaf71, type: 3}
+  o93: {fileID: 8300000, guid: 518e33ce7d3854e4c9db30d8ee048c27, type: 3}
+  o105: {fileID: 8300000, guid: 6db8ab1fcb3a3a6479d8cf836fe206df, type: 3}
+  o117: {fileID: 8300000, guid: 687b3aed6c7ea544da35db9666d9545e, type: 3}
+  o129: {fileID: 8300000, guid: b7ad877cd3523bc388caa85f6a78deda, type: 3}
 --- !u!1001 &130907246
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1992,7 +2003,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &259184416
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4311,7 +4322,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 23.46569, y: 50.44693}
-  m_SizeDelta: {x: 436.8752, y: 291.7957}
+  m_SizeDelta: {x: 472, y: 291.7957}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &799295156
 MonoBehaviour:
@@ -4632,7 +4643,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &870417057
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7530,7 +7541,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: e7096eea9dcf8434eb65bd6c170d4cc9, type: 3}
     m_FontSize: 36
     m_FontStyle: 1
     m_BestFit: 0
@@ -7542,7 +7553,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Start
+  m_Text: "\u30B9\u30BF\u30FC\u30C8"
 --- !u!222 &1308173087
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7745,7 +7756,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 6d3cd2545a6b934428f922b3983fce9e, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.3
+  m_Volume: 0.22
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -9330,7 +9341,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: e7096eea9dcf8434eb65bd6c170d4cc9, type: 3}
     m_FontSize: 34
     m_FontStyle: 1
     m_BestFit: 0
@@ -9342,7 +9353,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Lv.1 - Stage 1
+  m_Text: "\u30EC\u30D9\u30EB 1 - \u30B9\u30C6\u30FC\u30B8 1"
 --- !u!222 &1625818841
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10082,7 +10093,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 0c672967712281b49819c64f861a8b35, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.3
+  m_Volume: 0.22
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -10916,7 +10927,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 8158b58bc31ca674ab6779f053a14855, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.3
+  m_Volume: 0.22
   m_Pitch: 1
   Loop: 1
   Mute: 0

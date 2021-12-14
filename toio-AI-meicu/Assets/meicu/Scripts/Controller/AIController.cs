@@ -18,6 +18,7 @@ namespace toio.AI.meicu
         internal bool isPredicting { get; private set; } = false;
         // internal float[,] heatmap { get; private set; }
         internal event Action heatmapCallback;
+        internal event Action<int> thinkCallback;
         internal bool isPause = false;
         internal float intervalBegin = 3f;
         internal float intervalEnd = 1f;
@@ -124,6 +125,7 @@ namespace toio.AI.meicu
                     continue;
                 }
 
+                this.thinkCallback?.Invoke(0);
                 // Predicting Heatmap
                 this.isPredicting = true;
                 ClearHeatmapBuffer();
@@ -132,14 +134,16 @@ namespace toio.AI.meicu
                 yield return IE_PredictHeatmap(game.envA.Clone(), this.predictSteps);
                 Array.Copy(this.heatmapBuffer, this.heatmap, this.heatmap.Length);
                 if (isPause) continue;
-                this.heatmapCallback?.Invoke();
                 this.isPredicting = false;
+                this.heatmapCallback?.Invoke();
+                this.thinkCallback?.Invoke(1);
 
                 // Interval - simulate time of thinking
                 var interval = (float) game.envA.passedColorSpaceCnt / game.envA.quest.Length;
                 interval = interval * intervalEnd + (1-interval) * intervalBegin;
                 yield return new WaitForSecondsRealtime(interval);
                 if (isPause) continue;
+                this.thinkCallback?.Invoke(2);
 
                 // Request Agent Action
                 this.isActReceived = false;
@@ -153,6 +157,7 @@ namespace toio.AI.meicu
                 yield return new WaitUntil(()=>!isMoving);
 
                 Debug.Log("AICon.IE_Think : end");
+                this.thinkCallback?.Invoke(3);
             }
         }
 
@@ -273,7 +278,6 @@ namespace toio.AI.meicu
         {
             if (countDown == 0)
             {
-                Debug.LogWarning($"AICon.OnGameStarted. pause={isPause}");
                 agent.Restart();
                 StartCoroutine(IE_Think());
             }
