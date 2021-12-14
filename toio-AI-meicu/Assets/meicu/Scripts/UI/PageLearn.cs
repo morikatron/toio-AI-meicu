@@ -305,15 +305,27 @@ namespace toio.AI.meicu
 
                 if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 3);
                 else yield return new WaitForSecondsRealtime(2f);
+                videoPlayer.Pause();
+                yield return new WaitForSecondsRealtime(0.1f);
                 text.text = "最初はぜんぜんゴールできない…";
+                yield return new WaitForSecondsRealtime(0.1f);
+                videoPlayer.Play();
 
                 if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 7);
                 else yield return new WaitForSecondsRealtime(2f);
+                videoPlayer.Pause();
+                yield return new WaitForSecondsRealtime(0.1f);
                 text.text = "1000回くらいがんばってもまだまだ…";
+                yield return new WaitForSecondsRealtime(0.1f);
+                videoPlayer.Play();
 
                 if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 13);
                 else yield return new WaitForSecondsRealtime(2f);
+                videoPlayer.Pause();
+                yield return new WaitForSecondsRealtime(0.1f);
                 text.text = "2000回くらいで、やっとゴールできはじめたよ！";
+                yield return new WaitForSecondsRealtime(0.1f);
+                videoPlayer.Play();
 
                 if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 20);
                 else yield return new WaitForSecondsRealtime(2f);
@@ -321,7 +333,11 @@ namespace toio.AI.meicu
 
                 if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 27);
                 else yield return new WaitForSecondsRealtime(2f);
+                videoPlayer.Pause();
+                yield return new WaitForSecondsRealtime(0.1f);
                 text.text = "ほぼカンペキにゴールできるようになるまで、僕は4000回くらいチャレンジしたんだよ！";
+                yield return new WaitForSecondsRealtime(0.1f);
+                videoPlayer.Play();
 
                 yield return new WaitForSecondsRealtime(0.5f);
             }
