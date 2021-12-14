@@ -360,7 +360,7 @@ namespace toio.AI.meicu
             }
             else if (phase == 14)
             {
-                text.text = "つぎは「きいろ」のマスをタッチするよ。\n僕が進んだ道をよく見てタッチして！";
+                text.text = "次は「きいろ」のマスをタッチするよ。\n僕が進んだ道をよく見てタッチして！";
                 yield break;
             }
             else if (phase == 15)
