@@ -88,7 +88,7 @@ namespace toio.AI.meicu
                 {
                     if (ie_ChantActionP == null || candidateActionP != action)
                     {
-                        if (ie_ChantActionP != null) StopCoroutine(ie_ChantActionP);
+                        CancelChant();
                         ie_ChantActionP = IE_ChantActionP();
                         StartCoroutine(ie_ChantActionP);
                         candidateActionP = action;
@@ -96,8 +96,7 @@ namespace toio.AI.meicu
                 }
                 else
                 {
-                    if (ie_ChantActionP != null) StopCoroutine(ie_ChantActionP);
-                    ie_ChantActionP = null;
+                    CancelChant();
                 }
             }
         }
@@ -105,11 +104,17 @@ namespace toio.AI.meicu
         void OnIDMissed(Cube c)
         {
             lstCoord = new Vector2Int(-1, -1);
-            if (!isGameRunning) return;
+            // if (!isGameRunning) return;
 
+            CancelChant();
+        }
+
+        void CancelChant()
+        {
             if (ie_ChantActionP != null)
             {
                 StopCoroutine(ie_ChantActionP);
+                AudioPlayer.ins.StopSE();
                 ie_ChantActionP = null;
             }
         }
@@ -125,11 +130,12 @@ namespace toio.AI.meicu
                     ie_ChantActionP = null;
                     yield break;
                 }
-                AudioPlayer.ins.PlaySound((byte)(50+t*10), 0.2f, volume:0.5f);
+                if (t == 0)
+                    AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StepConfirming);
             }
 
             game.MoveP(candidateActionP);
-            AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StepConfirm, volume:0.5f);
+            AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StepConfirmed);
             ie_ChantActionP = null;
         }
 

@@ -10,10 +10,21 @@ namespace toio.AI.meicu
     {
         public static AudioPlayer ins {get; private set;}
 
+        [Header("Audio Sources")]
         public AudioSource bgmTitle;
         public AudioSource bgmTutorial;
         public AudioSource bgmBattle;
-        public AudioSource sound;
+        public AudioSource srcPerform;
+        public AudioSource srcSE;
+
+        public AudioClip confirmed;
+        public AudioClip confirming;
+        public AudioClip countdown;
+        public AudioClip start;
+
+        public AudioClip win;
+        public AudioClip lose;
+        public AudioClip levelup;
 
 
         void OnEnable()
@@ -48,142 +59,57 @@ namespace toio.AI.meicu
 
         internal enum ESE : byte
         {
-            StartConfirm, StartCount, Start,
-            StepConfirm,
-            Win, Lose, Draw,
+            StartConfirmed, StartCount, Start,
+            StepConfirmed, StepConfirming,
+            Win, Lose, Draw, LevelUp
         }
         internal void PlaySE(ESE se, float volume=0.5f)
         {
-            IEnumerator ie = null;
-            if (se == ESE.StartConfirm)
+            if (se == ESE.StartConfirmed)
             {
-                IEnumerator IE()
-                {
-                    PlaySoundEndless(69, volume);
-                    yield return new WaitForSecondsRealtime(0.04f);
-                    PlaySoundEndless(72, volume);
-                    yield return new WaitForSecondsRealtime(0.2f);
-                    StopSound();
-                    iePlaySound = null;
-                }
-                ie = IE();
+                srcSE.PlayOneShot(confirmed, volume);
             }
             else if (se == ESE.StartCount)
             {
-                IEnumerator IE()
-                {
-                    PlaySoundEndless(65, volume);
-                    yield return new WaitForSecondsRealtime(0.5f);
-                    StopSound();
-                    iePlaySound = null;
-                }
-                ie = IE();
+                srcSE.PlayOneShot(countdown, volume);
             }
             else if (se == ESE.Start)
             {
-                IEnumerator IE()
-                {
-                    PlaySoundEndless(72, volume);
-                    yield return new WaitForSecondsRealtime(1f);
-                    StopSound();
-                    iePlaySound = null;
-                }
-                ie = IE();
+                srcSE.PlayOneShot(start, volume);
             }
-            else if (se == ESE.StepConfirm)
+            else if (se == ESE.StepConfirming)
             {
-                IEnumerator IE()
-                {
-                    PlaySoundEndless(69, volume);
-                    yield return new WaitForSecondsRealtime(0.04f);
-                    PlaySoundEndless(72, volume);
-                    yield return new WaitForSecondsRealtime(0.2f);
-                    StopSound();
-                    iePlaySound = null;
-                }
-                ie = IE();
+                srcSE.PlayOneShot(confirming, volume);
+            }
+            else if (se == ESE.StepConfirmed)
+            {
+                srcSE.PlayOneShot(confirmed, volume);
             }
             else if (se == ESE.Win)
             {
-                IEnumerator IE()
-                {
-                    PlaySoundEndless(69, volume);
-                    yield return new WaitForSecondsRealtime(0.15f);
-                    PlaySoundEndless(71, volume);
-                    yield return new WaitForSecondsRealtime(0.15f);
-                    PlaySoundEndless(76, volume);
-                    yield return new WaitForSecondsRealtime(0.3f);
-                    PlaySoundEndless(73, volume);
-                    yield return new WaitForSecondsRealtime(0.08f);
-                    PlaySoundEndless(76, volume);
-                    yield return new WaitForSecondsRealtime(0.3f);
-                    StopSound();
-                    iePlaySound = null;
-                }
-                ie = IE();
+                srcPerform.PlayOneShot(win, volume);
             }
             else if (se == ESE.Lose)
             {
-                IEnumerator IE()
-                {
-                    PlaySoundEndless(65, volume);
-                    yield return new WaitForSecondsRealtime(0.15f);
-                    PlaySoundEndless(63, volume);
-                    yield return new WaitForSecondsRealtime(0.15f);
-                    PlaySoundEndless(59, volume);
-                    yield return new WaitForSecondsRealtime(0.3f);
-                    StopSound();
-                    iePlaySound = null;
-                }
-                ie = IE();
+                srcPerform.PlayOneShot(lose, volume);
             }
-
-            if (ie == null) return;
-
-            if (iePlaySound != null)
-                StopCoroutine(iePlaySound);
-            iePlaySound = ie;
-            StartCoroutine(iePlaySound);
-        }
-
-        IEnumerator iePlaySound = null;
-        internal void PlaySound(int soundId, float duration, float volume=0.3f)
-        {
-            IEnumerator ie()
+            else if (se == ESE.Draw)
             {
-                PlaySoundEndless(soundId, volume);
-                yield return new WaitForSecondsRealtime(duration);
-                StopSound();
-                iePlaySound = null;
+                srcPerform.PlayOneShot(lose, volume);
             }
-
-            if (iePlaySound != null)
-                StopCoroutine(iePlaySound);
-            iePlaySound = ie();
-            StartCoroutine(iePlaySound);
-        }
-
-        private int playingSoundId = -1;
-        internal void PlaySoundEndless(int soundId, float volume)
-        {
-            if (soundId >= 128) { StopSound(); return; }
-            if (soundId != playingSoundId)
+            else if (se == ESE.LevelUp)
             {
-                playingSoundId = soundId;
-                int octave = (int)(soundId/12);
-                int idx = (int)(soundId%12);
-                var clip = Resources.Load("Octave/" + (octave*12+9)) as AudioClip;
-                sound.pitch = Mathf.Pow(2, ((float)idx-9)/12);
-                sound.clip = clip;
+                srcPerform.PlayOneShot(levelup, volume);
             }
-            sound.volume = volume;
-            if (!sound.isPlaying)
-                sound.Play();
         }
-        internal void StopSound(){
-            playingSoundId = -1;
-            sound.Stop();
-            sound.clip = null;
+
+        internal void StopSE(){
+            srcSE.Stop();
+            srcSE.clip = null;
+        }
+        internal void StopPerform(){
+            srcPerform.Stop();
+            srcPerform.clip = null;
         }
     }
 
