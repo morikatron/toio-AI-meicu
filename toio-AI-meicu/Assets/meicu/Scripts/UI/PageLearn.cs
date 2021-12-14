@@ -122,6 +122,7 @@ namespace toio.AI.meicu
             {
                 text.text = "ここでは、僕が「どのように正しい道を見つけているのか」についてかいせつするよ。";
                 btnHint.gameObject.SetActive(false);
+                ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(false);
                 ui.transform.Find("Indicators").Find("Hint").gameObject.SetActive(false);
                 ui.transform.Find("ImgThink").gameObject.SetActive(false);
                 ui.transform.Find("Illust").gameObject.SetActive(false);
@@ -151,21 +152,51 @@ namespace toio.AI.meicu
             }
             else if (phase == 4)
             {
+                // Back
+                ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(false);
+
                 text.text = "つまり、最初は\n「てきとうに動いてみる」\nだけなんだ。";
             }
             else if (phase == 5)
             {
                 text.text = "例えばこの問題の場合、キミはすぐに\n「上に動けばいい」ってわかるでしょ？";
+                btnNext.gameObject.SetActive(true);
+
+                // Blink Arrow
+                for (int i=0; i < 5; i++)
+                {
+                    ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(true);
+                    yield return new WaitForSecondsRealtime(0.5f);
+                    ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(false);
+                    yield return new WaitForSecondsRealtime(0.5f);
+                }
             }
             else if (phase == 6)
             {
-                text.text = "でも僕は、最初はそれすら分からない。\nだから、上下左右のどこにも動く可能性があるんだ。";
-
+                // Back
                 uiBoard.HideHeatmap();
+
+                text.text = "でも僕は、最初はそれすら分からない。\nだから、上下左右のどこにも動く可能性があるんだ。";
+                btnNext.gameObject.SetActive(true);
+
+                // Blink Arrow
+                for (int i=0; i < 5; i++)
+                {
+                    ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(true);
+                    yield return new WaitForSecondsRealtime(0.5f);
+                    ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(false);
+                    yield return new WaitForSecondsRealtime(0.5f);
+                }
+
             }
             else if (phase == 7)
             {
+                // Hide Arrow
+                ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(false);
+
                 text.text = "明るさで表現すると、こんな感じ。\nどのマスも同じ明るさ、どこも同じだけ可能性があるってこと。";
+
+                // Show heatmap
                 heatmap = new float[9, 9];
                 heatmap[3, 4] = 0.25f; heatmap[5, 4] = 0.25f; heatmap[4, 3] = 0.25f; heatmap[4, 5] = 0.25f;
                 uiBoard.ShowHeatmap(heatmap);
