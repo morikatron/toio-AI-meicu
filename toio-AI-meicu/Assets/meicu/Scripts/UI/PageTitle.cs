@@ -44,7 +44,7 @@ namespace toio.AI.meicu
                 btnConnect.interactable = true;
                 btnTutorial.interactable = false;
                 btnBattle.interactable = false;
-                btnLearn.interactable = false;
+                btnLearn.interactable = true; // TODO
 
                 if (!isHiSaid)
                 {
@@ -84,15 +84,29 @@ namespace toio.AI.meicu
 
                     text.text = "まずは迷路パズルのルールを\n説明するよ！";
                 }
+                else if (MeiPrefs.level == 1)
+                {
+                    btnTutorial.interactable = true;
+                    btnBattle.interactable = true;
+                    btnLearn.interactable = false;
+
+                    while (true)
+                    {
+                        text.text = "みんなは迷路が好きかな？";
+                        yield return new WaitForSecondsRealtime(2f);
+                        text.text = "僕と迷路パズルでバトルしよう！";
+                        yield return new WaitForSecondsRealtime(2f);
+                    }
+                }
                 else if (!MeiPrefs.isLearnCleared)
                 {
-                    btnTutorial.interactable = false;
-                    btnBattle.interactable = false;
+                    btnTutorial.interactable = true;
+                    btnBattle.interactable = true;
                     btnLearn.interactable = true;
 
                     UIFinger.PointAt(btnLearn.transform, biasX:130);
 
-                    text.text = "僕たちAIロボットが迷路パズルを\nどのように解いているのか、\nかいせつするよ！";
+                    text.text = "かいせつボタンを押すと、\n僕の強さのひみつが分かるよ";
                 }
                 else
                 {
