@@ -2213,7 +2213,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &259184416
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2366,14 +2366,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5acfd712ffd025d4f845fef2ede7acfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  game: {fileID: 347711359}
   ui: {fileID: 259184415}
   uiBoard: {fileID: 1650846024}
   uiQuest: {fileID: 124841651}
-  game: {fileID: 347711359}
   text: {fileID: 2064867944}
   btnNext: {fileID: 4447843303656423843}
   btnBack: {fileID: 1963187248}
-  btnHint: {fileID: 386144866}
+  swHint: {fileID: 102379842}
   videoPlayer: {fileID: 227772473}
 --- !u!1 &323941438
 GameObject:
@@ -3072,17 +3072,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8449450151505895938, guid: bc0fd1f23d6b8634db5ec49d9fc5e1f7, type: 3}
   m_PrefabInstance: {fileID: 525761404}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &386144866 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7452440465588855806, guid: bc0fd1f23d6b8634db5ec49d9fc5e1f7, type: 3}
-  m_PrefabInstance: {fileID: 525761404}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &389599407
 GameObject:
   m_ObjectHideFlags: 0
@@ -5006,7 +4995,9 @@ MonoBehaviour:
   swHint: {fileID: 102379842}
   text: {fileID: 1692310717}
   textStage: {fileID: 1625818840}
+  meicu: {fileID: 1743104893}
   resultObj: {fileID: 143414535}
+  meicuResult: {fileID: 1980040428}
   textResult: {fileID: 178652202}
   textResultQuit: {fileID: 720057589}
   textTag: {fileID: 1493758275}
@@ -5103,7 +5094,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 28434754922710823, guid: 177bba39f7ad07940bdd6d427c5209c5, type: 3}
       propertyPath: m_Name
-      value: ImgToio
+      value: UIMeicu
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 177bba39f7ad07940bdd6d427c5209c5, type: 3}
@@ -5127,7 +5118,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &870417057
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9666,7 +9657,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 28434754922710823, guid: 177bba39f7ad07940bdd6d427c5209c5, type: 3}
       propertyPath: m_Name
-      value: ImgToio
+      value: UIMeicu
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 177bba39f7ad07940bdd6d427c5209c5, type: 3}
@@ -11014,6 +11005,17 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1743104893 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5740149231410177307, guid: 177bba39f7ad07940bdd6d427c5209c5, type: 3}
+  m_PrefabInstance: {fileID: 28434753761712363}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20b72444d88bb7a48bbc08a62360c4cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1760328915
 GameObject:
   m_ObjectHideFlags: 0
@@ -12085,7 +12087,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 28434754922710823, guid: 177bba39f7ad07940bdd6d427c5209c5, type: 3}
       propertyPath: m_Name
-      value: ImgToio
+      value: UIMeicu
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 28434754922710821, guid: 177bba39f7ad07940bdd6d427c5209c5, type: 3}
@@ -12327,6 +12329,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1980040428 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5740149231410177307, guid: 177bba39f7ad07940bdd6d427c5209c5, type: 3}
+  m_PrefabInstance: {fileID: 1943326282}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20b72444d88bb7a48bbc08a62360c4cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1984245052
@@ -13579,7 +13592,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 28434754922710823, guid: 177bba39f7ad07940bdd6d427c5209c5, type: 3}
       propertyPath: m_Name
-      value: ImgToio
+      value: UIMeicu
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 177bba39f7ad07940bdd6d427c5209c5, type: 3}

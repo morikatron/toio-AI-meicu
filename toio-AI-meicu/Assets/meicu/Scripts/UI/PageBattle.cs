@@ -19,7 +19,11 @@ namespace toio.AI.meicu
         public UISwitch swHint;
         public Text text;
         public Text textStage;
+        public UIMeicu meicu;
+
+        [Header("Result UI Components")]
         public GameObject resultObj;
+        public UIMeicu meicuResult;
         public Text textResult;
         public Text textResultQuit;
         public Text textTag;
@@ -195,6 +199,7 @@ namespace toio.AI.meicu
                 StartCoroutine(IE());
             }
 
+            meicuResult.SetState(UIMeicu.State.Regret);
             resultObj.SetActive(true);
             text.text = "";
             btnStart.transform.GetComponentInChildren<Text>().text = "スタート";
@@ -221,6 +226,7 @@ namespace toio.AI.meicu
                 stage = 1;
             }
 
+            meicuResult.SetState(UIMeicu.State.Laugh);
             resultObj.SetActive(true);
             text.text = "";
             btnStart.transform.GetComponentInChildren<Text>().text = "リトライ";
@@ -238,6 +244,7 @@ namespace toio.AI.meicu
             }
             StartCoroutine(IE());
 
+            meicuResult.SetState(UIMeicu.State.Dull);
             resultObj.SetActive(true);
             text.text = "";
             btnStart.transform.GetComponentInChildren<Text>().text = "リトライ";
