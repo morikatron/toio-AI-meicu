@@ -16,7 +16,7 @@ namespace toio.AI.meicu
         public Text text;
         public Button btnNext;
         public Button btnBack;
-        public Button btnHint;
+        public UISwitch swHint;
 
         public VideoPlayer videoPlayer;
 
@@ -25,7 +25,6 @@ namespace toio.AI.meicu
         MeiQuest quest = default;
         bool isHeatmapReceived = false;
         float[,] heatmap;
-        bool isHint = false;
 
 
         internal void SetActive(bool active)
@@ -68,16 +67,13 @@ namespace toio.AI.meicu
 
         public void OnBtnHint()
         {
-            isHint = !isHint;
-            if (isHint)
+            if (swHint.isOn)
             {
                 uiBoard.ShowHeatmap(heatmap);
-                ui.transform.Find("BtnHint").GetComponent<Image>().color = Color.white;
             }
             else
             {
                 uiBoard.HideHeatmap();
-                ui.transform.Find("BtnHint").GetComponent<Image>().color = new Color(0.8f, 0.8f, 0.8f);
             }
         }
 
@@ -121,7 +117,7 @@ namespace toio.AI.meicu
             if (phase == 0)
             {
                 text.text = "ここでは、僕が「どのように正しい道を見つけているのか」についてかいせつするよ。";
-                btnHint.gameObject.SetActive(false);
+                swHint.gameObject.SetActive(false);
                 ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(false);
                 ui.transform.Find("Indicators").Find("Hint").gameObject.SetActive(false);
                 ui.transform.Find("ImgThink").gameObject.SetActive(false);
@@ -397,7 +393,7 @@ namespace toio.AI.meicu
             else if (phase == 20)
             {
                 // Back
-                btnHint.gameObject.SetActive(false);
+                swHint.gameObject.SetActive(false);
                 uiBoard.gameObject.SetActive(false);
                 uiQuest.gameObject.SetActive(false);
                 ui.transform.Find("Illust").gameObject.SetActive(true);
@@ -416,11 +412,10 @@ namespace toio.AI.meicu
                 uiQuest.gameObject.SetActive(true);
 
                 // Show hint
-                btnHint.gameObject.SetActive(true);
+                swHint.gameObject.SetActive(true);
+                swHint.isOn = false;
                 ui.transform.Find("Indicators").Find("Hint").gameObject.SetActive(true);
-                ui.transform.Find("BtnHint").GetComponent<Image>().color = new Color(0.8f, 0.8f, 0.8f);
                 uiBoard.HideHeatmap();
-                isHint = false;
 
                 text.text = "ちなみに、このボタンに気付いた？";
             }

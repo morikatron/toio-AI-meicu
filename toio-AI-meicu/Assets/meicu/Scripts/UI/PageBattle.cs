@@ -9,11 +9,14 @@ namespace toio.AI.meicu
 
     public class PageBattle : MonoBehaviour
     {
-        public GameObject ui;
         public UIBoard uiBoard;
         public UIQuest uiQuest;
         public Game game;
+
+        [Header("UI Components")]
+        public GameObject ui;
         public Button btnStart;
+        public UISwitch swHint;
         public Text text;
         public Text textStage;
         public GameObject resultObj;
@@ -21,7 +24,6 @@ namespace toio.AI.meicu
         public Text textResultQuit;
         public Text textTag;
 
-        private bool isHint = false;
         private int stage = 1;
 
 
@@ -48,6 +50,7 @@ namespace toio.AI.meicu
                 btnStart.gameObject.SetActive(true);
                 btnStart.transform.GetComponentInChildren<Text>().text = "スタート";
                 resultObj.SetActive(false);
+                swHint.isOn = false;
 
                 UpdateTextIntro();
                 UpdateStageText();
@@ -131,15 +134,13 @@ namespace toio.AI.meicu
         }
         void UpdateHint()
         {
-            if (this.isHint)
+            if (swHint.isOn)
             {
-                ui.transform.Find("BtnHint").GetComponent<Image>().color = Color.white;
                 ui.transform.Find("ImgThink").gameObject.SetActive(true);
                 uiBoard.ShowHeatmap(AIController.ins.Heatmap);
             }
             else
             {
-                ui.transform.Find("BtnHint").GetComponent<Image>().color = new Color(0.8f, 0.8f, 0.8f);
                 ui.transform.Find("ImgThink").gameObject.SetActive(false);
                 uiBoard.HideHeatmap();
             }
@@ -267,7 +268,6 @@ namespace toio.AI.meicu
 
         public void OnBtnHint()
         {
-            this.isHint = !this.isHint;
             UpdateHint();
         }
 
@@ -401,7 +401,7 @@ namespace toio.AI.meicu
 
         void OnAIHeatmap()
         {
-            if (isHint)
+            if (swHint.isOn)
                 uiBoard.ShowHeatmap(AIController.ins.Heatmap);
         }
         void OnAIThink(int phase)

@@ -91,6 +91,7 @@ GameObject:
   - component: {fileID: 5772355284584999300}
   - component: {fileID: 2989370986560730893}
   - component: {fileID: 7452440465588855806}
+  - component: {fileID: 2903197449337403980}
   m_Layer: 5
   m_Name: BtnHint
   m_TagString: Untagged
@@ -115,8 +116,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 580, y: 299.88}
-  m_SizeDelta: {x: 80, y: 80}
+  m_AnchoredPosition: {x: 578, y: 298}
+  m_SizeDelta: {x: 78, y: 78}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5772355284584999300
 CanvasRenderer:
@@ -146,7 +147,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5eaf229e9a6795f4fbf1022fec46f885, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ac33ae75e4ab84d4d81dbdea6a96f600, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -200,3 +201,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &2903197449337403980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4468904256611299363}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9287a9bc7523b854f88b4c8fe27d21cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spriteOn: {fileID: 21300000, guid: fec2e0c40af9937468fe7b339659f0bf, type: 3}
+  spriteOff: {fileID: 21300000, guid: ac33ae75e4ab84d4d81dbdea6a96f600, type: 3}
+  initialOn: 0
