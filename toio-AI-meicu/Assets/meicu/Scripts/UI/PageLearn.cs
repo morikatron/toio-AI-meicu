@@ -9,10 +9,10 @@ namespace toio.AI.meicu
 {
     public class PageLearn : MonoBehaviour
     {
+        public Game game;
         public GameObject ui;
         public UIBoard uiBoard;
         public UIQuest uiQuest;
-        public Game game;
         public Text text;
         public Button btnNext;
         public Button btnBack;
@@ -39,8 +39,7 @@ namespace toio.AI.meicu
 
                 AIController.ins.heatmapCallback += OnHeatmap;
                 AIController.ins.LoadBestModel();
-
-                MeiPrefs.SetLearnCleared();
+                MeiPrefs.SetLearnCleared(); // TODO
                 phase = 0;
                 Refresh();
             }
@@ -79,7 +78,7 @@ namespace toio.AI.meicu
 
         public void OnBtnNext()
         {
-            if (phase == 26)
+            if (phase == 27)
             {
                 PageManager.OnBtnHome();
                 return;
@@ -156,7 +155,7 @@ namespace toio.AI.meicu
             else if (phase == 5)
             {
                 text.text = "例えばこの問題の場合、キミはすぐに\n「上に動けばいい」ってわかるでしょ？";
-                btnNext.gameObject.SetActive(true);
+                btnNext.interactable = true;
 
                 // Blink Arrow
                 for (int i=0; i < 5; i++)
@@ -438,6 +437,11 @@ namespace toio.AI.meicu
             else if (phase == 26)
             {
                 text.text = "迷路バトルで僕に勝っていったら…\nどんどん強い、たくさん学習した僕と戦えるから、頑張ってみて！";
+            }
+            else if (phase == 27)
+            {
+                MeiPrefs.SetLearnCleared();
+                text.text = "それではあらためて、\n僕とバトルで勝負だ！";
             }
 
             yield return new WaitForSecondsRealtime(0.1f);

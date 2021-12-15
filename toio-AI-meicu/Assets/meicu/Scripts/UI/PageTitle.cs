@@ -110,6 +110,11 @@ namespace toio.AI.meicu
                 }
                 else
                 {
+                    if (!MeiPrefs.isBattleEnteredAfterLearn)
+                    {
+                        UIFinger.PointAt(btnBattle.transform, biasX:130);
+                    }
+
                     btnTutorial.interactable = true;
                     btnBattle.interactable = true;
                     btnLearn.interactable = true;
