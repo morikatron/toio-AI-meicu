@@ -111,10 +111,14 @@ namespace toio.AI.meicu
 
         void OnGameOverP(Game.PlayerState state)
         {
-            if (state == Game.PlayerState.Success)
+            if (state == Game.PlayerState.Win)
+            {
+                AIController.ins.PerformHappy();
                 phase = 20;
+            }
             else if (state == Game.PlayerState.Fail)
             {
+                AIController.ins.PerformSad();
                 phase = 19;
                 PlayerController.ins.isPause = true;
             }
@@ -315,32 +319,32 @@ namespace toio.AI.meicu
             else if (phase == 11)
             {
                 text.text = "裏のランプが青色に光っているのがキミのキューブだけど、\n今はいったん手に持っておいてね。\n（青キューブを持ち上げてください）";
-                yield return new WaitUntil(()=>!Device.cubes[0].isGrounded);
+                yield return new WaitUntil(() => PlayerController.ins.isConnected && !PlayerController.ins.isGrounded);
                 AIController.ins.Move2Center();
                 yield return new WaitForSecondsRealtime(0.5f);
-                yield return new WaitUntil(() => Device.IsAtSpace(1, 4, 4));
+                yield return new WaitUntil(() => AIController.ins.IsAtCenter);
                 text.text = "では動いてみるよ！";
             }
             else if (phase == 12)
             {
                 text.text = "まずは（きいろ）";
                 AIController.ins.RequestMove(Env.Action.Left);
-                yield return new WaitUntil(()=>!AIController.ins.isMoving);
+                yield return new WaitUntil(() => !AIController.ins.isMoving);
                 yield return new WaitForSecondsRealtime(1f);
 
                 text.text = "つぎは（しろ）...";
                 AIController.ins.RequestMove(Env.Action.Down);
-                yield return new WaitUntil(()=>!AIController.ins.isMoving);
+                yield return new WaitUntil(() => !AIController.ins.isMoving);
                 yield return new WaitForSecondsRealtime(1f);
 
                 text.text = "つぎは（あか）...";
                 AIController.ins.RequestMove(Env.Action.Down);
-                yield return new WaitUntil(()=>!AIController.ins.isMoving);
+                yield return new WaitUntil(() => !AIController.ins.isMoving);
                 yield return new WaitForSecondsRealtime(1f);
 
                 text.text = "また（しろ）...";
                 AIController.ins.RequestMove(Env.Action.Right);
-                yield return new WaitUntil(()=>!AIController.ins.isMoving);
+                yield return new WaitUntil(() => !AIController.ins.isMoving);
                 yield return new WaitForSecondsRealtime(1f);
 
                 text.text = "つぎの（みどり）でゴールだけど、\n僕はここで待ってるから、\nキミも同じように\nキューブを動かしてみて！";
@@ -350,7 +354,7 @@ namespace toio.AI.meicu
             else if (phase == 13)
             {
                 text.text = "まずは「スタート」のマスに、\nキミのキューブでタッチしてみて！\n「ピコン」と音が鳴ったらOKだよ！";
-                yield return new WaitUntil(()=>Device.IsAtSpace(0, 4, 4));
+                yield return new WaitUntil(() => PlayerController.ins.IsAtCenter);
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StartConfirmed);
 
                 PlayerController.ins.isPause = false;

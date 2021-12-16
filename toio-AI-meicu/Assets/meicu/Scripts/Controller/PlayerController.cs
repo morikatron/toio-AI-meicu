@@ -7,21 +7,24 @@ using toio;
 namespace toio.AI.meicu
 {
 
-    public class PlayerController : MonoBehaviour
+    public class PlayerController : BaseController
     {
         internal static PlayerController ins { get; private set; }
 
         public Game game;
+
+        protected override int id => 0;
+
         internal bool isPause = false;
 
-        Cube cube;
         IEnumerator ie_ChantActionP = null;
         Env.Action candidateActionP;
         bool isGameRunning = false;
 
 
-        void OnEnable()
+        protected override void Awake()
         {
+            base.Awake();
             ins = this;
             game.startCallback += OnGameStarted;
             game.stepCallbackP += OnGameStep;
@@ -32,24 +35,18 @@ namespace toio.AI.meicu
 
         internal void Stop()
         {
-            isGameRunning = false;
+            StopMotion();
+
             StopAllCoroutines();
+            isGameRunning = false;
             ie_ChantActionP = null;
             lstCoord = new Vector2Int(-1, -1);
         }
 
-        internal void Init()
-        {
-            if (Device.cubes.Count >= 1)
-            {
-                cube = Device.cubes[0];
-                cube.idCallback.AddListener("P", OnID);
-                cube.idMissedCallback.AddListener("P", OnIDMissed);
-            }
-        }
 
+        #region ======== Cube Callbacks ========
         Vector2Int lstCoord = new Vector2Int(-1, -1);
-        void OnID(Cube c)
+        protected override void OnCubeID(Cube c)
         {
             if (!isGameRunning) return;
             if (isPause) return;
@@ -101,13 +98,15 @@ namespace toio.AI.meicu
             }
         }
 
-        void OnIDMissed(Cube c)
+        protected override void OnCubeIDMissed(Cube c)
         {
             lstCoord = new Vector2Int(-1, -1);
             // if (!isGameRunning) return;
 
             CancelChant();
         }
+
+        #endregion
 
         void CancelChant()
         {
@@ -118,7 +117,6 @@ namespace toio.AI.meicu
                 ie_ChantActionP = null;
             }
         }
-
 
         IEnumerator IE_ChantActionP()
         {
@@ -140,6 +138,7 @@ namespace toio.AI.meicu
         }
 
 
+        #region ======== Game Callbacks ========
 
         void OnGameStarted(int countDown)
         {
@@ -169,6 +168,8 @@ namespace toio.AI.meicu
         {
             Stop();
         }
+
+        #endregion
     }
 
 }

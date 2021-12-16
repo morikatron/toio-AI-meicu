@@ -11,7 +11,7 @@ namespace toio.AI.meicu
 
     public class Device
     {
-        static internal Action<int, bool> connectionCallback;
+        static internal event Action<int, bool> connectionCallback;
 
         static CubeManager _cubeManager;
         internal static CubeManager cubeManager
@@ -22,51 +22,121 @@ namespace toio.AI.meicu
                 return _cubeManager;
             }
         }
+        private static List<Cube> cubes => cubeManager.cubes;
+        private static Dictionary<int, int> IdxTable = new Dictionary<int, int>();
 
-        internal static bool isCube0Connected { get {
-            if (cubeManager.cubes.Count == 0) return false;
-            return cubeManager.cubes[0].isConnected;
-        }}
-        internal static bool isCube1Connected { get {
-            if (cubeManager.cubes.Count < 2) return false;
-            return cubeManager.cubes[1].isConnected;
-        }}
-        internal static bool isBothConnected => isCube0Connected && isCube1Connected;
 
+        internal static void Assign(int id)
+        {
+            if (!IdxTable.ContainsKey(id))
+            {
+                IdxTable.Add(id, -1);
+            }
+            UpdateAssign();
+        }
+        internal static bool IsConnected(int id)
+        {
+            if (!IdxTable.ContainsKey(id))
+                Assign(id);
+
+            int idx = IdxTable[id];
+            if (cubes.Count <= idx || idx < 0) return false;
+            return cubes[idx].isConnected;
+        }
+
+        internal static Cube GetCube(int id)
+        {
+            if (!IdxTable.ContainsKey(id)) return null;
+
+            int idx = IdxTable[id];
+            if (cubes.Count <= idx || idx < 0) return null;
+            return cubes[idx];
+        }
+
+        internal static bool isTwoConnected => nConnected >= 2;
         internal static int nConnected { get {
             int n = 0;
-            if (isCube0Connected) n++;
-            if (isCube1Connected) n++;
+            foreach (var c in cubes)
+            {
+                if (c.isConnected) n++;
+            }
             return n;
         }}
 
+
+        static void UpdateAssign()
+        {
+            for (int idx = 0; idx < cubes.Count; idx ++)
+            {
+                if (!cubes[idx].isConnected) continue;
+                if (IdxTable.ContainsValue(idx)) continue;
+                // Find a not connected id, assign idx to it
+                foreach (var id in IdxTable.Keys)
+                {
+                    var _idx = IdxTable[id];
+                    if (_idx < 0 || _idx >= cubes.Count || !cubes[_idx].isConnected)
+                    {
+                        IdxTable[id] = idx;
+
+                        if (cubes[idx] is CubeReal)
+                            (cubes[idx] as CubeReal).peripheral.AddConnectionListener(
+                                "meicu.Device", peri => connectionCallback.Invoke(id, peri.isConnected));
+
+                        // Connected event
+                        connectionCallback.Invoke(id, true);
+
+                        if (0 <= _idx && _idx < cubes.Count && cubes[_idx] is CubeReal)
+                        {
+                            (cubes[_idx] as CubeReal).peripheral.RemoveConnectionListener("meicu.Device");
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
         internal static async UniTask Connect()
         {
+            // TODO Timeout
             var cube = await cubeManager.SingleConnect();
-            var cubeIdx = cubeManager.cubes.FindIndex(c => c == cube);
+            var cubeIdx = cubes.FindIndex(c => c == cube);
+            cubeManager.handles[cubeIdx].SetBorderRect(new RectInt(545, 45, 410, 410));
 
-            if (cubeIdx == 0)
+            UpdateAssign();
+
+            int id = -1;
+            foreach (var _id in IdxTable.Keys)
+            {
+                if (IdxTable[_id] == cubeIdx)
+                {
+                    id = _id; break;
+                }
+            }
+
+            if (id == -1)
+            {
+                Debug.LogWarning("Device.Connect: 3rd cube connected.");
+                return;
+            }
+
+            // Turn on LED
+            if (id == 0)
             {
                 var color = Config.LEDBlue;
                 cube.TurnLedOn(color.r, color.g, color.b, 0);
             }
-            else
+            else if (id == 1)
             {
                 var color = Config.LEDOrange;
                 cube.TurnLedOn(color.r, color.g, color.b, 0);
             }
-
-            // Set Disconnection Callback
-            if (cube is CubeReal)
-            {
-                (cube as CubeReal).peripheral.AddConnectionListener(
-                    "meicu.Device",
-                    peri => connectionCallback?.Invoke(cubeIdx, peri.isConnected));
-            }
         }
 
-        internal static bool TargetMove(int idx, int row, int col, int biasX=0, int biasY=0)
+        internal static bool TargetMove(int id, int row, int col, int biasX=0, int biasY=0)
         {
+            if (!IdxTable.ContainsKey(id)) return false;
+            int idx = IdxTable[id];
+
             if (cubeManager.cubes.Count < idx+1) return false;
             var pos = SpaceCoords2ID(row, col);
             cubeManager.cubes[idx].TargetMove(
@@ -77,15 +147,17 @@ namespace toio.AI.meicu
             return true;
         }
 
-        internal static List<Cube> cubes => cubeManager.cubes;
-
-        public static bool IsAtSpace(int idx, int row, int col)
+        public static bool IsAtSpace(int id, int row, int col)
         {
-            if (idx == 0 && !isCube0Connected || idx == 1 && !isCube1Connected) return false;
+            if (!IdxTable.ContainsKey(id)) return false;
+            int idx = IdxTable[id];
+
+            if (!IsConnected(idx)) return false;
             if (!cubes[idx].isGrounded) return false;
             var rowCol = ID2SpaceCoord(cubes[idx].x, cubes[idx].y);
             return rowCol.x == row && rowCol.y == col;
         }
+
         public static Vector2Int SpaceCoords2ID(int row, int col)
         {
             return new Vector2Int(750 + (col-4)*44, 250 + (row-4)*44);

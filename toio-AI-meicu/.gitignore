@@ -4,6 +4,7 @@
 /Assets/toio-sdk/
 /Assets/WebGLTemplates/
 /Assets/Plugins/
+/Assets/ML-Agents/
 /Packages/
 
 # This .gitignore file should be placed at the root of your Unity project directory

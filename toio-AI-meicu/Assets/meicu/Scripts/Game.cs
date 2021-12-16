@@ -103,7 +103,7 @@ namespace toio.AI.meicu
 
         internal void StartGame()
         {
-            if (!Device.isBothConnected) return;
+            if (!Device.isTwoConnected) return;
 
             StartCoroutine(IE_Starting());
         }
@@ -129,8 +129,7 @@ namespace toio.AI.meicu
 
             while (true)
             {
-                var coordA = Device.ID2SpaceCoord(Device.cubes[1].x, Device.cubes[1].y);
-                if (coordA.x == 4 && coordA.y == 4 && !Device.cubes[0].isGrounded)
+                if (AIController.ins.IsAtCenter)
                 {
                     readyCallback?.Invoke(true);
                     break;
@@ -186,12 +185,45 @@ namespace toio.AI.meicu
             if (res != Env.Response.FailOut)
                 trajP.Add(GetPosP());
 
-            stepCallbackP?.Invoke(res);
-
+            // Fail
             if (Env.IsResponseFail(res))
-                FailP();
+            {
+                stateP = PlayerState.Fail;
+
+                if (stateA == PlayerState.Fail)
+                {
+                    inGame = false;
+                    stateP = PlayerState.Draw;
+                    stateA = PlayerState.Draw;
+                }
+
+                stepCallbackP?.Invoke(res);
+                overCallbackP?.Invoke(stateP);
+                if (!inGame) overCallbackA?.Invoke(stateA);
+                if (!inGame) overCallback?.Invoke(stateP, stateA);
+            }
+            // Goal
             else if (res == Env.Response.Goal)
-                SuccessP();
+            {
+                stateP = PlayerState.Win;
+                inGame = false;
+                if (stateA == PlayerState.Fail)
+                {
+                    stateA = PlayerState.LoseFail;
+                }
+                else
+                {
+                    stateA = PlayerState.LoseNotFail;
+                }
+
+                stepCallbackP?.Invoke(res);
+                overCallbackP?.Invoke(stateP);
+                overCallbackA?.Invoke(stateA);
+                overCallback?.Invoke(stateP, stateA);
+            }
+            // Nothing
+            else
+                stepCallbackP?.Invoke(res);
         }
 
         internal void MoveA(Env.Action action)
@@ -204,95 +236,51 @@ namespace toio.AI.meicu
             if (res != Env.Response.FailOut)
                 trajA.Add(GetPosA());
 
-            stepCallbackA?.Invoke(res);
-
+            // Fail
             if (Env.IsResponseFail(res))
-                FailA();
-            else if (res == Env.Response.Goal)
-                SuccessA();
-        }
-
-
-        private void FailP()
-        {
-            if (stateP != PlayerState.InGame) return;
-            stateP = PlayerState.Fail;
-            StartCoroutine(IE_Fail(0));
-
-            this.overCallbackP?.Invoke(stateP);
-            CheckOver();
-        }
-        private void FailA()
-        {
-            if (stateA != PlayerState.InGame) return;
-            stateA = PlayerState.Fail;
-            StartCoroutine(IE_Fail(1));
-
-            this.overCallbackA?.Invoke(stateA);
-            CheckOver();
-        }
-
-        private void SuccessP()
-        {
-            if (stateP != PlayerState.InGame) return;
-            stateP = PlayerState.Success;
-            this.overCallbackP?.Invoke(stateP);
-            this.overCallbackA?.Invoke(stateA);
-            CheckOver();
-            StartCoroutine(IE_Success(0));
-        }
-        private void SuccessA()
-        {
-            if (stateA != PlayerState.InGame) return;
-            stateA = PlayerState.Success;
-            this.overCallbackA?.Invoke(stateA);
-            this.overCallbackP?.Invoke(stateP);
-            CheckOver();
-            StartCoroutine(IE_Success(1));
-        }
-
-        private void CheckOver()
-        {
-            if (stateA == PlayerState.Success ||
-                stateP == PlayerState.Success ||
-                stateA == PlayerState.Fail && stateP == PlayerState.Fail)
             {
+                stateA = PlayerState.Fail;
+
+                if (stateP == PlayerState.Fail)
+                {
+                    inGame = false;
+                    stateA = PlayerState.Draw;
+                    stateP = PlayerState.Draw;
+                }
+
+                stepCallbackA?.Invoke(res);
+                overCallbackA?.Invoke(stateA);
+                if (!inGame) overCallbackP?.Invoke(stateP);
+                if (!inGame) overCallback?.Invoke(stateP, stateA);
+            }
+            // Goal
+            else if (res == Env.Response.Goal)
+            {
+                stateA = PlayerState.Win;
                 inGame = false;
+                if (stateP == PlayerState.Fail)
+                {
+                    stateP = PlayerState.LoseFail;
+                }
+                else
+                {
+                    stateP = PlayerState.LoseNotFail;
+                }
+
+                stepCallbackA?.Invoke(res);
+                overCallbackA?.Invoke(stateA);
+                overCallbackP?.Invoke(stateP);
                 overCallback?.Invoke(stateP, stateA);
             }
+            // Nothing
+            else
+                stepCallbackA?.Invoke(res);
         }
-
-        IEnumerator IE_Fail(int idx)
-        {
-            yield return new WaitForSecondsRealtime(0.5f);
-            Device.cubes[idx].Move(20, -20, 1500, Cube.ORDER_TYPE.Strong);
-            // if (idx == 0)
-            //     AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Lose);
-            yield break;
-        }
-
-        IEnumerator IE_Success(int idx)
-        {
-            if (stateA == PlayerState.InGame || stateP == PlayerState.InGame)
-                StartCoroutine(IE_Fail(1-idx));
-            yield return new WaitForSecondsRealtime(0.5f);
-            // if (idx == 0)
-            //     AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Win);
-            for (int i=0; i<4; i++)
-            {
-                Device.cubes[idx].Move(30, 30, 400, Cube.ORDER_TYPE.Strong);
-                yield return new WaitForSecondsRealtime(0.5f);
-                Device.cubes[idx].Move(-30, -30, 400, Cube.ORDER_TYPE.Strong);
-                yield return new WaitForSecondsRealtime(0.5f);
-            }
-        }
-
-
 
 
         public enum PlayerState
         {
-            None, InGame, Fail, Success
+            None, InGame, Win, Fail, LoseFail, LoseNotFail, Draw
         }
     }
 

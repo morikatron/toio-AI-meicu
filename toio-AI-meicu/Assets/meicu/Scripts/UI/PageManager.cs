@@ -28,7 +28,7 @@ namespace toio.AI.meicu
 
             Config.Init();
 
-            Device.connectionCallback = OnDeviceConnection;
+            Device.connectionCallback += OnDeviceConnection;
 
             // PlayerPrefs.DeleteAll();
             MeiPrefs.SetTutorialCleared();

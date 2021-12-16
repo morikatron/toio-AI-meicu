@@ -7,16 +7,17 @@ using toio;
 
 namespace toio.AI.meicu
 {
-    public class AIController : MonoBehaviour
+    public class AIController : BaseController
     {
         internal static AIController ins { get; private set; }
 
         public GameAgent agent;
         public Game game;
-        public int predictSteps = 8;
+        public int heatmapPredictSteps = 8;
+
+        protected override int id => 1;
 
         internal bool isPredicting { get; private set; } = false;
-        // internal float[,] heatmap { get; private set; }
         internal event Action heatmapCallback;
         internal event Action<int> thinkCallback;
         internal bool isPause = false;
@@ -25,18 +26,16 @@ namespace toio.AI.meicu
         internal ref readonly float[,] Heatmap => ref heatmap;
         internal bool isMoving { get; private set; } = false;
 
-        Cube cube { get { return Device.cubes.Count>1? Device.cubes[1]:null; } }
         bool isActReceived = false;
         Env.Action action;
         Vector2Int targetCoords;
         float[,] heatmap = new float[9, 9];
         float[,] heatmapBuffer = new float[9, 9];
 
-        private IEnumerator ie_Move = null;
 
-
-        void OnEnable()
+        protected override void Awake()
         {
+            base.Awake();
             ins = this;
             agent.actCallback = OnAgentAct;
             game.startCallback += OnGameStarted;
@@ -47,26 +46,13 @@ namespace toio.AI.meicu
 
         void Stop()
         {
+            StopMotion();
+
             StopAllCoroutines();
-            ie_Move = null;
             isPredicting = false;
             isActReceived = false;
             ClearHeatmap();
             ClearHeatmapBuffer();
-        }
-
-        internal void Init()
-        {
-            if (Device.isCube1Connected)
-            {
-                cube.idCallback.AddListener("A", OnID);
-                cube.idMissedCallback.AddListener("A", OnIDMissed);
-            }
-        }
-
-        internal void Move2Center()
-        {
-            Device.TargetMove(1, 4, 4, -10, 10);
         }
 
         internal void LoadModelByLevel(int lv)
@@ -78,41 +64,45 @@ namespace toio.AI.meicu
             agent.LoadModelByName(Config.bestModelName);
         }
 
+        internal void Move2Center()
+        {
+            Device.TargetMove(id, 4, 4, -10, 10);
+        }
+
         internal void RequestMove(Env.Action action)
         {
             this.action = action;
             (var r, var c) = Env.Translate(action, game.envA.row, game.envA.col);
 
-            if (ie_Move != null && this.targetCoords.x == r && this.targetCoords.y == c)
+            if (ieMotion != null && !isPerforming && this.targetCoords.x == r && this.targetCoords.y == c)
                 return;
 
             this.targetCoords = new Vector2Int(r, c);
 
-            StopMove();
-            ie_Move = IE_Move();
-            StartCoroutine(ie_Move);
+            StopMotion();
+            ieMotion = IE_Move();
+            StartCoroutine(ieMotion);
         }
 
         internal void RequestMove(int row, int col)
         {
-            if (ie_Move != null && this.targetCoords.x == row && this.targetCoords.y == col)
+            if (ieMotion != null && !isPerforming && this.targetCoords.x == row && this.targetCoords.y == col)
                 return;
 
             this.targetCoords = new Vector2Int(row, col);
 
-            StopMove();
-            ie_Move = IE_Move();
-            StartCoroutine(ie_Move);
+            StopMotion();
+            ieMotion = IE_Move();
+            StartCoroutine(ieMotion);
         }
 
-        internal void StopMove()
+        internal override void StopMotion(bool sendCmd = false)
         {
-            if (ie_Move != null)
-            {
-                StopCoroutine(ie_Move);
-                ie_Move = null;
-            }
+            isMoving = false;
+            base.StopMotion(sendCmd);
         }
+
+
 
 
         IEnumerator IE_Think()
@@ -131,7 +121,7 @@ namespace toio.AI.meicu
                 ClearHeatmapBuffer();
 
                 Debug.Log("AICon.IE_Think : predict heatmap");
-                yield return IE_PredictHeatmap(game.envA.Clone(), this.predictSteps);
+                yield return IE_PredictHeatmap(game.envA.Clone(), this.heatmapPredictSteps);
                 Array.Copy(this.heatmapBuffer, this.heatmap, this.heatmap.Length);
                 if (isPause) continue;
                 this.isPredicting = false;
@@ -167,7 +157,7 @@ namespace toio.AI.meicu
             isMoving = true;
 
             Debug.Log($"AICon.IE_Move : TargetMove({targetCoords.x}, {targetCoords.y})");
-            Device.TargetMove(1, targetCoords.x, targetCoords.y, -10, 10);
+            Device.TargetMove(id, targetCoords.x, targetCoords.y, -10, 10);
 
             float retryTime = 0;
 
@@ -182,13 +172,13 @@ namespace toio.AI.meicu
                 {
                     yield return new WaitUntil(()=>cube.isConnected);
                     Debug.Log($"AICon.IE_Move : TargetMove({targetCoords.x}, {targetCoords.y}) again on reconnection");
-                    Device.TargetMove(1, targetCoords.x, targetCoords.y, -10, 10);
+                    Device.TargetMove(id, targetCoords.x, targetCoords.y, -10, 10);
                 }
                 else if (retryTime > 10)
                 {
                     retryTime = 10;
                     Debug.Log($"AICon.IE_Move : TargetMove({targetCoords.x}, {targetCoords.y}) again on timeout(10s)");
-                    Device.TargetMove(1, targetCoords.x, targetCoords.y, -10, 10);
+                    Device.TargetMove(id, targetCoords.x, targetCoords.y, -10, 10);
                 }
             }
 
@@ -262,16 +252,6 @@ namespace toio.AI.meicu
             this.isPause = false;
         }
 
-
-        void OnID(Cube c)
-        {
-
-        }
-
-        void OnIDMissed(Cube c)
-        {
-
-        }
 
         #region ======== Game Event ========
         void OnGameStarted(int countDown)

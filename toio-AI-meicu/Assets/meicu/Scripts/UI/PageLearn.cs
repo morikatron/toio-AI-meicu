@@ -23,7 +23,6 @@ namespace toio.AI.meicu
 
         int phase = 0;
         MeiQuest quest = default;
-        bool isHeatmapReceived = false;
         float[,] heatmap;
         private bool requestBtnNext = false; // btn operation during one phase
 
@@ -40,8 +39,6 @@ namespace toio.AI.meicu
                 swHint.GetComponent<Button>().interactable = false;
                 swHint.isOn = false;
 
-                // AIController.ins.heatmapCallback += OnHeatmap;
-                // AIController.ins.LoadBestModel();
                 MeiPrefs.SetLearnCleared(); // TODO
 
                 phase = 0;
@@ -51,7 +48,6 @@ namespace toio.AI.meicu
             else
             {
                 StopAllCoroutines();
-                // AIController.ins.heatmapCallback -= OnHeatmap;
 
                 PlayerController.ins.isPause = false;
                 AIController.ins.isPause = false;
@@ -109,12 +105,6 @@ namespace toio.AI.meicu
 
             Refresh();
         }
-
-        void OnHeatmap()
-        {
-            isHeatmapReceived = true;
-        }
-
 
         internal void Refresh()
         {

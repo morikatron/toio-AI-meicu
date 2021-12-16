@@ -50,6 +50,8 @@ namespace toio.AI.meicu
                 game.readyCallback += OnGameReady;
                 game.startCallback += OnGameStarted;
                 game.overCallback += OnGameOver;
+                game.overCallbackP += OnGameOverP;
+                game.overCallbackA += OnGameOverA;
                 game.stepCallbackP += OnGameStepP;
                 game.stepCallbackA += OnGameStepA;
 
@@ -79,6 +81,8 @@ namespace toio.AI.meicu
                 game.readyCallback -= OnGameReady;
                 game.startCallback -= OnGameStarted;
                 game.overCallback -= OnGameOver;
+                game.overCallbackP -= OnGameOverP;
+                game.overCallbackA -= OnGameOverA;
                 game.stepCallbackP -= OnGameStepP;
                 game.stepCallbackA -= OnGameStepA;
             }
@@ -351,7 +355,7 @@ namespace toio.AI.meicu
 
                 IEnumerator Wait2Start()
                 {
-                    yield return new WaitUntil(() => Device.ID2SpaceCoord(Device.cubes[0].x, Device.cubes[0].y) == new Vector2Int(4, 4) && Device.cubes[0].isGrounded); // TODO move to PlayerCon
+                    yield return new WaitUntil(()=>PlayerController.ins.IsAtCenter);
                     Debug.Log("PageBattle.OnGameReady: Touched, Call game.StartGame");
                     AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StartConfirmed);
                     yield return new WaitForSecondsRealtime(0.3f);
@@ -392,20 +396,50 @@ namespace toio.AI.meicu
 
         void OnGameOver(Game.PlayerState stateP, Game.PlayerState stateA)
         {
-            if (stateP == Game.PlayerState.Success)
+            if (stateP == Game.PlayerState.Win)
             {
-                Debug.Log("Player Win");
+                Debug.Log("PageBattle.OnGameOver: Player Win");
                 ProcPlayerWin();
             }
-            else if (stateA == Game.PlayerState.Success)
+            else if (stateA == Game.PlayerState.Win)
             {
-                Debug.Log("AI Win");
+                Debug.Log("PageBattle.OnGameOver: AI Win");
                 ProcPlayerLose();
             }
             else
             {
-                Debug.Log("Both Fail");
+                Debug.Log("PageBattle.OnGameOver: Both Fail");
                 ProcDraw();
+            }
+        }
+        void OnGameOverP(Game.PlayerState stateP)
+        {
+            if (stateP == Game.PlayerState.Fail || stateP == Game.PlayerState.Draw)
+            {
+                PlayerController.ins.PerformRegret();
+            }
+            else if (stateP == Game.PlayerState.LoseFail || stateP == Game.PlayerState.LoseNotFail)
+            {
+                PlayerController.ins.PerformSad();
+            }
+            else if (stateP == Game.PlayerState.Win)
+            {
+                PlayerController.ins.PerformHappy();
+            }
+        }
+        void OnGameOverA(Game.PlayerState stateA)
+        {
+            if (stateA == Game.PlayerState.Fail || stateA == Game.PlayerState.Draw)
+            {
+                AIController.ins.PerformRegret();
+            }
+            else if (stateA == Game.PlayerState.LoseFail || stateA == Game.PlayerState.LoseNotFail)
+            {
+                AIController.ins.PerformSad();
+            }
+            else if (stateA == Game.PlayerState.Win)
+            {
+                AIController.ins.PerformHappy();
             }
         }
 
