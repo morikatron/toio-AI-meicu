@@ -15,7 +15,6 @@ namespace toio.AI.meicu
         public Sprite spriteRegret;
         public Sprite spriteTrouble;
 
-        private RectTransform tr;
         private IEnumerator ie = null;
         private State state = State.Default;
 
@@ -25,14 +24,10 @@ namespace toio.AI.meicu
             Default, Dull, Laugh, Regret, Trouble
         }
 
-        void Awake()
-        {
-            tr = img.transform as RectTransform;
-            img.sprite = spriteDefault;
-        }
-
         public void SetState(State state)
         {
+            var tr = img.transform as RectTransform;
+
             if (this.state != state)
             {
                 if (state == State.Default)

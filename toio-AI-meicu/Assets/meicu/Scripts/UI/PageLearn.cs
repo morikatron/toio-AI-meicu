@@ -25,6 +25,7 @@ namespace toio.AI.meicu
         MeiQuest quest = default;
         bool isHeatmapReceived = false;
         float[,] heatmap;
+        private bool requestBtnNext = false; // btn operation during one phase
 
 
         internal void SetActive(bool active)
@@ -36,17 +37,21 @@ namespace toio.AI.meicu
             {
                 uiQuest.Reset();
                 uiBoard.Reset();
+                swHint.GetComponent<Button>().interactable = false;
+                swHint.isOn = false;
 
-                AIController.ins.heatmapCallback += OnHeatmap;
-                AIController.ins.LoadBestModel();
+                // AIController.ins.heatmapCallback += OnHeatmap;
+                // AIController.ins.LoadBestModel();
                 MeiPrefs.SetLearnCleared(); // TODO
+
                 phase = 0;
+                requestBtnNext = false;
                 Refresh();
             }
             else
             {
                 StopAllCoroutines();
-                AIController.ins.heatmapCallback -= OnHeatmap;
+                // AIController.ins.heatmapCallback -= OnHeatmap;
 
                 PlayerController.ins.isPause = false;
                 AIController.ins.isPause = false;
@@ -68,16 +73,25 @@ namespace toio.AI.meicu
         {
             if (swHint.isOn)
             {
+                ui.transform.Find("ImgThink").gameObject.SetActive(true);
                 uiBoard.ShowHeatmap(heatmap);
             }
             else
             {
+                ui.transform.Find("ImgThink").gameObject.SetActive(false);
                 uiBoard.HideHeatmap();
             }
         }
 
         public void OnBtnNext()
         {
+            // BtnNext used as interaction during one phase
+            if (requestBtnNext)
+            {
+                requestBtnNext = false;
+                return;
+            }
+
             if (phase == 27)
             {
                 PageManager.OnBtnHome();
@@ -116,7 +130,6 @@ namespace toio.AI.meicu
             if (phase == 0)
             {
                 text.text = "ここでは、僕が「どのように正しい道を見つけているのか」についてかいせつするよ。";
-                swHint.gameObject.SetActive(false);
                 ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(false);
                 ui.transform.Find("Indicators").Find("Hint").gameObject.SetActive(false);
                 ui.transform.Find("ImgThink").gameObject.SetActive(false);
@@ -170,6 +183,7 @@ namespace toio.AI.meicu
             {
                 // Back
                 uiBoard.HideHeatmap();
+                ui.transform.Find("ImgThink").gameObject.SetActive(false);
 
                 // Hide Arrow
                 ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(false);
@@ -205,8 +219,6 @@ namespace toio.AI.meicu
                 heatmap = new float[9, 9];
                 float[] probs = new float[4];
                 for (int i = 0; i < 4; i++) probs[i] = 0.25f;   // initial uniform prob dist.
-
-                btnNext.interactable = true; // TODO
 
                 // Learning Iteration
                 for (int t = 0; t < 100; t++)
@@ -249,7 +261,6 @@ namespace toio.AI.meicu
                         if (t < 2)
                         {
                             text.text = $"　　　　　　試行 {t+1} 回目\n\n「上」に行ってみたらゴールに成功したね。この時にAIは「上に行けばゴールの可能性がアップする」と学習するんだ。";
-                            interval += 3;
                         }
                         else
                         {
@@ -272,7 +283,6 @@ namespace toio.AI.meicu
                         if (t < 2)
                         {
                             text.text = $"　　　　　　試行 {t+1} 回目\n\n「{actionStr}」に行ってみたら今度はゴールに失敗したね。この時にAIは「左に行くとゴールの可能性がダウンする」と学習するんだ。";
-                            interval += 3;
                         }
                         else
                         {
@@ -281,6 +291,15 @@ namespace toio.AI.meicu
                     }
 
                     yield return new WaitForSecondsRealtime(interval);
+
+                    // Request button interaction
+                    if (t < 2)
+                    {
+                        requestBtnNext = true;
+                        btnNext.interactable = true;
+                        yield return new WaitUntil(()=>!requestBtnNext);
+                        btnNext.interactable = false;
+                    }
                 }
                 text.text = "ほら「上」のマスが明るくなってきたでしょ？";
             }
@@ -298,6 +317,7 @@ namespace toio.AI.meicu
                 ui.transform.Find("Video").gameObject.SetActive(false);
                 uiBoard.gameObject.SetActive(true);
                 uiQuest.gameObject.SetActive(true);
+                ui.transform.Find("ImgThink").gameObject.SetActive(true);
             }
             else if (phase == 14)
             {
@@ -392,9 +412,10 @@ namespace toio.AI.meicu
             else if (phase == 20)
             {
                 // Back
-                swHint.gameObject.SetActive(false);
+                swHint.GetComponent<Button>().interactable = false;
                 uiBoard.gameObject.SetActive(false);
                 uiQuest.gameObject.SetActive(false);
+                ui.transform.Find("ImgThink").gameObject.SetActive(false);
                 ui.transform.Find("Illust").gameObject.SetActive(true);
                 ui.transform.Find("Indicators").Find("Hint").gameObject.SetActive(false);
 
@@ -411,10 +432,10 @@ namespace toio.AI.meicu
                 uiQuest.gameObject.SetActive(true);
 
                 // Show hint
-                swHint.gameObject.SetActive(true);
+                swHint.GetComponent<Button>().interactable = true;
                 swHint.isOn = false;
+                OnBtnHint();
                 ui.transform.Find("Indicators").Find("Hint").gameObject.SetActive(true);
-                uiBoard.HideHeatmap();
 
                 text.text = "ちなみに、このボタンに気付いた？";
             }

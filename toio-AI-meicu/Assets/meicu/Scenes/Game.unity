@@ -2373,7 +2373,7 @@ MonoBehaviour:
   text: {fileID: 2064867944}
   btnNext: {fileID: 4447843303656423843}
   btnBack: {fileID: 1963187248}
-  swHint: {fileID: 102379842}
+  swHint: {fileID: 1550613077}
   videoPlayer: {fileID: 227772473}
 --- !u!1 &323941438
 GameObject:
@@ -9738,6 +9738,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1494644485}
   m_CullTransparentMesh: 1
+--- !u!114 &1550613077 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2903197449337403980, guid: bc0fd1f23d6b8634db5ec49d9fc5e1f7, type: 3}
+  m_PrefabInstance: {fileID: 525761404}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9287a9bc7523b854f88b4c8fe27d21cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1568380706
 GameObject:
   m_ObjectHideFlags: 0
@@ -12089,8 +12100,7 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIMeicu
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 28434754922710821, guid: 177bba39f7ad07940bdd6d427c5209c5, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 177bba39f7ad07940bdd6d427c5209c5, type: 3}
 --- !u!224 &1943326283 stripped
 RectTransform:
