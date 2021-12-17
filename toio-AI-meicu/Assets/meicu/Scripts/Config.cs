@@ -64,11 +64,11 @@ namespace toio.AI.meicu
                     nStages: 5,
                     retryOnFail: true
                 );
-                lv.stageSettings.Add(new StageSetting(4f  , 2f  ));
-                lv.stageSettings.Add(new StageSetting(3.5f, 1.5f));
-                lv.stageSettings.Add(new StageSetting(3f  , 1.5f));
-                lv.stageSettings.Add(new StageSetting(2.5f, 1f  ));
-                lv.stageSettings.Add(new StageSetting(2f  , 0.5f));
+                lv.stageSettings.Add(new StageSetting(3f  , 2f  ));
+                lv.stageSettings.Add(new StageSetting(2.5f, 1.5f));
+                lv.stageSettings.Add(new StageSetting(2f  , 1.5f));
+                lv.stageSettings.Add(new StageSetting(1.5f, 1f  ));
+                lv.stageSettings.Add(new StageSetting(1f  , 0.5f));
                 levelSettings.Add(lv);
             }
 
@@ -80,11 +80,11 @@ namespace toio.AI.meicu
                     nStages: 5,
                     retryOnFail: true
                 );
-                lv.stageSettings.Add(new StageSetting(4f  , 2f  ));
-                lv.stageSettings.Add(new StageSetting(3.5f, 1.5f));
-                lv.stageSettings.Add(new StageSetting(3f  , 1.5f));
-                lv.stageSettings.Add(new StageSetting(2.5f, 1f  ));
-                lv.stageSettings.Add(new StageSetting(2f  , 0.5f));
+                lv.stageSettings.Add(new StageSetting(3f  , 2f  ));
+                lv.stageSettings.Add(new StageSetting(2.5f, 1.5f));
+                lv.stageSettings.Add(new StageSetting(2f  , 1.5f));
+                lv.stageSettings.Add(new StageSetting(1.5f, 1f  ));
+                lv.stageSettings.Add(new StageSetting(1f  , 0.5f));
                 levelSettings.Add(lv);
             }
 
@@ -96,11 +96,11 @@ namespace toio.AI.meicu
                     nStages: 5,
                     retryOnFail: true
                 );
-                lv.stageSettings.Add(new StageSetting(5f  , 2f  ));
-                lv.stageSettings.Add(new StageSetting(4.5f, 1.5f));
-                lv.stageSettings.Add(new StageSetting(4f  , 1.5f));
-                lv.stageSettings.Add(new StageSetting(3.5f, 1f  ));
-                lv.stageSettings.Add(new StageSetting(3f  , 0.5f));
+                lv.stageSettings.Add(new StageSetting(4f  , 2f  ));
+                lv.stageSettings.Add(new StageSetting(3.5f, 1.5f));
+                lv.stageSettings.Add(new StageSetting(3f  , 1.5f));
+                lv.stageSettings.Add(new StageSetting(2.5f, 1f  ));
+                lv.stageSettings.Add(new StageSetting(2f  , 0.5f));
                 levelSettings.Add(lv);
             }
 
@@ -112,11 +112,11 @@ namespace toio.AI.meicu
                     nStages: 5,
                     retryOnFail: false
                 );
-                lv.stageSettings.Add(new StageSetting(4.5f  , 2f  ));
-                lv.stageSettings.Add(new StageSetting(4f, 1.5f));
-                lv.stageSettings.Add(new StageSetting(3.5f  , 1.5f));
-                lv.stageSettings.Add(new StageSetting(3f, 1f  ));
-                lv.stageSettings.Add(new StageSetting(2.5f  , 0.5f));
+                lv.stageSettings.Add(new StageSetting(3.5f  , 2f  ));
+                lv.stageSettings.Add(new StageSetting(3f, 1.5f));
+                lv.stageSettings.Add(new StageSetting(2.5f  , 1.5f));
+                lv.stageSettings.Add(new StageSetting(2f, 1f  ));
+                lv.stageSettings.Add(new StageSetting(1.5f  , 0.5f));
                 levelSettings.Add(lv);
             }
 
@@ -128,11 +128,11 @@ namespace toio.AI.meicu
                     nStages: 5,
                     retryOnFail: false
                 );
-                lv.stageSettings.Add(new StageSetting(4f  , 2f  ));
-                lv.stageSettings.Add(new StageSetting(3.5f, 1.5f));
-                lv.stageSettings.Add(new StageSetting(3f  , 1.5f));
-                lv.stageSettings.Add(new StageSetting(2.5f, 1f  ));
-                lv.stageSettings.Add(new StageSetting(2f  , 0.5f));
+                lv.stageSettings.Add(new StageSetting(3f  , 2f  ));
+                lv.stageSettings.Add(new StageSetting(2.5f, 1.5f));
+                lv.stageSettings.Add(new StageSetting(2f  , 1.5f));
+                lv.stageSettings.Add(new StageSetting(1.5f, 1f  ));
+                lv.stageSettings.Add(new StageSetting(1f  , 0.5f));
                 levelSettings.Add(lv);
             }
 
@@ -144,11 +144,11 @@ namespace toio.AI.meicu
                     nStages: 5,
                     retryOnFail: false
                 );
-                lv.stageSettings.Add(new StageSetting(6f  , 2f  ));
-                lv.stageSettings.Add(new StageSetting(5.5f, 1.5f));
-                lv.stageSettings.Add(new StageSetting(5f  , 1.5f));
-                lv.stageSettings.Add(new StageSetting(4.5f, 1f  ));
-                lv.stageSettings.Add(new StageSetting(4f  , 0.5f));
+                lv.stageSettings.Add(new StageSetting(5f  , 2f  ));
+                lv.stageSettings.Add(new StageSetting(4.5f, 1.5f));
+                lv.stageSettings.Add(new StageSetting(4f  , 1.5f));
+                lv.stageSettings.Add(new StageSetting(3.5f, 1f  ));
+                lv.stageSettings.Add(new StageSetting(3f  , 0.5f));
                 levelSettings.Add(lv);
             }
 
@@ -160,11 +160,11 @@ namespace toio.AI.meicu
                     nStages: 5,
                     retryOnFail: false
                 );
-                lv.stageSettings.Add(new StageSetting(6f  , 2f  ));
-                lv.stageSettings.Add(new StageSetting(5.5f, 1.5f));
-                lv.stageSettings.Add(new StageSetting(5f  , 1.5f));
-                lv.stageSettings.Add(new StageSetting(4.5f, 1f  ));
-                lv.stageSettings.Add(new StageSetting(4f  , 0.5f));
+                lv.stageSettings.Add(new StageSetting(5f  , 2f  ));
+                lv.stageSettings.Add(new StageSetting(4.5f, 1.5f));
+                lv.stageSettings.Add(new StageSetting(4f  , 1.5f));
+                lv.stageSettings.Add(new StageSetting(3.5f, 1f  ));
+                lv.stageSettings.Add(new StageSetting(3f  , 0.5f));
                 levelSettings.Add(lv);
             }
 
@@ -176,11 +176,11 @@ namespace toio.AI.meicu
                     nStages: 5,
                     retryOnFail: false
                 );
-                lv.stageSettings.Add(new StageSetting(6f  , 2f  ));
-                lv.stageSettings.Add(new StageSetting(5.5f, 1.5f));
-                lv.stageSettings.Add(new StageSetting(5f  , 1.5f));
-                lv.stageSettings.Add(new StageSetting(4.5f, 1f  ));
-                lv.stageSettings.Add(new StageSetting(4f  , 0.5f));
+                lv.stageSettings.Add(new StageSetting(5f  , 2f  ));
+                lv.stageSettings.Add(new StageSetting(4.5f, 1.5f));
+                lv.stageSettings.Add(new StageSetting(4f  , 1.5f));
+                lv.stageSettings.Add(new StageSetting(3.5f, 1f  ));
+                lv.stageSettings.Add(new StageSetting(3f  , 0.5f));
                 levelSettings.Add(lv);
             }
 
@@ -192,11 +192,11 @@ namespace toio.AI.meicu
                     nStages: 5,
                     retryOnFail: false
                 );
-                lv.stageSettings.Add(new StageSetting(8f  , 2f  ));
-                lv.stageSettings.Add(new StageSetting(7f  , 1.5f));
-                lv.stageSettings.Add(new StageSetting(6f  , 1.5f));
-                lv.stageSettings.Add(new StageSetting(5f  , 1f  ));
-                lv.stageSettings.Add(new StageSetting(4f  , 0.5f));
+                lv.stageSettings.Add(new StageSetting(6f  , 2f  ));
+                lv.stageSettings.Add(new StageSetting(5f  , 1.5f));
+                lv.stageSettings.Add(new StageSetting(4.5f  , 1.5f));
+                lv.stageSettings.Add(new StageSetting(4f  , 1f  ));
+                lv.stageSettings.Add(new StageSetting(3.5f  , 0.5f));
                 levelSettings.Add(lv);
             }
 
@@ -208,11 +208,11 @@ namespace toio.AI.meicu
                     nStages: 5,
                     retryOnFail: false
                 );
-                lv.stageSettings.Add(new StageSetting(8f  , 2f  ));
-                lv.stageSettings.Add(new StageSetting(7f  , 1.5f));
-                lv.stageSettings.Add(new StageSetting(6f  , 1.5f));
-                lv.stageSettings.Add(new StageSetting(5f  , 1f  ));
-                lv.stageSettings.Add(new StageSetting(4f  , 0.5f));
+                lv.stageSettings.Add(new StageSetting(6f  , 2f  ));
+                lv.stageSettings.Add(new StageSetting(5f  , 1.5f));
+                lv.stageSettings.Add(new StageSetting(4.5f  , 1.5f));
+                lv.stageSettings.Add(new StageSetting(4f  , 1f  ));
+                lv.stageSettings.Add(new StageSetting(3.5f  , 0.5f));
                 levelSettings.Add(lv);
             }
 
@@ -224,11 +224,11 @@ namespace toio.AI.meicu
                     nStages: 5,
                     retryOnFail: false
                 );
-                lv.stageSettings.Add(new StageSetting(8f  , 2f  ));
-                lv.stageSettings.Add(new StageSetting(7f  , 1.5f));
+                lv.stageSettings.Add(new StageSetting(7f  , 2f  ));
                 lv.stageSettings.Add(new StageSetting(6f  , 1.5f));
-                lv.stageSettings.Add(new StageSetting(5f  , 1f  ));
-                lv.stageSettings.Add(new StageSetting(4f  , 0.5f));
+                lv.stageSettings.Add(new StageSetting(5f  , 1.5f));
+                lv.stageSettings.Add(new StageSetting(4f  , 1f  ));
+                lv.stageSettings.Add(new StageSetting(3f  , 0.5f));
                 levelSettings.Add(lv);
             }
         }

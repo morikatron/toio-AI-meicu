@@ -44,7 +44,7 @@ namespace toio.AI.meicu
                 btnConnect.interactable = true;
                 btnTutorial.interactable = false;
                 btnBattle.interactable = false;
-                btnLearn.interactable = true; // TODO debug
+                btnLearn.interactable = false;
 
                 if (!isHiSaid)
                 {
@@ -56,6 +56,8 @@ namespace toio.AI.meicu
 
                 if (!MeiPrefs.isTutorialCleared)
                     UIFinger.PointAt(btnConnect.transform, biasX:70);
+                else
+                    UIFinger.Hide();
             }
             else if (Device.nConnected == 1)
             {
@@ -66,6 +68,8 @@ namespace toio.AI.meicu
 
                 if (!MeiPrefs.isTutorialCleared)
                     UIFinger.PointAt(btnConnect.transform, biasX:70);
+                else
+                    UIFinger.Hide();
 
                 text.text = "もう1つ接続してね！";
             }

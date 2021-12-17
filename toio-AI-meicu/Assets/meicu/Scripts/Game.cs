@@ -129,7 +129,7 @@ namespace toio.AI.meicu
 
             while (true)
             {
-                if (AIController.ins.IsAtCenter)
+                if (AIController.ins.IsAtCenter && !PlayerController.ins.isGrounded)
                 {
                     readyCallback?.Invoke(true);
                     break;

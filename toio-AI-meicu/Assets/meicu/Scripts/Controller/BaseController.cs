@@ -37,7 +37,6 @@ namespace toio.AI.meicu
 
             if (cube != null && connected)
             {
-                Debug.Log(id);
                 cube.idCallback.ClearListener();
                 cube.idMissedCallback.ClearListener();
                 cube.idCallback.AddListener(id.ToString(), OnCubeID);

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Video;
+using UnityEngine.UI;
 
 
 namespace toio.AI.meicu
@@ -14,8 +15,11 @@ namespace toio.AI.meicu
         public PageBattle pageBattle;
         public PageLearn pageLearn;
         public DialogConnect dialogConnect;
-
         public VideoPlayer videoPlayer;
+
+        [Header("Debug")]
+        public bool isDebug;
+        public Transform uiDebug;
 
 
         static PageManager ins;
@@ -30,17 +34,12 @@ namespace toio.AI.meicu
 
             Device.connectionCallback += OnDeviceConnection;
 
-            // PlayerPrefs.DeleteAll();
-            MeiPrefs.SetTutorialCleared();
-            MeiPrefs.SetLearnCleared();
-            if (MeiPrefs.level <= 2)
-                MeiPrefs.level = 3;
             // Load video
             videoPlayer.url = Application.streamingAssetsPath + "/training.mp4";
             videoPlayer.Prepare();
+            videoPlayer.prepareCompleted += (vp) => { vp.StepForward(); vp.Pause(); };
 
             SetPage(EPage.Title);
-            dialogConnect.gameObject.SetActive(false);
         }
 
 
@@ -57,6 +56,10 @@ namespace toio.AI.meicu
             ins.pageTutorial?.SetActive(ePage == EPage.Tutorial);
             ins.pageBattle?.SetActive(ePage == EPage.Battle);
             ins.pageLearn?.SetActive(ePage == EPage.Learn);
+
+            if (ins.isDebug && ePage == EPage.Title)
+                ins.UpdateDebugSliderLv();
+            ins.uiDebug?.gameObject.SetActive(ins.isDebug && ePage == EPage.Title);
 
             AudioPlayer.ins.PlayBGM(ePage);
 
@@ -99,6 +102,43 @@ namespace toio.AI.meicu
             if (page == EPage.Learn) ins.pageLearn?.Pause();
         }
 
+
+        #region ========= Debug ========
+
+        void UpdateDebugSliderLv()
+        {
+            uiDebug.Find("TextLv").GetComponent<Text>().text = $"Level {MeiPrefs.level}";
+            uiDebug.Find("SliderLv").GetComponent<Slider>().value = MeiPrefs.level;
+        }
+
+        public void OnDebugBtnResetFlags()
+        {
+            PlayerPrefs.DeleteAll();
+
+            UpdateDebugSliderLv();
+            if (page == EPage.Title) pageTitle.Refresh();
+        }
+        public void OnDebugBtnClearFlags()
+        {
+            MeiPrefs.SetTutorialCleared();
+            MeiPrefs.SetLearnCleared();
+            MeiPrefs.SetBattleEnteredAfterLearn();
+            if (MeiPrefs.level == 1) MeiPrefs.level = 2;
+
+            UpdateDebugSliderLv();
+            if (page == EPage.Title) pageTitle.Refresh();
+        }
+        public void OnDebugSliderLv()
+        {
+            MeiPrefs.level = (int)uiDebug.Find("SliderLv").GetComponent<Slider>().value;
+
+            UpdateDebugSliderLv();
+            if (page == EPage.Title) pageTitle.Refresh();
+        }
+
+        #endregion
     }
+
+
 
 }

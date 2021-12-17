@@ -300,16 +300,16 @@ namespace toio.AI.meicu
 
             btnStart.gameObject.SetActive(false);
 
-            var lv = Config.levelSettings[MeiPrefs.level - 1];
-            var st = lv.stageSettings[stage-1];
+            var levelSetting = Config.levelSettings[MeiPrefs.level - 1];
+            var stageSetting = levelSetting.stageSettings[stage-1];
 
             uiQuest.Reset();
             uiBoard.Reset();
 
-            AIController.ins.intervalBegin = st.intervelBegin;
-            AIController.ins.intervalEnd = st.intervalEnd;
+            AIController.ins.intervalBegin = stageSetting.intervelBegin;
+            AIController.ins.intervalEnd = stageSetting.intervalEnd;
 
-            game.InitGame(lv.questSize, keepQuest);
+            game.InitGame(levelSetting.questSize, keepQuest);
             game.WaitReady();
 
             UpdateStageText();

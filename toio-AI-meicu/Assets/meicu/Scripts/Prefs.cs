@@ -87,7 +87,7 @@ namespace toio.AI.meicu
 
         internal static void LevelUp()
         {
-            if (level == 5) return;
+            if (level == Config.nLevels) return;
 
             level += 1;
         }
