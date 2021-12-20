@@ -154,30 +154,30 @@ namespace toio.AI.meicu
             Debug.Log($"AICon.IE_Move : Begin");
             isMoving = true;
 
-            Debug.Log($"AICon.IE_Move : TargetMove({targetCoords.x}, {targetCoords.y})");
-            Device.TargetMove(id, targetCoords.x, targetCoords.y, -10, 10);
-
-            float retryTime = 0;
+            float retryTime = 11;
 
             // Wait Cube to Arrive
             while (Device.ID2SpaceCoord(cube.x, cube.y) != targetCoords)
             {
-                yield return new WaitForSecondsRealtime(0.5f);
-                retryTime += 0.5f;
-
-
                 if (!cube.isConnected)
                 {
                     yield return new WaitUntil(()=>cube.isConnected);
-                    Debug.Log($"AICon.IE_Move : TargetMove({targetCoords.x}, {targetCoords.y}) again on reconnection");
-                    Device.TargetMove(id, targetCoords.x, targetCoords.y, -10, 10);
+                    retryTime = 11;
+                }
+                else if (!cube.isGrounded)
+                {
+                    cube.Move(20, -20, 400, Cube.ORDER_TYPE.Strong);
+                    retryTime = 11;
                 }
                 else if (retryTime > 10)
                 {
                     retryTime = 0;
-                    Debug.Log($"AICon.IE_Move : TargetMove({targetCoords.x}, {targetCoords.y}) again on timeout(10s)");
+                    Debug.Log($"AICon.IE_Move : TargetMove({targetCoords.x}, {targetCoords.y})");
                     Device.TargetMove(id, targetCoords.x, targetCoords.y, -10, 10);
                 }
+
+                yield return new WaitForSecondsRealtime(0.5f);
+                retryTime += 0.5f;
             }
 
             // Simulate Chant time 1s
