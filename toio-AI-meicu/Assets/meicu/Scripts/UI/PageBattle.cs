@@ -162,7 +162,7 @@ namespace toio.AI.meicu
             else
             {
                 int n = new int[]{0, 1, 10, 50, 100, 200, 500, 700, 900, 1000, 1500, 2000}[MeiPrefs.level];
-                var content = $"僕は【迷キュー{classNames[MeiPrefs.level]}】だよ\n試行錯誤を{n}万回以上したんだ。\n\nどうだい？勝てるかな？";
+                var content = $"僕は【迷キュー{classNames[MeiPrefs.level]}】だよ\n試行錯誤を<color=red>{n}万回以上</color>したんだ。\n\nどうだい？勝てるかな？";
                 if (MeiPrefs.level == 3)
                     content += "\n（ここからリセットボタン使えないから\n間違えないように気をつけてね）";
 

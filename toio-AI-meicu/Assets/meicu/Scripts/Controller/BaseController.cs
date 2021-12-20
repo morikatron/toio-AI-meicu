@@ -41,10 +41,12 @@ namespace toio.AI.meicu
                 cube.idMissedCallback.ClearListener();
                 cube.idCallback.AddListener(id.ToString(), OnCubeID);
                 cube.idMissedCallback.AddListener(id.ToString(), OnCubeIDMissed);
+                cube.targetMoveCallback.AddListener(id.ToString(), OnCubeTargetMove);
             }
         }
         protected virtual void OnCubeID(Cube cube) {}
         protected virtual void OnCubeIDMissed(Cube cube) {}
+        protected virtual void OnCubeTargetMove(Cube cube, int configId, Cube.TargetMoveRespondType type) {}
 
         internal bool IsAtCenter => Device.IsAtSpace(id, 4, 4);
 

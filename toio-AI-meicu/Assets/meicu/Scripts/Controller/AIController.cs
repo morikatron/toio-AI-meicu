@@ -103,8 +103,6 @@ namespace toio.AI.meicu
         }
 
 
-
-
         IEnumerator IE_Think()
         {
             while (true)
@@ -176,7 +174,7 @@ namespace toio.AI.meicu
                 }
                 else if (retryTime > 10)
                 {
-                    retryTime = 10;
+                    retryTime = 0;
                     Debug.Log($"AICon.IE_Move : TargetMove({targetCoords.x}, {targetCoords.y}) again on timeout(10s)");
                     Device.TargetMove(id, targetCoords.x, targetCoords.y, -10, 10);
                 }
@@ -250,6 +248,18 @@ namespace toio.AI.meicu
             this.heatmapCallback?.Invoke();
             this.isPredicting = false;
             this.isPause = false;
+        }
+
+
+        protected override void OnCubeIDMissed(Cube cube)
+        {
+            Debug.LogWarning("AIController.OnCubeIDMissed.");
+        }
+
+        protected override void OnCubeTargetMove(Cube cube, int configId, Cube.TargetMoveRespondType type)
+        {
+            if (type != Cube.TargetMoveRespondType.Normal)
+                Debug.LogWarning("AIController.OnCubeTargetMove : type = " + type.ToString());
         }
 
 
