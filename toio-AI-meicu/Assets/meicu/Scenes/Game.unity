@@ -4800,7 +4800,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Debuger
+  m_Text: Debugger
 --- !u!222 &758795135
 CanvasRenderer:
   m_ObjectHideFlags: 0

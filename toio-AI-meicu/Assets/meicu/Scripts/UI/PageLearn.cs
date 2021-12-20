@@ -272,7 +272,7 @@ namespace toio.AI.meicu
                         if (action == 3) actionStr = "左";
                         if (t < 2)
                         {
-                            text.text = $"　　　　　　試行 {t+1} 回目\n\n「{actionStr}」に行ってみたら今度はゴールに失敗したね。この時にAIは「左に行くとゴールの可能性がダウンする」と学習するんだ。";
+                            text.text = $"　　　　　　試行 {t+1} 回目\n\n「{actionStr}」に行ってみたら今度はゴールに失敗したね。この時にAIは「{actionStr}に行くとゴールの可能性がダウンする」と学習するんだ。";
                         }
                         else
                         {

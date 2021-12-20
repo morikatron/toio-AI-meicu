@@ -374,7 +374,7 @@ namespace toio.AI.meicu
             }
             else if (phase == 16)
             {
-                text.text = "そうそう！次は「きいろ」だよ！\n僕が通った道をよく見てね！";
+                text.text = "そうそう！次は「あか」だよ！\n僕が通った道をよく見てね！";
                 yield break;
             }
             else if (phase == 17)
