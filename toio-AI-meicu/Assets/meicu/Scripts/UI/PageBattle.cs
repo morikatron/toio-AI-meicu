@@ -18,7 +18,8 @@ namespace toio.AI.meicu
         public Button btnStart;
         public UISwitch swHint;
         public Text text;
-        public Text textStage;
+        public Transform trLevel;
+        public Transform trStage;
         public UIMeicu meicu;
 
         [Header("Result UI Components")]
@@ -169,14 +170,15 @@ namespace toio.AI.meicu
                 SetText(content);
             }
 
-            textTag.text = classNames[MeiPrefs.level];
+            textTag.text = "迷キュー" + classNames[MeiPrefs.level];
 
             UpdateStageText();
         }
 
         void UpdateStageText()
         {
-            textStage.text = $"レベル {MeiPrefs.level}/{Config.nLevels} ・ ステージ {stage}/5";
+            trLevel.GetComponentInChildren<UIBrain>().SetLevel(MeiPrefs.level);
+            trStage.GetComponentInChildren<UIStage>().SetHand(stage, 5);
         }
         void UpdateHint()
         {
@@ -375,14 +377,14 @@ namespace toio.AI.meicu
             {
                 uiQuest.ShowQuest(game.quest);
                 uiBoard.ShowGoal(new Vector2Int(game.quest.goalRow, game.quest.goalCol));
-                SetText($"　　　　　　　　　{countDown}", force:true);
+                SetText($"　　　　　　　<size=120>{countDown}</size>", force:true);
 
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StartCount);
             }
             else if (countDown == 0)
             {
                 Debug.Log("Game Started");
-                SetText("　　　　　ゲームスタート！\n\nお題の順番に合わせて\nキューブを動かそう！", minDuration:1f, force:true);
+                SetText("　　　　<size=32>ゲームスタート！</size>\n\nお題の順番に合わせて\nキューブを動かそう！", minDuration:1f, force:true);
 
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Start);
 
@@ -488,7 +490,7 @@ namespace toio.AI.meicu
         {
             if (phase == 1)
             {
-                var content = Random.Range(0f, 1f) < 0.5f? "考え中…" : "次は…どっち？";
+                var content = Random.Range(0f, 1f) < 0.5f? "考え中…" : "次は…どっちだろう？";
                 SetText(content, wait:false);
             }
             else if (phase == 2)

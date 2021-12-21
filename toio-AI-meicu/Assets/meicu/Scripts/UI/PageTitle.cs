@@ -110,7 +110,13 @@ namespace toio.AI.meicu
 
                     UIFinger.PointAt(btnLearn.transform, biasX:130);
 
-                    text.text = "かいせつボタンを押すと、\n僕の強さのひみつが分かるよ";
+                    while (true)
+                    {
+                        text.text = "レベル1のクリア、おめでとう！";
+                        yield return new WaitForSecondsRealtime(2f);
+                        text.text = "かいせつボタンを押すと、\n僕の強さのひみつが分かるよ";
+                        yield return new WaitForSecondsRealtime(2f);
+                    }
                 }
                 else
                 {
