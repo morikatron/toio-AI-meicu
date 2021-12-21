@@ -122,6 +122,7 @@ namespace toio.AI.meicu
                 text.text = "ここでは、僕が「どのように正しい道を見つけているのか」についてかいせつするよ。";
                 ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(false);
                 ui.transform.Find("Indicators").Find("Hint").gameObject.SetActive(false);
+                ui.transform.Find("Indicators").Find("Trials").gameObject.SetActive(false);
                 ui.transform.Find("ImgThink").gameObject.SetActive(false);
                 ui.transform.Find("Illust").gameObject.SetActive(false);
                 ui.transform.Find("Video").gameObject.SetActive(false);
@@ -202,6 +203,9 @@ namespace toio.AI.meicu
 
             else if (phase == 10)
             {
+                // Back
+                ui.transform.Find("Indicators").Find("Trials").gameObject.SetActive(false);
+
                 text.text = "これを「試行錯誤（しこうさくご）」って言うんだ。\nじっさいに100回やってみるね！";
             }
             else if (phase == 11)
@@ -218,6 +222,7 @@ namespace toio.AI.meicu
                     text.text = $"　　　　　　試行 {t+1} 回目\n\n\n\n";
 
                     // Restart
+                    ui.transform.Find("Indicators").Find("Trials").gameObject.SetActive(false);
                     uiBoard.HideTrajA();
                     uiBoard.ShowKomaA(4, 4);
                     heatmap[3, 4] = probs[0]; heatmap[4, 5] = probs[1]; heatmap[5, 4] = probs[2]; heatmap[4, 3] = probs[3];
@@ -233,20 +238,36 @@ namespace toio.AI.meicu
                     (var r, var c) = Env.Translate((Env.Action)action, 4, 4);
                     var pos = new Vector2Int(r, c);
 
-                    // Update GUI
-                    uiBoard.ShowKomaA(pos);
-                    uiBoard.ShowTrajA(new Vector2Int[]{pos});
-
                     // Learn
-                    if (r == 3 && c == 4)   // Goal
+                    if (action == 0)   // Goal
                     {
-                        uiQuest.ShowA(1);
                         for (int a = 0; a < 4; a++)
                         {
                             if (a == action) probs[a] += 0.009f;
                             else probs[a] -= 0.003f;
                         }
+                    }
+                    else    // Fail
+                    {
+                        for (int a = 0; a < 4; a++)
+                        {
+                            if (a == action) probs[a] -= 0.009f;
+                            else probs[a] += 0.003f;
+                        }
+                    }
 
+                    // Update GUI
+                    uiBoard.ShowKomaA(pos);
+                    uiBoard.ShowTrajA(new Vector2Int[]{pos});
+                    ui.transform.Find("Indicators").Find("Trials").gameObject.SetActive(true);
+                    ui.transform.Find("Indicators").Find("Trials").Find("a0").gameObject.SetActive(action==0);
+                    ui.transform.Find("Indicators").Find("Trials").Find("a1").gameObject.SetActive(action==1);
+                    ui.transform.Find("Indicators").Find("Trials").Find("a2").gameObject.SetActive(action==2);
+                    ui.transform.Find("Indicators").Find("Trials").Find("a3").gameObject.SetActive(action==3);
+
+                    if (action == 0)   // Goal
+                    {
+                        uiQuest.ShowA(1);
                         // Update text
                         if (t < 2)
                         {
@@ -259,12 +280,6 @@ namespace toio.AI.meicu
                     }
                     else    // Fail
                     {
-                        for (int a = 0; a < 4; a++)
-                        {
-                            if (a == action) probs[a] -= 0.009f;
-                            else probs[a] += 0.003f;
-                        }
-
                         // Update text
                         string actionStr = "";
                         if (action == 1) actionStr = "右";
@@ -295,6 +310,9 @@ namespace toio.AI.meicu
             }
             else if (phase == 12)
             {
+                // Hide Indicator
+                ui.transform.Find("Indicators").Find("Trials").gameObject.SetActive(false);
+
                 text.text = "これは、僕がまず「上のマスに移動するのが良さそうだ」って分かってきたって事なんだ。";
             }
 
