@@ -88,7 +88,7 @@ namespace toio.AI.meicu
                 return;
             }
 
-            if (phase == 27)
+            if (phase == 25)
             {
                 PageManager.OnBtnHome();
                 return;
@@ -125,6 +125,8 @@ namespace toio.AI.meicu
                 ui.transform.Find("Indicators").Find("Trials").gameObject.SetActive(false);
                 ui.transform.Find("ImgThink").gameObject.SetActive(false);
                 ui.transform.Find("Illust").gameObject.SetActive(false);
+                ui.transform.Find("Illust2").gameObject.SetActive(false);
+                ui.transform.Find("Illust3").gameObject.SetActive(false);
                 ui.transform.Find("Video").gameObject.SetActive(false);
                 uiBoard.gameObject.SetActive(true);
                 uiQuest.gameObject.SetActive(true);
@@ -231,7 +233,7 @@ namespace toio.AI.meicu
 
                     // Sample action
                     var action = SampleIdx(probs);
-                    if (t == 0) action = 0;
+                    if (t == 0 || t == 99) action = 0;
                     if (t == 1) action = Random.Range(1, 3);
 
                     // Env step
@@ -396,44 +398,95 @@ namespace toio.AI.meicu
                 // Hide Video
                 ui.transform.Find("Video").gameObject.SetActive(false);
 
-                // Show Illust
-                ui.transform.Find("Illust").gameObject.SetActive(true);
+                text.text = "ボクたちAIが学習していく\n\n流れをまとめると...";
 
-                text.text = "僕たちAIはコンピュータだから、最初から正しい道を知っているんじゃないかって思うかもしれないけど、";
+                // Show Illust
+                var illustTr = ui.transform.Find("Illust");
+                illustTr.gameObject.SetActive(true);
+                for (int i = 0; i < illustTr.childCount; i++)
+                    illustTr.GetChild(i).gameObject.SetActive(false);
+
+                illustTr.Find("Step1").gameObject.SetActive(true);
+                yield return new WaitForSecondsRealtime(2f);
+                illustTr.Find("Arrow1").gameObject.SetActive(true);
+                yield return new WaitForSecondsRealtime(0.5f);
+                illustTr.Find("Step2").gameObject.SetActive(true);
+                yield return new WaitForSecondsRealtime(2f);
+                illustTr.Find("Arrow2").gameObject.SetActive(true);
+                yield return new WaitForSecondsRealtime(0.5f);
+                illustTr.Find("Step3").gameObject.SetActive(true);
+                yield return new WaitForSecondsRealtime(2f);
+                illustTr.Find("Arrow3").gameObject.SetActive(true);
+                yield return new WaitForSecondsRealtime(0.5f);
+                illustTr.Find("Step4").gameObject.SetActive(true);
+                yield return new WaitForSecondsRealtime(2f);
+                illustTr.Find("Arrow4").gameObject.SetActive(true);
+                yield return new WaitForSecondsRealtime(0.5f);
+                illustTr.Find("Step5").gameObject.SetActive(true);
+                yield return new WaitForSecondsRealtime(2f);
+                illustTr.Find("Arrow5").gameObject.SetActive(true);
+                yield return new WaitForSecondsRealtime(0.5f);
+                illustTr.Find("Step6").gameObject.SetActive(true);
+                yield return new WaitForSecondsRealtime(2f);
+                illustTr.Find("Arrow6").gameObject.SetActive(true);
+                yield return new WaitForSecondsRealtime(0.5f);
+
+                text.text = "わかったかな？\n\n僕たちAIはコンピュータだから、最初から正しい道を知っているんじゃないかって思うかもしれないけど、";
             }
             else if (phase == 16)
             {
-                text.text = "実は、こうやって何度も失敗しながら、それでも繰り返しチャレンジして、\nやっと正解を見つけるんだ！";
+                // Back
+                ui.transform.Find("Illust").gameObject.SetActive(true);
+                ui.transform.Find("Illust2").gameObject.SetActive(false);
+
+                text.text = "実は、こうやって何度も失敗しながら、それでも繰り返しチャレンジして、\nやっと答えを見つけるんだ！";
             }
             else if (phase == 17)
             {
-                text.text = "なんだかキミたち人間と似てるでしょ？";
+                // Hide illust
+                ui.transform.Find("Illust").gameObject.SetActive(false);
+
+                text.text = "ほら見てごらん...\n\n何度もチャレンジして\n答えを見つかるところが\nどこかキミたち人間と似てるよね";
+
+                // Show illust2
+                var illustTr = ui.transform.Find("Illust2");
+                ui.transform.Find("Illust2").gameObject.SetActive(true);
+                illustTr.gameObject.SetActive(true);
+                for (int i = 0; i < illustTr.childCount; i++)
+                    illustTr.GetChild(i).gameObject.SetActive(false);
+
+                illustTr.Find("Step1").gameObject.SetActive(true);
+                yield return new WaitForSecondsRealtime(2f);
+                illustTr.Find("Arrow1").gameObject.SetActive(true);
+                yield return new WaitForSecondsRealtime(0.5f);
+                illustTr.Find("Step2").gameObject.SetActive(true);
+                yield return new WaitForSecondsRealtime(2f);
+                illustTr.Find("Arrow2").gameObject.SetActive(true);
+                yield return new WaitForSecondsRealtime(0.5f);
+                illustTr.Find("Step3").gameObject.SetActive(true);
             }
             else if (phase == 18)
-            {
-                text.text = "そして僕たちも、何度も何度も繰り返して学習するほど、強くかしこくなってゆくんだ！";
-            }
-            else if (phase == 19)
-            {
-                text.text = "でも…サボって学習しなければ\n弱いまま…";
-            }
-            else if (phase == 20)
             {
                 // Back
                 swHint.GetComponent<Button>().interactable = false;
                 uiBoard.gameObject.SetActive(false);
                 uiQuest.gameObject.SetActive(false);
                 ui.transform.Find("ImgThink").gameObject.SetActive(false);
-                ui.transform.Find("Illust").gameObject.SetActive(true);
                 ui.transform.Find("Indicators").Find("Hint").gameObject.SetActive(false);
 
-                text.text = "これもキミたちと似ているね！";
+                // Hide illust2
+                ui.transform.Find("Illust2").gameObject.SetActive(false);
+
+                // Show illust3
+                ui.transform.Find("Illust3").gameObject.SetActive(true);
+
+                text.text = "だからキミたち人間と\nボクたちAIは\nいい友だちになれると思う";
             }
 
-            else if (phase == 21)
+            else if (phase == 19)
             {
                 // Hide Illust
-                ui.transform.Find("Illust").gameObject.SetActive(false);
+                ui.transform.Find("Illust3").gameObject.SetActive(false);
 
                 // Show Board
                 uiBoard.gameObject.SetActive(true);
@@ -447,27 +500,27 @@ namespace toio.AI.meicu
 
                 text.text = "ちなみに、このボタンに気付いた？";
             }
-            else if (phase == 22)
+            else if (phase == 20)
             {
                 text.text = "このボタンは、僕の頭の中をこっそりのぞけるヒミツのボタン…";
             }
-            else if (phase == 23)
+            else if (phase == 21)
             {
                 text.text = "いま僕がどんな道を考えているか、見ることができるんだ。";
             }
-            else if (phase == 24)
+            else if (phase == 22)
             {
                 text.text = "もし、キミがどっちに進めばわからなくなった時は、こっそり見てみるといいかもね！";
             }
-            else if (phase == 25)
+            else if (phase == 23)
             {
                 text.text = "最初のころの僕はまだ弱いから…間違ったり、なかなか道が見えなかったりするけどね。";
             }
-            else if (phase == 26)
+            else if (phase == 24)
             {
                 text.text = "迷路バトルで僕に勝っていったら…\nどんどん強い、たくさん学習した僕と戦えるから、頑張ってみて！";
             }
-            else if (phase == 27)
+            else if (phase == 25)
             {
                 MeiPrefs.SetLearnCleared();
                 text.text = "それではあらためて、\n僕とバトルで勝負だ！";
