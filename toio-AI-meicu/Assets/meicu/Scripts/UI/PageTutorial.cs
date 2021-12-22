@@ -113,7 +113,7 @@ namespace toio.AI.meicu
         {
             if (state == Game.PlayerState.Win)
             {
-                AIController.ins.PerformHappy();
+                PlayerController.ins.PerformHappy();
                 phase = 20;
             }
             else if (state == Game.PlayerState.Fail)
@@ -257,7 +257,7 @@ namespace toio.AI.meicu
 
                 // Inactivate all indicators
                 SetIndicator("Start", false);
-                text.text = "こんにちは！僕は「迷キュー」";
+                text.text = "こんにちは！ボクは「迷キュー」";
             }
             else if (phase == 1)
             {
@@ -295,7 +295,7 @@ namespace toio.AI.meicu
             else if (phase == 7)
             {
                 SetIndicator("Quest");
-                text.text = "僕とキミと、どちらが早くゴールに\nたどりつけるか、勝負だよ！";
+                text.text = "ボクとキミと、どちらが早くゴールに\nたどりつけるか、勝負だよ！";
             }
 
             else if (phase == 8)
@@ -314,7 +314,7 @@ namespace toio.AI.meicu
             else if (phase == 10)
             {
                 SetIndicator("Start", false);
-                text.text = "それでは、\nまずは僕が動きながら説明するね。\n\nオレンジ色のキューブが僕だよ。";
+                text.text = "それでは、\nまずはボクが動きながら説明するね。\n\nオレンジ色のキューブがボクだよ。";
             }
             else if (phase == 11)
             {
@@ -327,27 +327,27 @@ namespace toio.AI.meicu
             }
             else if (phase == 12)
             {
-                text.text = "まずは（きいろ）";
+                text.text = "まずは「きいろ」";
                 AIController.ins.RequestMove(Env.Action.Left);
                 yield return new WaitUntil(() => !AIController.ins.isMoving);
                 yield return new WaitForSecondsRealtime(1f);
 
-                text.text = "つぎは（しろ）...";
+                text.text = "つぎは「しろ」...";
                 AIController.ins.RequestMove(Env.Action.Down);
                 yield return new WaitUntil(() => !AIController.ins.isMoving);
                 yield return new WaitForSecondsRealtime(1f);
 
-                text.text = "つぎは（あか）...";
+                text.text = "つぎは「あか」...";
                 AIController.ins.RequestMove(Env.Action.Down);
                 yield return new WaitUntil(() => !AIController.ins.isMoving);
                 yield return new WaitForSecondsRealtime(1f);
 
-                text.text = "また（しろ）...";
+                text.text = "また「しろ」...";
                 AIController.ins.RequestMove(Env.Action.Right);
                 yield return new WaitUntil(() => !AIController.ins.isMoving);
                 yield return new WaitForSecondsRealtime(1f);
 
-                text.text = "つぎの（みどり）でゴールだけど、\n僕はここで待ってるから、\nキミも同じように\nキューブを動かしてみて！";
+                text.text = "つぎの「みどり」でゴールだけど、\nボクはここで待ってるから、\nキミも同じように\nキューブを動かしてみて！";
                 yield return new WaitForSecondsRealtime(0.1f);
             }
 
@@ -364,7 +364,7 @@ namespace toio.AI.meicu
             }
             else if (phase == 14)
             {
-                text.text = "次は「きいろ」のマスをタッチするよ。\n僕が進んだ道をよく見てタッチして！";
+                text.text = "次は「きいろ」のマスをタッチするよ。\nボクが進んだ道をよく見てタッチして！\n\n「プープープー・ピッ」という音が鳴ったらOKだよ。";
                 yield break;
             }
             else if (phase == 15)
@@ -374,12 +374,12 @@ namespace toio.AI.meicu
             }
             else if (phase == 16)
             {
-                text.text = "そうそう！次は「あか」だよ！\n僕が通った道をよく見てね！";
+                text.text = "そうそう！次は「あか」だよ！\nボクが通った道をよく見てね！";
                 yield break;
             }
             else if (phase == 17)
             {
-                text.text = "そして「しろ」。\n同じマスにならぶよ！\n\n同じマスにタッチしにくい場合は、僕を少しずらしてね！";
+                text.text = "そして「しろ」。\n同じマスにならぶよ！\n\n同じマスにタッチしにくい場合は、ボクを少しずらしてね！";
                 yield break;
             }
             else if (phase == 18)
@@ -390,7 +390,7 @@ namespace toio.AI.meicu
 
             else if (phase == 19)
             {
-                text.text = "あれれ？僕の動きをよく見て。もう一度最初からやってみてね。";
+                text.text = "あれれ？ボクの動きをよく見て。もう一度最初からやってみてね。";
             }
             else if (phase == 20)
             {
@@ -404,7 +404,7 @@ namespace toio.AI.meicu
             }
             else if (phase == 22)
             {
-                text.text = "それじゃぁ、\n僕と「バトル」で勝負しよう！";
+                text.text = "それじゃぁ、\nボクと「バトル」で勝負しよう！";
             }
 
             yield return new WaitForSecondsRealtime(0.1f);

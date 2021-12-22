@@ -119,7 +119,7 @@ namespace toio.AI.meicu
 
             if (phase == 0)
             {
-                text.text = "ここでは、僕が「どのように正しい道を見つけているのか」についてかいせつするよ。";
+                text.text = "ここでは、ボクが\n「どのように正しい道を見つけているのか」\nについてかいせつするよ。";
                 ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(false);
                 ui.transform.Find("Indicators").Find("Hint").gameObject.SetActive(false);
                 ui.transform.Find("Indicators").Find("Trials").gameObject.SetActive(false);
@@ -145,7 +145,7 @@ namespace toio.AI.meicu
             }
             else if (phase == 2)
             {
-                text.text = "まず最初、僕は自分の位置と問題を見てみる。";
+                text.text = "まず最初、ボクは自分の位置と問題を見てみる。";
             }
             else if (phase == 3)
             {
@@ -181,7 +181,7 @@ namespace toio.AI.meicu
                 // Hide Arrow
                 ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(false);
 
-                text.text = "でも僕は、最初はそれすら分からない。\nだから、上下左右のどこにも動く可能性があるんだ。";
+                text.text = "でもボクは、最初はそれすら分からない。\nだから、上下左右のどこにも動く可能性があるんだ。";
                 btnNext.gameObject.SetActive(true);
             }
             else if (phase == 7)
@@ -273,7 +273,7 @@ namespace toio.AI.meicu
                         // Update text
                         if (t < 2)
                         {
-                            text.text = $"　　　　　　試行 {t+1} 回目\n\n「上」に行ってみたらゴールに成功したね。この時にAIは「上に行けばゴールの可能性がアップする」と学習するんだ。";
+                            text.text = $"　　　　　　試行 {t+1} 回目\n\n「上」に行ってみたらゴールに成功したね。この時にAIは\n「上に行けばゴールの可能性がアップする」\nと学習するんだ。";
                         }
                         else
                         {
@@ -289,7 +289,7 @@ namespace toio.AI.meicu
                         if (action == 3) actionStr = "左";
                         if (t < 2)
                         {
-                            text.text = $"　　　　　　試行 {t+1} 回目\n\n「{actionStr}」に行ってみたら今度はゴールに失敗したね。この時にAIは「{actionStr}に行くとゴールの可能性がダウンする」と学習するんだ。";
+                            text.text = $"　　　　　　試行 {t+1} 回目\n\n「{actionStr}」に行ってみたら今度はゴールに失敗したね。この時にAIは\n「{actionStr}に行くとゴールの可能性がダウンする」\nと学習するんだ。";
                         }
                         else
                         {
@@ -315,7 +315,7 @@ namespace toio.AI.meicu
                 // Hide Indicator
                 ui.transform.Find("Indicators").Find("Trials").gameObject.SetActive(false);
 
-                text.text = "これは、僕がまず「上のマスに移動するのが良さそうだ」って分かってきたって事なんだ。";
+                text.text = "これは、ボクがまず「上のマスに移動するのが良さそうだ」って分かってきたって事なんだ。";
             }
 
 
@@ -385,7 +385,7 @@ namespace toio.AI.meicu
                 else yield return new WaitForSecondsRealtime(2f);
                 videoPlayer.Pause();
                 yield return new WaitForSecondsRealtime(0.2f);
-                text.text = "ほぼカンペキにゴールできるようになるまで、僕は4000回くらいチャレンジしたんだよ！";
+                text.text = "ほぼカンペキにゴールできるようになるまで、ボクは4000回くらいチャレンジしたんだよ！";
                 yield return new WaitForSecondsRealtime(0.2f);
                 videoPlayer.Play();
 
@@ -407,31 +407,19 @@ namespace toio.AI.meicu
                     illustTr.GetChild(i).gameObject.SetActive(false);
 
                 illustTr.Find("Step1").gameObject.SetActive(true);
-                yield return new WaitForSecondsRealtime(2f);
-                illustTr.Find("Arrow1").gameObject.SetActive(true);
-                yield return new WaitForSecondsRealtime(0.5f);
+                yield return new WaitForSecondsRealtime(3f);
                 illustTr.Find("Step2").gameObject.SetActive(true);
                 yield return new WaitForSecondsRealtime(2f);
-                illustTr.Find("Arrow2").gameObject.SetActive(true);
-                yield return new WaitForSecondsRealtime(0.5f);
                 illustTr.Find("Step3").gameObject.SetActive(true);
                 yield return new WaitForSecondsRealtime(2f);
-                illustTr.Find("Arrow3").gameObject.SetActive(true);
-                yield return new WaitForSecondsRealtime(0.5f);
                 illustTr.Find("Step4").gameObject.SetActive(true);
                 yield return new WaitForSecondsRealtime(2f);
-                illustTr.Find("Arrow4").gameObject.SetActive(true);
-                yield return new WaitForSecondsRealtime(0.5f);
                 illustTr.Find("Step5").gameObject.SetActive(true);
                 yield return new WaitForSecondsRealtime(2f);
-                illustTr.Find("Arrow5").gameObject.SetActive(true);
-                yield return new WaitForSecondsRealtime(0.5f);
                 illustTr.Find("Step6").gameObject.SetActive(true);
                 yield return new WaitForSecondsRealtime(2f);
-                illustTr.Find("Arrow6").gameObject.SetActive(true);
-                yield return new WaitForSecondsRealtime(0.5f);
 
-                text.text = "わかったかな？\n\n僕たちAIはコンピュータだから、最初から正しい道を知っているんじゃないかって思うかもしれないけど、";
+                text.text = "わかったかな？\n\nボクたちAIはコンピュータだから、最初から正しい道を知っているんじゃないかって思うかもしれないけど、";
             }
             else if (phase == 16)
             {
@@ -456,13 +444,9 @@ namespace toio.AI.meicu
                     illustTr.GetChild(i).gameObject.SetActive(false);
 
                 illustTr.Find("Step1").gameObject.SetActive(true);
-                yield return new WaitForSecondsRealtime(2f);
-                illustTr.Find("Arrow1").gameObject.SetActive(true);
-                yield return new WaitForSecondsRealtime(0.5f);
+                yield return new WaitForSecondsRealtime(3f);
                 illustTr.Find("Step2").gameObject.SetActive(true);
                 yield return new WaitForSecondsRealtime(2f);
-                illustTr.Find("Arrow2").gameObject.SetActive(true);
-                yield return new WaitForSecondsRealtime(0.5f);
                 illustTr.Find("Step3").gameObject.SetActive(true);
             }
             else if (phase == 18)
@@ -502,11 +486,11 @@ namespace toio.AI.meicu
             }
             else if (phase == 20)
             {
-                text.text = "このボタンは、僕の頭の中をこっそりのぞけるヒミツのボタン…";
+                text.text = "このボタンは、ボクの頭の中をこっそりのぞけるヒミツのボタン…";
             }
             else if (phase == 21)
             {
-                text.text = "いま僕がどんな道を考えているか、見ることができるんだ。";
+                text.text = "いまボクがどんな道を考えているか、\n見ることができるんだ。\n\n押してみてごらん。";
             }
             else if (phase == 22)
             {
@@ -514,16 +498,16 @@ namespace toio.AI.meicu
             }
             else if (phase == 23)
             {
-                text.text = "最初のころの僕はまだ弱いから…間違ったり、なかなか道が見えなかったりするけどね。";
+                text.text = "最初のころのボクはまだ弱いから…間違ったり、なかなか道が見えなかったりするけどね。";
             }
             else if (phase == 24)
             {
-                text.text = "迷路バトルで僕に勝っていったら…\nどんどん強い、たくさん学習した僕と戦えるから、頑張ってみて！";
+                text.text = "迷路バトルでボクに勝っていったら…\nどんどん強い、たくさん学習したボクと戦えるから、頑張ってみて！";
             }
             else if (phase == 25)
             {
                 MeiPrefs.SetLearnCleared();
-                text.text = "それではあらためて、\n僕とバトルで勝負だ！";
+                text.text = "それではあらためて、\nボクとバトルで勝負だ！";
             }
 
             yield return new WaitForSecondsRealtime(0.1f);

@@ -34,6 +34,8 @@ namespace toio.AI.meicu
 
         internal void PlayBGM(PageManager.EPage page)
         {
+            UnmuteBGM();
+
             if (page == PageManager.EPage.Title)
             {
                 bgmTutorial.Stop();
@@ -55,6 +57,19 @@ namespace toio.AI.meicu
                 if (!bgmTutorial.isPlaying)
                     bgmTutorial.Play();
             }
+        }
+
+        internal void MuteBGM()
+        {
+            bgmTitle.volume = 0;
+            bgmTutorial.volume = 0;
+            bgmBattle.volume = 0;
+        }
+        internal void UnmuteBGM()
+        {
+            bgmTitle.volume = 0.3f;
+            bgmTutorial.volume = 0.3f;
+            bgmBattle.volume = 0.3f;
         }
 
         internal enum ESE : byte

@@ -48,7 +48,7 @@ namespace toio.AI.meicu
 
                 if (!isHiSaid)
                 {
-                    text.text = "こんにちは！\n僕の名前は「迷キュー」";
+                    text.text = "こんにちは！\nボクの名前は「迷キュー」";
                     yield return new WaitForSecondsRealtime(2f);
                     isHiSaid = true;
                 }
@@ -98,7 +98,7 @@ namespace toio.AI.meicu
                     {
                         text.text = "みんなは迷路が好きかな？";
                         yield return new WaitForSecondsRealtime(2f);
-                        text.text = "僕と迷路パズルでバトルしよう！";
+                        text.text = "ボクと迷路パズルでバトルしよう！";
                         yield return new WaitForSecondsRealtime(2f);
                     }
                 }
@@ -114,7 +114,7 @@ namespace toio.AI.meicu
                     {
                         text.text = "レベル1のクリア、おめでとう！";
                         yield return new WaitForSecondsRealtime(2f);
-                        text.text = "かいせつボタンを押すと、\n僕の強さのひみつが分かるよ";
+                        text.text = "かいせつボタンを押すと、\nボクの強さのひみつが分かるよ";
                         yield return new WaitForSecondsRealtime(2f);
                     }
                 }
@@ -133,7 +133,7 @@ namespace toio.AI.meicu
                     {
                         text.text = "みんなは迷路が好きかな？";
                         yield return new WaitForSecondsRealtime(2f);
-                        text.text = "僕と迷路パズルでバトルしよう！";
+                        text.text = "ボクと迷路パズルでバトルしよう！";
                         yield return new WaitForSecondsRealtime(2f);
                     }
                 }

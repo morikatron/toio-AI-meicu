@@ -154,30 +154,30 @@ namespace toio.AI.meicu
         {
             if (stage > 1)
             {
-                SetText("つぎのステージやろう!\n僕はもっと早くなるぞ！");
+                SetText("つぎのステージやろう!\nボクはもっと早くなるぞ！");
             }
             else if (MeiPrefs.level == 1)
             {
-                SetText("それじゃぁ、僕とたたかってみよう！\n\n最初の僕は【ビギナー】、\nまだまだ弱いけど…");
+                SetText("それじゃぁ、ボクとたたかってみよう！\n\n最初のボクは【ビギナー】、\nまだまだ弱いけど…");
             }
             else
             {
                 int n = new int[]{0, 1, 10, 50, 100, 200, 500, 700, 900, 1000, 1500, 2000}[MeiPrefs.level];
-                var content = $"僕は【迷キュー{classNames[MeiPrefs.level]}】だよ\n試行錯誤を<color=red>{n}万回以上</color>したんだ。\n\nどうだい？勝てるかな？";
+                var content = $"ボクは【迷キュー・{classNames[MeiPrefs.level]}】だよ\n試行錯誤を<color=red>{n}万回以上</color>したんだ。\n\nどうだい？勝てるかな？";
                 if (MeiPrefs.level == 3)
                     content += "\n（ここからリセットボタン使えないから\n間違えないように気をつけてね）";
 
                 SetText(content);
             }
 
-            textTag.text = "迷キュー" + classNames[MeiPrefs.level];
+            textTag.text = "迷キュー・" + classNames[MeiPrefs.level];
 
             UpdateStageText();
         }
 
         void UpdateStageText()
         {
-            trLevel.GetComponentInChildren<UIBrain>().SetLevel(MeiPrefs.level);
+            trLevel.GetComponentInChildren<Text>().text = $"レベル  {MeiPrefs.level}";
             trStage.GetComponentInChildren<UIStage>().SetHand(stage, 5);
         }
         void UpdateHint()
@@ -203,7 +203,7 @@ namespace toio.AI.meicu
 
                 if (MeiPrefs.level == Config.nLevels)
                 {
-                    textResult.text = "おめでとう！すべてクリアだよ！\n今の僕はキミにかなわない…\n僕ももっと「学習」して、もっと強くなったら、また勝負してね！";
+                    textResult.text = "おめでとう！すべてクリアだよ！\n今のボクはキミにかなわない…\nボクももっと「学習」して、もっと強くなったら、また勝負してね！";
                 }
                 else
                 {
@@ -215,7 +215,7 @@ namespace toio.AI.meicu
                     if (MeiPrefs.level == 1)
                     {
                         resultToTitle = true;
-                        textResultQuit.text = "「かいせつ」が開放されたよ。\n見てみよう！";
+                        textResultQuit.text = "「かいせつ」が開放されたよ。\n見てみてね！";
                     }
                     else
                     {
@@ -253,7 +253,7 @@ namespace toio.AI.meicu
         {
             AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Lose);
 
-            textResult.text = "どうだっ！僕の勝ちだよ！";
+            textResult.text = "どうだっ！ボクの勝ちだよ！";
 
             IEnumerator IE()
             {
@@ -351,7 +351,7 @@ namespace toio.AI.meicu
             if (ready)
             {
                 Debug.Log("PageBattle.OnGameReady: Ready");
-                SetText("スタートにタッチしてゲームスタート！\n\n僕がいても強引にタッチしていいよ。", minDuration:0);
+                SetText("スタートにタッチしてゲームスタート！\n\nボクがいても強引にタッチしていいよ。", minDuration:0);
                 uiBoard.ShowKomaA(new Vector2Int(4, 4));
                 uiBoard.ShowKomaP(new Vector2Int(4, 4));
 
@@ -367,7 +367,7 @@ namespace toio.AI.meicu
             }
             else
             {
-                SetText("キミのキューブを手に持って！\n僕はスタートマスに移動するね！", minDuration:0);
+                SetText("キミのキューブを手に持って！\nボクはスタートマスに移動するね！", minDuration:0);
             }
         }
 
@@ -416,7 +416,13 @@ namespace toio.AI.meicu
         }
         void OnGameOverP(Game.PlayerState stateP)
         {
-            if (stateP == Game.PlayerState.Fail || stateP == Game.PlayerState.Draw)
+            if (stateP == Game.PlayerState.Fail)
+            {
+                PlayerController.ins.PerformRegret();
+                AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Lose);
+                // TODO batu icon
+            }
+            else if (stateP == Game.PlayerState.Draw)
             {
                 PlayerController.ins.PerformRegret();
             }
@@ -431,7 +437,12 @@ namespace toio.AI.meicu
         }
         void OnGameOverA(Game.PlayerState stateA)
         {
-            if (stateA == Game.PlayerState.Fail || stateA == Game.PlayerState.Draw)
+            if (stateA == Game.PlayerState.Fail)
+            {
+                AIController.ins.PerformRegret();
+                // TODO batu icon
+            }
+            else if (stateA == Game.PlayerState.Draw)
             {
                 AIController.ins.PerformRegret();
             }
