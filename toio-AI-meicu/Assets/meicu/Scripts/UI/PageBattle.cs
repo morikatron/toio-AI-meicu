@@ -215,11 +215,11 @@ namespace toio.AI.meicu
                     if (MeiPrefs.level == 1)
                     {
                         resultToTitle = true;
-                        textResultQuit.text = "「かいせつ」が開放されたよ。\n見てみよう！\n\n（タップして戻る）";
+                        textResultQuit.text = "「かいせつ」が開放されたよ。\n見てみよう！";
                     }
                     else
                     {
-                        textResultQuit.text = "（タップして戻る）";
+                        textResultQuit.text = "";
                     }
                     yield break;
                 }
@@ -237,7 +237,7 @@ namespace toio.AI.meicu
 
                 IEnumerator IE()
                 {
-                    textResultQuit.text = "（タップして戻る）";
+                    textResultQuit.text = "";
                     yield break;
                 }
                 StartCoroutine(IE());
@@ -257,7 +257,7 @@ namespace toio.AI.meicu
 
             IEnumerator IE()
             {
-                textResultQuit.text = "（タップして戻る）";
+                textResultQuit.text = "";
                 yield break;
             }
             StartCoroutine(IE());
@@ -283,7 +283,7 @@ namespace toio.AI.meicu
             textResult.text = "うわっ、まちがえた･･･\n引き分けだね、もういっかいやろう";
             IEnumerator IE()
             {
-                textResultQuit.text = "（タップして戻る）";
+                textResultQuit.text = "";
                 yield break;
             }
             StartCoroutine(IE());
