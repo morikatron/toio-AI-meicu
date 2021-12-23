@@ -31,6 +31,7 @@ namespace toio.AI.meicu
 
         private int stage = 1;
         private bool textBusy = false;
+        private bool keepQuest = false;
 
 
         internal void SetActive(bool active)
@@ -58,6 +59,7 @@ namespace toio.AI.meicu
 
                 stage = 1;
                 textBusy = false;
+                keepQuest = false;
 
                 btnStart.gameObject.SetActive(true);
                 btnStart.transform.GetComponentInChildren<Text>().text = "スタート";
@@ -263,7 +265,12 @@ namespace toio.AI.meicu
             StartCoroutine(IE());
 
             // Back to Stage 1 or not
-            if (Config.levelSettings[MeiPrefs.level - 1].retryOnFail)
+            var failBehaviour = Config.levelSettings[MeiPrefs.level - 1].failBehaviour;
+            if (failBehaviour == Config.FailBehaviour.KeepQuest)
+            {
+                keepQuest = true;
+            }
+            else if (failBehaviour == Config.FailBehaviour.KeepStage)
             {}
             else
             {
@@ -281,6 +288,8 @@ namespace toio.AI.meicu
             AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Draw);
 
             textResult.text = "うわっ、まちがえた･･･\n引き分けだね、もういっかいやろう";
+            keepQuest = true;
+
             IEnumerator IE()
             {
                 textResultQuit.text = "";
@@ -298,7 +307,8 @@ namespace toio.AI.meicu
         #region ======== UI Callbacks ========
         public void OnBtnStart()
         {
-            bool keepQuest = MeiPrefs.level < 3 && game.inGame;
+            bool keepQuest = this.keepQuest || game.inGame; // inGame means Reset
+            this.keepQuest = false;
 
             btnStart.gameObject.SetActive(false);
 
@@ -308,8 +318,7 @@ namespace toio.AI.meicu
             uiQuest.Reset();
             uiBoard.Reset();
 
-            AIController.ins.intervalBegin = stageSetting.intervelBegin;
-            AIController.ins.intervalEnd = stageSetting.intervalEnd;
+            AIController.ins.setting = stageSetting;
 
             game.InitGame(levelSetting.questSize, keepQuest);
             game.WaitReady();

@@ -21,8 +21,7 @@ namespace toio.AI.meicu
         internal event Action heatmapCallback;
         internal event Action<int> thinkCallback;
         internal bool isPause = false;
-        internal float intervalBegin = 3f;
-        internal float intervalEnd = 1f;
+        internal Config.StageSetting setting;
         internal ref readonly float[,] Heatmap => ref heatmap;
         internal bool isMoving { get; private set; } = false;
 
@@ -114,29 +113,31 @@ namespace toio.AI.meicu
                 }
 
                 this.thinkCallback?.Invoke(0);
+
+                float t = Time.realtimeSinceStartup;
+
                 // Predicting Heatmap
+                Debug.Log($"AICon.IE_Think : predict heatmap (t={t})");
                 this.isPredicting = true;
                 ClearHeatmapBuffer();
 
-                Debug.Log("AICon.IE_Think : predict heatmap");
                 yield return IE_PredictHeatmap(game.envA.Clone(), this.heatmapPredictSteps);
                 Array.Copy(this.heatmapBuffer, this.heatmap, this.heatmap.Length);
-                if (isPause) continue;
                 this.isPredicting = false;
+                if (isPause) continue;
                 this.heatmapCallback?.Invoke();
                 this.thinkCallback?.Invoke(1);
 
                 // Interval - simulate time of thinking
-                var interval = (float) game.envA.passedColorSpaceCnt / game.envA.quest.Length;
-                interval = interval * intervalEnd + (1-interval) * intervalBegin;
-                yield return new WaitForSecondsRealtime(interval);
+                var interval = setting.thinkTimes[game.envA.passedSpaceCnt];
+                yield return new WaitForSecondsRealtime(interval - (Time.realtimeSinceStartup - t));
                 if (isPause) continue;
                 this.thinkCallback?.Invoke(2);
 
                 // Request Agent Action
+                Debug.Log($"AICon.IE_Think : RequestAct (t={Time.realtimeSinceStartup})");
                 this.isActReceived = false;
                 agent.RequestAct(game.envA);
-                Debug.Log("AICon.IE_Think : RequestAct");
                 yield return new WaitUntil(()=>isActReceived);
                 yield return new WaitForEndOfFrame();
                 if (isPause) continue;
@@ -155,6 +156,8 @@ namespace toio.AI.meicu
             isMoving = true;
 
             float retryTime = 11;
+            var spd = setting.speeds[game.envA.passedSpaceCnt];
+            float t = Time.realtimeSinceStartup;
 
             // Wait Cube to Arrive
             while (Device.ID2SpaceCoord(cube.x, cube.y) != targetCoords)
@@ -173,15 +176,16 @@ namespace toio.AI.meicu
                 {
                     retryTime = 0;
                     Debug.Log($"AICon.IE_Move : TargetMove({targetCoords.x}, {targetCoords.y})");
-                    Device.TargetMove(id, targetCoords.x, targetCoords.y, -10, 10);
+                    Device.TargetMove(id, targetCoords.x, targetCoords.y, -10, 10, maxSpd:spd);
                 }
 
-                yield return new WaitForSecondsRealtime(0.5f);
-                retryTime += 0.5f;
+                yield return new WaitForSecondsRealtime(0.1f);
+                retryTime += 0.1f;
             }
 
-            // Simulate Chant time 1s
-            yield return new WaitForSecondsRealtime(1f);
+            // Simulate confirm time
+            var interval = setting.confirmTimes[game.envA.passedSpaceCnt];
+            yield return new WaitForSecondsRealtime(interval - (Time.realtimeSinceStartup - t - 25f/spd));
 
             // Apply Step to game
             game.MoveA(action);

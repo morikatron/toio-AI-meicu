@@ -132,7 +132,7 @@ namespace toio.AI.meicu
             }
         }
 
-        internal static bool TargetMove(int id, int row, int col, int biasX=0, int biasY=0)
+        internal static bool TargetMove(int id, int row, int col, int biasX=0, int biasY=0, byte maxSpd=80)
         {
             if (!IdxTable.ContainsKey(id)) return false;
             int idx = IdxTable[id];
@@ -142,6 +142,7 @@ namespace toio.AI.meicu
             cubeManager.cubes[idx].TargetMove(
                 pos.x, pos.y, 0,
                 timeOut: 2,
+                maxSpd: maxSpd,
                 targetMoveType:Cube.TargetMoveType.RoundBeforeMove,
                 targetRotationType:Cube.TargetRotationType.NotRotate);
             return true;

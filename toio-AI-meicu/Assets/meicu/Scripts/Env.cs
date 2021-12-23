@@ -37,6 +37,7 @@ namespace toio.AI.meicu
         [HideInInspector]
 
         public int passedColorSpaceCnt { get; private set; } = 0;
+        public int passedSpaceCnt { get; private set; } = 0;
 
 
         public Env Clone()
@@ -44,6 +45,7 @@ namespace toio.AI.meicu
             var c = new Env();
             c.state = (Env.Space[,]) this.state.Clone();
             c.passedColorSpaceCnt = this.passedColorSpaceCnt;
+            c.passedSpaceCnt = this.passedSpaceCnt;
             c.SetQuest(this.quest);
             c.row = this.row;
             c.col = this.col;
@@ -59,6 +61,7 @@ namespace toio.AI.meicu
             this.state[this.row, this.col] = Env.Space.Passed;
 
             this.passedColorSpaceCnt = 0;
+            this.passedSpaceCnt = 0;
             this.response = Response.None;
         }
 
@@ -87,6 +90,7 @@ namespace toio.AI.meicu
                 (row, col) = Translate(action ,row, col);
 
                 this.state[row, col] = Env.Space.Passed;
+                passedSpaceCnt ++;
                 if (spaceBoard != Env.Space.W)
                 {
                     passedColorSpaceCnt ++;
@@ -116,11 +120,7 @@ namespace toio.AI.meicu
             return this.response;
         }
 
-        public bool Move(int actionCode)
-        {
-            return Move((Env.Action) actionCode);
-        }
-        public bool Move(Env.Action action)
+        private bool StepIgnoringQuest(Env.Action action)
         {
             if (!IsInside(action)) return false;
 
@@ -128,8 +128,6 @@ namespace toio.AI.meicu
             if (state[row, col] == Env.Space.Passed)
                 return false;
             state[row, col] = Env.Space.Passed;
-            // if (spaceColor != MeiEnv.Space.W)
-            //     passedColorSpaceCnt ++;
             return true;
         }
 
@@ -231,7 +229,7 @@ namespace toio.AI.meicu
                 var action = (Env.Action) validActions.OrderBy(_=>rand.NextDouble()).ToArray()[0];
 
                 refActions.Add(action);
-                env.Move(action);
+                env.StepIgnoringQuest(action);
                 if (env.spaceBoard != Env.Space.W)
                 {
                     colors.Add(env.spaceBoard);
