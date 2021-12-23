@@ -169,6 +169,10 @@ namespace toio.AI.meicu
                 var content = $"ボクは【迷キュー・{classNames[MeiPrefs.level]}】だよ\n試行錯誤を<color=red>{n}万回以上</color>したんだ。\n\nどうだい？勝てるかな？";
                 if (MeiPrefs.level == 3)
                     content += "\n（ここからリセットボタン使えないから\n間違えないように気をつけてね）";
+                else if (MeiPrefs.level == 4)
+                    content += "\n（ここから負けた時には、\nちがうお題が出るんだよ）";
+                else if (MeiPrefs.level == 11)
+                    content += "\n（このレベルは5連勝しないとクリアできないよ）";
                 SetText(content);
             }
             // New Stage enterd
