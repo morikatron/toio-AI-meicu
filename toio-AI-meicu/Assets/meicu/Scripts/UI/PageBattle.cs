@@ -29,6 +29,8 @@ namespace toio.AI.meicu
         public Text textResultQuit;
         public Text textTag;
 
+        public enum BattleState { NotStarted, InGame, PWin, AWin, Draw }
+        private BattleState state = BattleState.NotStarted;
         private int stage = 1;
         private bool textBusy = false;
         private bool keepQuest = false;
@@ -57,6 +59,7 @@ namespace toio.AI.meicu
                 game.stepCallbackP += OnGameStepP;
                 game.stepCallbackA += OnGameStepA;
 
+                state = BattleState.NotStarted;
                 stage = 1;
                 textBusy = false;
                 keepQuest = false;
@@ -154,27 +157,37 @@ namespace toio.AI.meicu
         string[] classNames = new string[]{"", "ビギナー", "ジュニア", "シニア", "プロ", "サブリーダー", "リーダー", "サブトレーナー", "トレーナー", "スター", "スーパースター", "マスター"};
         void SetTextIntro()
         {
-            if (stage > 1)
+            // First level/stage entered
+            if (state == BattleState.NotStarted && MeiPrefs.level == 1 && stage == 1)
             {
-                SetText("つぎのステージやろう!\nボクはもっと早くなるぞ！");
+                SetText($"それじゃぁ、ボクとたたかってみよう！\nボクに5回勝つとレベルクリアだよ！\n\n最初のボクは【{classNames[1]}】、\nまだまだ弱いけど…");
             }
-            else if (MeiPrefs.level == 1)
-            {
-                SetText("それじゃぁ、ボクとたたかってみよう！\n\n最初のボクは【ビギナー】、\nまだまだ弱いけど…");
-            }
-            else
+            // New level enterd.
+            else if ((state == BattleState.NotStarted || state == BattleState.PWin) && stage == 1)
             {
                 int n = new int[]{0, 1, 10, 50, 100, 200, 500, 700, 900, 1000, 1500, 2000}[MeiPrefs.level];
                 var content = $"ボクは【迷キュー・{classNames[MeiPrefs.level]}】だよ\n試行錯誤を<color=red>{n}万回以上</color>したんだ。\n\nどうだい？勝てるかな？";
                 if (MeiPrefs.level == 3)
                     content += "\n（ここからリセットボタン使えないから\n間違えないように気をつけてね）";
-
                 SetText(content);
+            }
+            // New Stage enterd
+            if (state == BattleState.PWin && stage > 1)
+            {
+                SetText("次のステージに行こう！\nボクはもっと早くなるぞ！");
+            }
+            // P Lose
+            else if (state == BattleState.AWin)
+            {
+                SetText("もう一度やってみよう！\n次も負けないぞ！");
+            }
+            // Draw
+            else if (state == BattleState.Draw)
+            {
+                SetText("もう一度やってみよう！\n次は勝つぞ！");
             }
 
             textTag.text = "迷キュー・" + classNames[MeiPrefs.level];
-
-            UpdateStageText();
         }
 
         void UpdateStageText()
@@ -310,6 +323,8 @@ namespace toio.AI.meicu
             bool keepQuest = this.keepQuest || game.inGame; // inGame means Reset
             this.keepQuest = false;
 
+            state = BattleState.InGame;
+
             btnStart.gameObject.SetActive(false);
 
             var levelSetting = Config.levelSettings[MeiPrefs.level - 1];
@@ -345,6 +360,7 @@ namespace toio.AI.meicu
                 resultObj.SetActive(false);
                 btnStart.gameObject.SetActive(true);
                 SetTextIntro();
+                UpdateStageText();
             }
         }
         #endregion
@@ -410,16 +426,19 @@ namespace toio.AI.meicu
             if (stateP == Game.PlayerState.Win)
             {
                 Debug.Log("PageBattle.OnGameOver: Player Win");
+                state = BattleState.PWin;
                 ProcPlayerWin();
             }
             else if (stateA == Game.PlayerState.Win)
             {
                 Debug.Log("PageBattle.OnGameOver: AI Win");
+                state = BattleState.AWin;
                 ProcPlayerLose();
             }
             else
             {
-                Debug.Log("PageBattle.OnGameOver: Both Fail");
+                Debug.Log("PageBattle.OnGameOver: Draw");
+                state = BattleState.Draw;
                 ProcDraw();
             }
         }

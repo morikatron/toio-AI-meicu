@@ -364,7 +364,7 @@ namespace toio.AI.meicu
             }
             else if (phase == 14)
             {
-                text.text = "次は「きいろ」のマスをタッチするよ。\nボクが進んだ道をよく見てタッチして！\n\n「プープープー・ピッ」という音が鳴ったらOKだよ。";
+                text.text = "次は「きいろ」のマスをタッチするよ。\nボクが進んだ道をよく見てタッチして！\n\n「プープープープープー・ピッ」\nという音が鳴り終わったらOKだよ。";
                 yield break;
             }
             else if (phase == 15)

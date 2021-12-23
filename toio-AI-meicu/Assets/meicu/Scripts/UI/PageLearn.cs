@@ -119,7 +119,7 @@ namespace toio.AI.meicu
 
             if (phase == 0)
             {
-                text.text = "ここでは、ボクが\n「どのように正しい道を見つけているのか」\nについてかいせつするよ。";
+                text.text = "ここでは、ボクが\n「どのように正しい道を見つけるのか」\nについてかいせつするよ。";
                 ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(false);
                 ui.transform.Find("Indicators").Find("Hint").gameObject.SetActive(false);
                 ui.transform.Find("Indicators").Find("Trials").gameObject.SetActive(false);
@@ -181,7 +181,7 @@ namespace toio.AI.meicu
                 // Hide Arrow
                 ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(false);
 
-                text.text = "でもボクは、最初はそれすら分からない。\nだから、上下左右のどこにも動く可能性があるんだ。";
+                text.text = "でもボクは、最初はそれすら分からないんだ。\nだから、上下左右のどこにも動く可能性があるんだよ。";
                 btnNext.gameObject.SetActive(true);
             }
             else if (phase == 7)
@@ -273,7 +273,7 @@ namespace toio.AI.meicu
                         // Update text
                         if (t < 2)
                         {
-                            text.text = $"　　　　　　試行 {t+1} 回目\n\n「上」に行ってみたらゴールに成功したね。この時にAIは\n「上に行けばゴールの可能性がアップする」\nと学習するんだ。";
+                            text.text = $"　　　　　　試行 {t+1} 回目\n\n「上」に動いてみたらゴールに成功！\nこの時AIは\n「上に行けばゴールの可能性がアップ」\nと学習するんだ。";
                         }
                         else
                         {
@@ -289,7 +289,7 @@ namespace toio.AI.meicu
                         if (action == 3) actionStr = "左";
                         if (t < 2)
                         {
-                            text.text = $"　　　　　　試行 {t+1} 回目\n\n「{actionStr}」に行ってみたら今度はゴールに失敗したね。この時にAIは\n「{actionStr}に行くとゴールの可能性がダウンする」\nと学習するんだ。";
+                            text.text = $"　　　　　　試行 {t+1} 回目\n\n「{actionStr}」に行ってみたら、今度はゴールに\n失敗しちゃった！\nこの時AIは\n「{actionStr}に行けばゴールの可能性がダウン」\nと学習するんだ。";
                         }
                         else
                         {
@@ -434,7 +434,7 @@ namespace toio.AI.meicu
                 // Hide illust
                 ui.transform.Find("Illust").gameObject.SetActive(false);
 
-                text.text = "ほら見てごらん...\n\n何度もチャレンジして\n答えを見つかるところが\nどこかキミたち人間と似てるよね";
+                text.text = "ほら見てごらん...\n\n何度もチャレンジして\n答えを見つけるところが\nどこかキミたち人間と似てるよね";
 
                 // Show illust2
                 var illustTr = ui.transform.Find("Illust2");
@@ -480,9 +480,25 @@ namespace toio.AI.meicu
                 swHint.GetComponent<Button>().interactable = true;
                 swHint.isOn = false;
                 OnBtnHint();
-                ui.transform.Find("Indicators").Find("Hint").gameObject.SetActive(true);
+                var hintTr = ui.transform.Find("Indicators").Find("Hint");
 
                 text.text = "ちなみに、このボタンに気付いた？";
+
+                hintTr.gameObject.SetActive(true);
+                yield return new WaitForSecondsRealtime(0.75f);
+                btnNext.interactable = true;
+                btnBack.interactable = true;
+                hintTr.gameObject.SetActive(false);
+                yield return new WaitForSecondsRealtime(0.75f);
+                hintTr.gameObject.SetActive(true);
+                yield return new WaitForSecondsRealtime(0.75f);
+                hintTr.gameObject.SetActive(false);
+                yield return new WaitForSecondsRealtime(0.75f);
+                hintTr.gameObject.SetActive(true);
+                yield return new WaitForSecondsRealtime(0.75f);
+                hintTr.gameObject.SetActive(false);
+                yield return new WaitForSecondsRealtime(0.75f);
+                hintTr.gameObject.SetActive(true);
             }
             else if (phase == 20)
             {
@@ -491,6 +507,8 @@ namespace toio.AI.meicu
             else if (phase == 21)
             {
                 text.text = "いまボクがどんな道を考えているか、\n見ることができるんだ。\n\n押してみてごらん。";
+                var ishint = swHint.isOn;
+                yield return new WaitUntil(()=>swHint.isOn!=ishint);
             }
             else if (phase == 22)
             {
