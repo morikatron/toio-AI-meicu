@@ -17,6 +17,7 @@ namespace toio.AI.meicu
         public Button btnNext;
         public Button btnBack;
         public UISwitch swHint;
+        public UISwitch btnBGM;
 
         public VideoPlayer videoPlayer;
 
@@ -34,6 +35,8 @@ namespace toio.AI.meicu
 
             if (active)
             {
+                btnBGM.isOn = AudioPlayer.ins.isBGMOn;
+
                 uiQuest.Reset();
                 uiBoard.Reset();
                 swHint.GetComponent<Button>().interactable = false;
@@ -64,6 +67,8 @@ namespace toio.AI.meicu
             Refresh();
         }
 
+
+        #region ======== UI Callbacks ========
 
         public void OnBtnHint()
         {
@@ -106,11 +111,19 @@ namespace toio.AI.meicu
             Refresh();
         }
 
+        public void OnBtnBGM()
+        {
+            AudioPlayer.ins.isBGMOn = btnBGM.isOn;
+        }
+
         internal void Refresh()
         {
             StopAllCoroutines();
             StartCoroutine(IE_Refresh());
         }
+
+        #endregion
+
 
         IEnumerator IE_Refresh()
         {

@@ -15,6 +15,7 @@ namespace toio.AI.meicu
         public Button btnTutorial;
         public Button btnBattle;
         public Button btnLearn;
+        public UISwitch btnBGM;
         public Text text;
 
         private bool isHiSaid = false;
@@ -26,6 +27,7 @@ namespace toio.AI.meicu
 
             if (active)
             {
+                btnBGM.isOn = AudioPlayer.ins.isBGMOn;
                 Refresh();
             }
         }
@@ -173,6 +175,11 @@ namespace toio.AI.meicu
         public void OnBtnLearn()
         {
             PageManager.SetPage(PageManager.EPage.Learn);
+        }
+
+        public void OnBtnBGM()
+        {
+            AudioPlayer.ins.isBGMOn = btnBGM.isOn;
         }
     }
 

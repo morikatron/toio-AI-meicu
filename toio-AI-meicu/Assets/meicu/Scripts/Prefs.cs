@@ -8,11 +8,23 @@ namespace toio.AI.meicu
 
     internal static class MeiPrefs
     {
+        internal static readonly string KeyMute = "MeicuMute";
         internal static readonly string KeyTutorialCleared = "MeicuTC";
         internal static readonly string KeyLearnCleared = "MeicuLC";
         internal static readonly string KeyBattleEnteredAfterLearn = "MeicuBEAL";
         internal static readonly string KeyLevel = "MeicuLv";
         // internal static readonly string KeyStage = "MeicuStage";
+
+        internal static bool isMute
+        {
+            get {
+                return PlayerPrefs.HasKey(KeyMute);
+            }
+            set {
+                if (value) PlayerPrefs.SetInt(KeyMute, 1);
+                else PlayerPrefs.DeleteKey(KeyMute);
+            }
+        }
 
         internal static bool isTutorialCleared
         {

@@ -17,6 +17,7 @@ namespace toio.AI.meicu
         public GameObject ui;
         public Button btnStart;
         public UISwitch swHint;
+        public UISwitch btnBGM;
         public Text text;
         public Transform trLevel;
         public Transform trStage;
@@ -45,6 +46,8 @@ namespace toio.AI.meicu
             {
                 if (MeiPrefs.isLearnCleared)
                     MeiPrefs.SetBattleEnteredAfterLearn();
+
+                btnBGM.isOn = AudioPlayer.ins.isBGMOn;
 
                 uiQuest.Reset();
                 uiBoard.Reset();
@@ -366,6 +369,11 @@ namespace toio.AI.meicu
                 SetTextIntro();
                 UpdateStageText();
             }
+        }
+
+        public void OnBtnBGM()
+        {
+            AudioPlayer.ins.isBGMOn = btnBGM.isOn;
         }
         #endregion
 

@@ -16,6 +16,7 @@ namespace toio.AI.meicu
         public Text text;
         public Button btnNext;
         public Button btnBack;
+        public UISwitch btnBGM;
         public Transform indicators;
 
         int phase = 0;
@@ -31,6 +32,8 @@ namespace toio.AI.meicu
 
             if (active)
             {
+                btnBGM.isOn = AudioPlayer.ins.isBGMOn;
+
                 uiQuest.Reset();
                 uiBoard.Reset();
                 game.initedCallback += OnGameInited;
@@ -82,6 +85,11 @@ namespace toio.AI.meicu
         public void OnBtnBack()
         {
             LastPhase();
+        }
+
+        public void OnBtnBGM()
+        {
+            AudioPlayer.ins.isBGMOn = btnBGM.isOn;
         }
 
         void InitQuests()
