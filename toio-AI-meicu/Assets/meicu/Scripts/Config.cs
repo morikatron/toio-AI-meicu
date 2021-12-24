@@ -14,7 +14,7 @@ namespace toio.AI.meicu
         public static readonly Color32 LEDBlue = new Color32(22, 11, 255, 255);
 
 
-        public struct LevelSetting
+        public class LevelSetting
         {
             public LevelSetting(
                 int questSize,
@@ -36,7 +36,7 @@ namespace toio.AI.meicu
             public List<StageSetting> stageSettings;
         }
 
-        public struct StageSetting
+        public class StageSetting
         {
             public float[] thinkTimes;
             public byte[] speeds;
@@ -114,11 +114,11 @@ namespace toio.AI.meicu
                     nStages: 5,
                     failBehaviour: FailBehaviour.KeepQuest
                 );
-                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 30, 50, 5.0f, 5, 1.9f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 40, 50, 4.5f, 5, 1.8f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 40, 60, 4.0f, 5, 1.7f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 50, 60, 3.5f, 5, 1.6f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 60, 60, 3.0f, 5, 1.5f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 30, 50, 5.0f, 5, 2.5f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 40, 50, 4.5f, 5, 2.3f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 40, 60, 4.0f, 5, 2.2f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 50, 60, 3.5f, 5, 2.1f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 60, 60, 3.0f, 5, 2.0f));
                 levelSettings.Add(lv);
             }
 
@@ -130,11 +130,11 @@ namespace toio.AI.meicu
                     nStages: 5,
                     failBehaviour: FailBehaviour.KeepQuest
                 );
-                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 40, 50, 4.0f, 5, 1.9f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 50, 60, 3.5f, 5, 1.6f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 60, 70, 3.0f, 5, 1.3f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 60, 70, 2.5f, 5, 1.2f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 70, 70, 2.0f, 5, 1.0f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 40, 50, 4.5f, 5, 2.2f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 50, 60, 4.0f, 5, 2.0f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 60, 70, 3.5f, 5, 1.8f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 60, 70, 3.0f, 5, 1.6f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(5, 70, 70, 2.5f, 5, 1.4f));
                 levelSettings.Add(lv);
             }
 
@@ -146,11 +146,11 @@ namespace toio.AI.meicu
                     nStages: 5,
                     failBehaviour: FailBehaviour.KeepQuest
                 );
-                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 40, 50, 4.0f, 7, 1.9f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 50, 60, 3.5f, 7, 1.6f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 60, 70, 3.0f, 7, 1.4f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 70, 80, 2.5f, 7, 1.2f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 70, 80, 2.0f, 7, 1.0f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 40, 50, 5.0f, 7, 2.0f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 50, 60, 4.5f, 7, 1.8f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 60, 70, 4.0f, 7, 1.6f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 70, 80, 3.5f, 7, 1.4f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 70, 80, 3.0f, 7, 1.2f));
                 levelSettings.Add(lv);
             }
 
@@ -162,11 +162,11 @@ namespace toio.AI.meicu
                     nStages: 5,
                     failBehaviour: FailBehaviour.KeepStage
                 );
-                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 40, 50, 3.5f, 6, 1.9f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 50, 60, 3.0f, 6, 1.6f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 60, 70, 2.5f, 6, 1.4f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 70, 80, 2.0f, 5, 1.2f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 70, 80, 2.0f, 5, 1.0f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 40, 50, 4.0f, 6, 2.0f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 50, 60, 3.5f, 6, 1.6f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 60, 70, 3.5f, 6, 1.4f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 70, 80, 3.0f, 6, 1.2f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 70, 80, 2.5f, 6, 1.0f));
                 levelSettings.Add(lv);
             }
 
@@ -178,11 +178,11 @@ namespace toio.AI.meicu
                     nStages: 5,
                     failBehaviour: FailBehaviour.KeepStage
                 );
-                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 50, 50, 3.0f, 5, 1.9f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 60, 60, 3.0f, 5, 1.6f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 70, 70, 2.5f, 5, 1.4f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 70, 80, 2.0f, 4, 1.2f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 80, 80, 2.0f, 4, 1.0f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 50, 50, 3.5f, 5, 2.0f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 60, 60, 3.0f, 5, 1.5f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 70, 70, 3.0f, 6, 1.0f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 70, 80, 3.0f, 5, 1.0f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 80, 80, 2.5f, 4, 1.0f));
                 levelSettings.Add(lv);
             }
 
@@ -194,10 +194,10 @@ namespace toio.AI.meicu
                     nStages: 5,
                     failBehaviour: FailBehaviour.KeepStage
                 );
-                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 40, 50, 5.0f, 8, 1.9f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 50, 60, 4.5f, 8, 1.6f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 60, 70, 4.0f, 8, 1.4f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 70, 80, 3.5f, 8, 1.2f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 40, 50, 5.0f, 8, 2.0f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 50, 60, 4.5f, 8, 1.8f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 60, 70, 4.0f, 8, 1.6f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 70, 80, 3.5f, 8, 1.3f));
                 lv.stageSettings.Add(StageSetting.CreatePattern1(9, 70, 80, 3.0f, 8, 1.0f));
                 levelSettings.Add(lv);
             }
@@ -210,9 +210,9 @@ namespace toio.AI.meicu
                     nStages: 5,
                     failBehaviour: FailBehaviour.KeepStage
                 );
-                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 40, 50, 4.5f, 6, 1.6f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 50, 60, 4.0f, 6, 1.4f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 60, 70, 3.5f, 6, 1.3f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 40, 50, 4.5f, 6, 1.8f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 50, 60, 4.0f, 6, 1.6f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 60, 70, 3.5f, 6, 1.4f));
                 lv.stageSettings.Add(StageSetting.CreatePattern1(9, 70, 80, 3.0f, 6, 1.2f));
                 lv.stageSettings.Add(StageSetting.CreatePattern1(9, 70, 80, 2.5f, 6, 1.0f));
                 levelSettings.Add(lv);
@@ -226,10 +226,10 @@ namespace toio.AI.meicu
                     nStages: 5,
                     failBehaviour: FailBehaviour.KeepStage
                 );
-                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 40, 50, 4.0f, 4, 1.6f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 40, 50, 4.0f, 4, 1.8f));
                 lv.stageSettings.Add(StageSetting.CreatePattern1(9, 50, 60, 3.5f, 4, 1.4f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 60, 70, 3.0f, 4, 1.3f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 70, 80, 3.0f, 4, 1.2f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 60, 70, 3.0f, 8, 1.0f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(9, 70, 80, 3.0f, 6, 1.0f));
                 lv.stageSettings.Add(StageSetting.CreatePattern1(9, 70, 80, 2.5f, 4, 1.0f));
                 levelSettings.Add(lv);
             }
@@ -242,8 +242,8 @@ namespace toio.AI.meicu
                     nStages: 5,
                     failBehaviour: FailBehaviour.KeepStage
                 );
-                lv.stageSettings.Add(StageSetting.CreatePattern1(11, 40, 50, 5.5f, 8, 1.6f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(11, 50, 60, 5.0f, 8, 1.4f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(11, 40, 50, 5.5f, 8, 1.8f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(11, 50, 60, 5.0f, 8, 1.6f));
                 lv.stageSettings.Add(StageSetting.CreatePattern1(11, 60, 70, 4.5f, 8, 1.3f));
                 lv.stageSettings.Add(StageSetting.CreatePattern1(11, 70, 80, 4.0f, 10, 1.0f));
                 lv.stageSettings.Add(StageSetting.CreatePattern1(11, 70, 80, 3.5f, 8, 1.0f));
@@ -258,8 +258,8 @@ namespace toio.AI.meicu
                     nStages: 5,
                     failBehaviour: FailBehaviour.KeepStage
                 );
-                lv.stageSettings.Add(StageSetting.CreatePattern1(11, 50, 60, 4.5f, 8, 1.6f));
-                lv.stageSettings.Add(StageSetting.CreatePattern1(11, 60, 70, 4.0f, 8, 1.4f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(11, 50, 60, 4.5f, 4, 1.6f));
+                lv.stageSettings.Add(StageSetting.CreatePattern1(11, 60, 70, 4.0f, 4, 1.3f));
                 lv.stageSettings.Add(StageSetting.CreatePattern1(11, 60, 70, 3.5f, 8, 1.0f));
                 lv.stageSettings.Add(StageSetting.CreatePattern1(11, 70, 80, 3.0f, 6, 1.0f));
                 lv.stageSettings.Add(StageSetting.CreatePattern1(11, 70, 80, 2.5f, 4, 1.0f));
