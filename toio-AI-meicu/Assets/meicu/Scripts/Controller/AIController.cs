@@ -68,7 +68,7 @@ namespace toio.AI.meicu
             Device.TargetMove(id, 4, 4, -10, 10);
         }
 
-        internal void RequestMove(Env.Action action)
+        internal void RequestMove(Env.Action action, bool useStageSetting = false)
         {
             this.action = action;
             (var r, var c) = Env.Translate(action, game.envA.row, game.envA.col);
@@ -79,11 +79,11 @@ namespace toio.AI.meicu
             this.targetCoords = new Vector2Int(r, c);
 
             StopMotion();
-            ieMotion = IE_Move();
+            ieMotion = useStageSetting? IE_Move(setting) : IE_Move();
             StartCoroutine(ieMotion);
         }
 
-        internal void RequestMove(int row, int col)
+        internal void RequestMove(int row, int col, bool useStageSetting = false)
         {
             if (ieMotion != null && !isPerforming && this.targetCoords.x == row && this.targetCoords.y == col)
                 return;
@@ -91,7 +91,7 @@ namespace toio.AI.meicu
             this.targetCoords = new Vector2Int(row, col);
 
             StopMotion();
-            ieMotion = IE_Move();
+            ieMotion = useStageSetting? IE_Move(setting) : IE_Move();
             StartCoroutine(ieMotion);
         }
 
@@ -150,13 +150,15 @@ namespace toio.AI.meicu
             }
         }
 
-        IEnumerator IE_Move()
+        IEnumerator IE_Move(Config.StageSetting setting = null)
         {
             Debug.Log($"AICon.IE_Move : Begin");
             isMoving = true;
 
             float retryTime = 11;
-            var spd = setting.speeds[game.envA.passedSpaceCnt];
+            byte spd = 70;
+            if (setting != null)
+                spd = setting.speeds[game.envA.passedSpaceCnt];
             float t = Time.realtimeSinceStartup;
 
             // Wait Cube to Arrive
@@ -184,8 +186,12 @@ namespace toio.AI.meicu
             }
 
             // Simulate confirm time
-            var interval = setting.confirmTimes[game.envA.passedSpaceCnt];
-            yield return new WaitForSecondsRealtime(interval - (Time.realtimeSinceStartup - t - 25f/spd));
+            if (setting != null)
+            {
+                var interval = setting.confirmTimes[game.envA.passedSpaceCnt];
+                yield return new WaitForSecondsRealtime(interval - (Time.realtimeSinceStartup - t - 25f/spd));
+            }
+            else yield return new WaitForSecondsRealtime(0.5f);
 
             // Apply Step to game
             game.MoveA(action);
@@ -299,7 +305,7 @@ namespace toio.AI.meicu
             this.isActReceived = true;
 
             if (!isPredicting)
-                RequestMove(action);
+                RequestMove(action, useStageSetting:true);
         }
 
         void ClearHeatmap()
