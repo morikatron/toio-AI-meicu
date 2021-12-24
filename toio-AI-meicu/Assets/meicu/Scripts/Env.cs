@@ -23,7 +23,7 @@ namespace toio.AI.meicu
 
         protected Env.Space[,] state;
         public Response response { get; protected set; } = Response.None;
-        public MeiQuest quest = null;
+        public Quest quest = null;
 
         [HideInInspector]
         public int row { get; protected set; } = 4;
@@ -65,7 +65,7 @@ namespace toio.AI.meicu
             this.response = Response.None;
         }
 
-        public void SetQuest(MeiQuest quest)
+        public void SetQuest(Quest quest)
         {
             this.quest = quest;
         }
@@ -211,7 +211,7 @@ namespace toio.AI.meicu
             return obs;
         }
 
-        public MeiQuest GenerateQuest(int size=2)
+        public Quest GenerateQuest(int size=2)
         {
             var env = this.Clone();
 
@@ -236,10 +236,10 @@ namespace toio.AI.meicu
                 }
             }
 
-            return new MeiQuest(this.row, this.col, colors.ToArray(), env.row, env.col, refActions.ToArray());
+            return new Quest(this.row, this.col, colors.ToArray(), env.row, env.col, refActions.ToArray());
         }
 
-        public static MeiQuest GenerateQuest(int size, int startRow=4, int startCol=4)
+        public static Quest GenerateQuest(int size, int startRow=4, int startCol=4)
         {
             Env env = new Env();
             env.Reset(startRow, startCol);
@@ -267,14 +267,14 @@ namespace toio.AI.meicu
         }
     }
 
-    public class MeiQuest
+    public class Quest
     {
         public int startRow, startCol;
         public Env.Space[] colors;
         public int goalRow;
         public int goalCol;
         public Env.Action[] refActions;
-        public MeiQuest(int startRow, int startCol, Env.Space[] colors, int goalRow, int goalCol, Env.Action[] refActions=null)
+        public Quest(int startRow, int startCol, Env.Space[] colors, int goalRow, int goalCol, Env.Action[] refActions=null)
         {
             this.startRow = startRow;
             this.startCol = startCol;
@@ -301,7 +301,7 @@ namespace toio.AI.meicu
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
-            var other = obj as MeiQuest;
+            var other = obj as Quest;
 
             if (Length != other.Length) return false;
             for (int i=0; i<Length; i++)

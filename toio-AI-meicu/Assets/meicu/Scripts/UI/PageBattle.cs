@@ -44,8 +44,8 @@ namespace toio.AI.meicu
 
             if (active)
             {
-                if (MeiPrefs.isLearnCleared)
-                    MeiPrefs.SetBattleEnteredAfterLearn();
+                if (Prefs.isLearnCleared)
+                    Prefs.SetBattleEnteredAfterLearn();
 
                 btnBGM.isOn = AudioPlayer.ins.isBGMOn;
 
@@ -113,15 +113,15 @@ namespace toio.AI.meicu
         void LevelUp()
         {
             stage = 1;
-            if (MeiPrefs.level == Config.nLevels)
+            if (Prefs.level == Config.nLevels)
                 return;
 
-            MeiPrefs.LevelUp();
+            Prefs.LevelUp();
             LoadLevel();
         }
         void LoadLevel()
         {
-            AIController.ins.LoadModelByLevel(MeiPrefs.level);
+            AIController.ins.LoadModelByLevel(Prefs.level);
         }
 
 
@@ -161,20 +161,20 @@ namespace toio.AI.meicu
         void SetTextIntro()
         {
             // First level/stage entered
-            if (state == BattleState.NotStarted && MeiPrefs.level == 1 && stage == 1)
+            if (state == BattleState.NotStarted && Prefs.level == 1 && stage == 1)
             {
                 SetText($"それじゃぁ、ボクとたたかってみよう！\nボクに5回勝つとレベルクリアだよ！\n\n最初のボクは【{classNames[1]}】、\nまだまだ弱いけど…");
             }
             // New level enterd.
             else if ((state == BattleState.NotStarted || state == BattleState.PWin) && stage == 1)
             {
-                int n = new int[]{0, 1, 10, 50, 100, 200, 500, 700, 900, 1000, 1500, 2000}[MeiPrefs.level];
-                var content = $"ボクは【迷キュー・{classNames[MeiPrefs.level]}】だよ\n試行錯誤を<color=red>{n}万回以上</color>したんだ。\n\nどうだい？勝てるかな？";
-                if (MeiPrefs.level == 3)
+                int n = new int[]{0, 1, 10, 50, 100, 200, 500, 700, 900, 1000, 1500, 2000}[Prefs.level];
+                var content = $"ボクは【迷キュー・{classNames[Prefs.level]}】だよ\n試行錯誤を<color=red>{n}万回以上</color>したんだ。\n\nどうだい？勝てるかな？";
+                if (Prefs.level == 3)
                     content += "\n（ここからリセットボタン使えないから\n間違えないように気をつけてね）";
-                else if (MeiPrefs.level == 4)
+                else if (Prefs.level == 4)
                     content += "\n（ここから負けた時には、\nちがうお題が出るんだよ）";
-                else if (MeiPrefs.level == 11)
+                else if (Prefs.level == 11)
                     content += "\n（このレベルは5連勝しないとクリアできないよ）";
                 SetText(content);
             }
@@ -194,12 +194,12 @@ namespace toio.AI.meicu
                 SetText("もう一度やってみよう！\n次は勝つぞ！");
             }
 
-            textTag.text = "迷キュー・" + classNames[MeiPrefs.level];
+            textTag.text = "迷キュー・" + classNames[Prefs.level];
         }
 
         void UpdateStageText()
         {
-            trLevel.GetComponentInChildren<Text>().text = $"レベル  {MeiPrefs.level}";
+            trLevel.GetComponentInChildren<Text>().text = $"レベル  {Prefs.level}";
             trStage.GetComponentInChildren<UIStage>().SetHand(stage, 5);
         }
         void UpdateHint()
@@ -219,22 +219,22 @@ namespace toio.AI.meicu
         void ProcPlayerWin()
         {
             // Level Clear
-            if (stage == Config.levelSettings[MeiPrefs.level - 1].nStages)
+            if (stage == Config.levelSettings[Prefs.level - 1].nStages)
             {
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.LevelUp);
 
-                if (MeiPrefs.level == Config.nLevels)
+                if (Prefs.level == Config.nLevels)
                 {
                     textResult.text = "おめでとう！すべてクリアだよ！\n今のボクはキミにかなわない…\nボクももっと「学習」して、もっと強くなったら、また勝負してね！";
                 }
                 else
                 {
-                    textResult.text = $"おめでとう！レベル {MeiPrefs.level} クリアだよ！";
+                    textResult.text = $"おめでとう！レベル {Prefs.level} クリアだよ！";
                 }
 
                 IEnumerator IE()
                 {
-                    if (MeiPrefs.level == 1)
+                    if (Prefs.level == 1)
                     {
                         resultToTitle = true;
                         textResultQuit.text = "「かいせつ」が開放されたよ。\n見てみてね！";
@@ -285,7 +285,7 @@ namespace toio.AI.meicu
             StartCoroutine(IE());
 
             // Back to Stage 1 or not
-            var failBehaviour = Config.levelSettings[MeiPrefs.level - 1].failBehaviour;
+            var failBehaviour = Config.levelSettings[Prefs.level - 1].failBehaviour;
             if (failBehaviour == Config.FailBehaviour.KeepQuest)
             {
                 keepQuest = true;
@@ -334,7 +334,7 @@ namespace toio.AI.meicu
 
             btnStart.gameObject.SetActive(false);
 
-            var levelSetting = Config.levelSettings[MeiPrefs.level - 1];
+            var levelSetting = Config.levelSettings[Prefs.level - 1];
             var stageSetting = levelSetting.stageSettings[stage-1];
 
             uiQuest.Reset();
@@ -425,7 +425,7 @@ namespace toio.AI.meicu
 
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Start);
 
-                if (MeiPrefs.level < 3)
+                if (Prefs.level < 3)
                 {
                     btnStart.gameObject.SetActive(true);
                     btnStart.transform.GetComponentInChildren<Text>().text = "リセット";

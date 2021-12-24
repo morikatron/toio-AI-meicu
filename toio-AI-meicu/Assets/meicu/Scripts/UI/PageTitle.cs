@@ -56,7 +56,7 @@ namespace toio.AI.meicu
                 }
                 text.text = "左上の「接続」ボタンから\nキューブを接続してね！";
 
-                if (!MeiPrefs.isTutorialCleared)
+                if (!Prefs.isTutorialCleared)
                     UIFinger.PointAt(btnConnect.transform, biasX:70);
                 else
                     UIFinger.Hide();
@@ -68,7 +68,7 @@ namespace toio.AI.meicu
                 btnBattle.interactable = false;
                 btnLearn.interactable = false;
 
-                if (!MeiPrefs.isTutorialCleared)
+                if (!Prefs.isTutorialCleared)
                     UIFinger.PointAt(btnConnect.transform, biasX:70);
                 else
                     UIFinger.Hide();
@@ -80,7 +80,7 @@ namespace toio.AI.meicu
                 btnConnect.interactable = false;
                 UIFinger.Hide();
 
-                if (!MeiPrefs.isTutorialCleared)
+                if (!Prefs.isTutorialCleared)
                 {
                     btnTutorial.interactable = true;
                     btnBattle.interactable = false;
@@ -90,7 +90,7 @@ namespace toio.AI.meicu
 
                     text.text = "まずは迷路パズルのルールを\n説明するよ！";
                 }
-                else if (MeiPrefs.level == 1)
+                else if (Prefs.level == 1)
                 {
                     btnTutorial.interactable = true;
                     btnBattle.interactable = true;
@@ -104,7 +104,7 @@ namespace toio.AI.meicu
                         yield return new WaitForSecondsRealtime(2f);
                     }
                 }
-                else if (!MeiPrefs.isLearnCleared)
+                else if (!Prefs.isLearnCleared)
                 {
                     btnTutorial.interactable = true;
                     btnBattle.interactable = true;
@@ -122,7 +122,7 @@ namespace toio.AI.meicu
                 }
                 else
                 {
-                    if (!MeiPrefs.isBattleEnteredAfterLearn)
+                    if (!Prefs.isBattleEnteredAfterLearn)
                     {
                         UIFinger.PointAt(btnBattle.transform, biasX:130);
                     }

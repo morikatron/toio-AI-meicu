@@ -20,7 +20,7 @@ namespace toio.AI.meicu
         public Transform indicators;
 
         int phase = 0;
-        MeiQuest demoQuest, tryQuest;
+        Quest demoQuest, tryQuest;
 
 
         internal void SetActive(bool active)
@@ -49,7 +49,7 @@ namespace toio.AI.meicu
                 InitQuests();
 
                 Refresh();
-                MeiPrefs.SetTutorialCleared();  // TODO
+                Prefs.SetTutorialCleared();  // TODO
             }
             else
             {
@@ -95,10 +95,10 @@ namespace toio.AI.meicu
         void InitQuests()
         {
             Env.Space[] colors = {Env.Space.G, Env.Space.G, Env.Space.B};
-            this.demoQuest = new MeiQuest(4, 4, colors, 3, 6, null);
+            this.demoQuest = new Quest(4, 4, colors, 3, 6, null);
 
             Env.Space[] colors2 = {Env.Space.Y, Env.Space.R, Env.Space.G};
-            this.tryQuest = new MeiQuest(4, 4, colors2, 6, 5, null);
+            this.tryQuest = new Quest(4, 4, colors2, 6, 5, null);
         }
 
 
@@ -260,7 +260,7 @@ namespace toio.AI.meicu
                 game.InitGame(demoQuest);
 
                 // Highlight next button for first time
-                if (!MeiPrefs.isTutorialCleared)
+                if (!Prefs.isTutorialCleared)
                     UIFinger.PointAt(btnNext.transform, 30);
 
                 // Inactivate all indicators
@@ -403,7 +403,7 @@ namespace toio.AI.meicu
             else if (phase == 20)
             {
                 text.text = "ゴール！\n問題の色の順番通りにゴールまでの道を探す、というルールが分かったかな？";
-                MeiPrefs.SetTutorialCleared();
+                Prefs.SetTutorialCleared();
             }
 
             else if (phase == 21)

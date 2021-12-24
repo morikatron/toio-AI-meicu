@@ -13,7 +13,7 @@ namespace toio.AI.meicu
         internal Env envP;
         internal Env envA;
 
-        internal MeiQuest quest;
+        internal Quest quest;
         internal bool inGame { get; private set; } = false;
 
         internal PlayerState stateP { get; private set; }
@@ -61,7 +61,7 @@ namespace toio.AI.meicu
         #endregion
 
 
-        internal void InitGame(MeiQuest quest)
+        internal void InitGame(Quest quest)
         {
             StopGame();
 

@@ -55,7 +55,7 @@ namespace toio.AI.meicu
             goal.gameObject.SetActive(true);
             goal.anchoredPosition = new Vector2(35 * spaces - 5, 0);
         }
-        internal void ShowQuest(MeiQuest quest)
+        internal void ShowQuest(Quest quest)
         {
             ShowQuest(quest.colors);
         }

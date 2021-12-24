@@ -26,8 +26,8 @@ namespace toio.AI.meicu
         float[,] heatmap;
         private bool requestBtnNext = false; // btn operation during one phase
 
-        private MeiQuest questForTrial = new MeiQuest(4, 4, new Env.Space[]{Env.Space.R}, 3, 4);
-        private MeiQuest questForHint = new MeiQuest(4, 4, new Env.Space[]{Env.Space.Y, Env.Space.R, Env.Space.G, Env.Space.R, Env.Space.Y}, 0, 3);
+        private Quest questForTrial = new Quest(4, 4, new Env.Space[]{Env.Space.R}, 3, 4);
+        private Quest questForHint = new Quest(4, 4, new Env.Space[]{Env.Space.Y, Env.Space.R, Env.Space.G, Env.Space.R, Env.Space.Y}, 0, 3);
         private float[,] heatmapForHint = new float[,]
             {{0, 0, 0.06524067f, 0.9997286f, 0.9344879f, 0.9345089f, 0, 0, 0, },
             {0, 0, 0.06524451f, 0, 0, 0.9345089f, 0, 0, 0, },
@@ -588,7 +588,7 @@ namespace toio.AI.meicu
             }
             else if (phase == 25)
             {
-                MeiPrefs.SetLearnCleared();
+                Prefs.SetLearnCleared();
                 text.text = "それではあらためて、\nボクとバトルで勝負だ！";
             }
 

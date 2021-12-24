@@ -107,8 +107,8 @@ namespace toio.AI.meicu
 
         void UpdateDebugSliderLv()
         {
-            uiDebug.Find("TextLv").GetComponent<Text>().text = $"Level {MeiPrefs.level}";
-            uiDebug.Find("SliderLv").GetComponent<Slider>().value = MeiPrefs.level;
+            uiDebug.Find("TextLv").GetComponent<Text>().text = $"Level {Prefs.level}";
+            uiDebug.Find("SliderLv").GetComponent<Slider>().value = Prefs.level;
         }
 
         public void OnDebugBtnResetFlags()
@@ -120,17 +120,17 @@ namespace toio.AI.meicu
         }
         public void OnDebugBtnClearFlags()
         {
-            MeiPrefs.SetTutorialCleared();
-            MeiPrefs.SetLearnCleared();
-            MeiPrefs.SetBattleEnteredAfterLearn();
-            if (MeiPrefs.level == 1) MeiPrefs.level = 2;
+            Prefs.SetTutorialCleared();
+            Prefs.SetLearnCleared();
+            Prefs.SetBattleEnteredAfterLearn();
+            if (Prefs.level == 1) Prefs.level = 2;
 
             UpdateDebugSliderLv();
             if (page == EPage.Title) pageTitle.Refresh();
         }
         public void OnDebugSliderLv()
         {
-            MeiPrefs.level = (int)uiDebug.Find("SliderLv").GetComponent<Slider>().value;
+            Prefs.level = (int)uiDebug.Find("SliderLv").GetComponent<Slider>().value;
 
             UpdateDebugSliderLv();
             if (page == EPage.Title) pageTitle.Refresh();

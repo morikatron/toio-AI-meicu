@@ -6,7 +6,7 @@ using UnityEngine;
 namespace toio.AI.meicu
 {
 
-    internal static class MeiPrefs
+    internal static class Prefs
     {
         internal static readonly string KeyMute = "MeicuMute";
         internal static readonly string KeyTutorialCleared = "MeicuTC";
