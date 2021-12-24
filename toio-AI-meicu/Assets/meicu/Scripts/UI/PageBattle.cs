@@ -460,15 +460,17 @@ namespace toio.AI.meicu
             {
                 PlayerController.ins.PerformRegret();
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Lose);
-                // TODO batu icon
+                uiBoard.ShowFailP();
             }
             else if (stateP == Game.PlayerState.Draw)
             {
                 PlayerController.ins.PerformRegret();
+                uiBoard.ShowFailP();
             }
             else if (stateP == Game.PlayerState.LoseFail || stateP == Game.PlayerState.LoseNotFail)
             {
                 PlayerController.ins.PerformSad();
+                uiBoard.ShowFailP();
             }
             else if (stateP == Game.PlayerState.Win)
             {
@@ -480,15 +482,17 @@ namespace toio.AI.meicu
             if (stateA == Game.PlayerState.Fail)
             {
                 AIController.ins.PerformRegret();
-                // TODO batu icon
+                uiBoard.ShowFailA();
             }
             else if (stateA == Game.PlayerState.Draw)
             {
                 AIController.ins.PerformRegret();
+                uiBoard.ShowFailA();
             }
             else if (stateA == Game.PlayerState.LoseFail || stateA == Game.PlayerState.LoseNotFail)
             {
                 AIController.ins.PerformSad();
+                uiBoard.ShowFailA();
             }
             else if (stateA == Game.PlayerState.Win)
             {

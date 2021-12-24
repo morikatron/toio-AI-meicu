@@ -34,6 +34,7 @@ namespace toio.AI.meicu
             HideKomaA();
             HideKomaP();
             HideGoal();
+            HideFail();
 
             // Reset Mat
             for (int r = 0; r < 9; r++)
@@ -217,6 +218,20 @@ namespace toio.AI.meicu
                     img.color = color;
                 }
             }
+        }
+
+        internal void ShowFailP()
+        {
+            transform.Find("KomaP").Find("ImgFail").gameObject.SetActive(true);
+        }
+        internal void ShowFailA()
+        {
+            transform.Find("KomaA").Find("ImgFail").gameObject.SetActive(true);
+        }
+        internal void HideFail()
+        {
+            transform.Find("KomaP").Find("ImgFail").gameObject.SetActive(false);
+            transform.Find("KomaA").Find("ImgFail").gameObject.SetActive(false);
         }
 
 
