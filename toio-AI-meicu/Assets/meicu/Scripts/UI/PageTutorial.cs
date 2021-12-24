@@ -19,8 +19,9 @@ namespace toio.AI.meicu
         public UISwitch btnBGM;
         public Transform indicators;
 
-        int phase = 0;
-        Quest demoQuest, tryQuest;
+        private int phase = 0;
+        private Quest demoQuest = new Quest(4, 4, new Env.Space[]{Env.Space.G, Env.Space.G, Env.Space.B}, 3, 6, null);
+        private Quest tryQuest = new Quest(4, 4, new Env.Space[]{Env.Space.Y, Env.Space.R, Env.Space.G}, 6, 5, null);
 
 
         internal void SetActive(bool active)
@@ -43,13 +44,11 @@ namespace toio.AI.meicu
                 game.stepCallbackP += OnGameStepP;
                 game.stepCallbackA += OnGameStepA;
 
+                // Pause controllers
                 PlayerController.ins.isPause = true;
                 AIController.ins.isPause = true;
 
-                InitQuests();
-
                 Refresh();
-                Prefs.SetTutorialCleared();  // TODO
             }
             else
             {
@@ -72,7 +71,7 @@ namespace toio.AI.meicu
 
         internal void Resume()
         {
-            if (phase == 8 || phase == 9)
+            if (phase >= 13 && phase <= 18)
                 PlayerController.ins.isPause = false;
             Refresh();
         }
@@ -90,15 +89,6 @@ namespace toio.AI.meicu
         public void OnBtnBGM()
         {
             AudioPlayer.ins.isBGMOn = btnBGM.isOn;
-        }
-
-        void InitQuests()
-        {
-            Env.Space[] colors = {Env.Space.G, Env.Space.G, Env.Space.B};
-            this.demoQuest = new Quest(4, 4, colors, 3, 6, null);
-
-            Env.Space[] colors2 = {Env.Space.Y, Env.Space.R, Env.Space.G};
-            this.tryQuest = new Quest(4, 4, colors2, 6, 5, null);
         }
 
 

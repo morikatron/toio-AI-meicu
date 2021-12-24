@@ -33,7 +33,6 @@ namespace toio.AI.meicu
         public enum BattleState { NotStarted, InGame, PWin, AWin, Draw }
         private BattleState state = BattleState.NotStarted;
         private int stage = 1;
-        private bool textBusy = false;
         private bool keepQuest = false;
 
 
@@ -62,21 +61,24 @@ namespace toio.AI.meicu
                 game.stepCallbackP += OnGameStepP;
                 game.stepCallbackA += OnGameStepA;
 
+                // Init vars
                 state = BattleState.NotStarted;
                 stage = 1;
                 textBusy = false;
                 keepQuest = false;
 
+                // Init UIs
                 btnStart.gameObject.SetActive(true);
                 btnStart.transform.GetComponentInChildren<Text>().text = "スタート";
                 resultObj.SetActive(false);
                 swHint.isOn = false;
 
-                SetTextIntro();
+                SetIntroText();
                 UpdateStageText();
                 UpdateHint();
                 LoadLevel();
 
+                // Un-Pause controllers
                 AIController.ins.isPause = false;
                 PlayerController.ins.isPause = false;
             }
@@ -125,7 +127,11 @@ namespace toio.AI.meicu
         }
 
 
+        #region ======== UI functions ========
+
+        private bool textBusy = false;
         private IEnumerator ie_text = null;
+        // Coordinate setting text
         void SetText(string content, float minDuration = 0.8f, bool wait = true, bool force = false)
         {
             if (!wait && textBusy)
@@ -158,7 +164,8 @@ namespace toio.AI.meicu
         }
 
         string[] classNames = new string[]{"", "ビギナー", "ジュニア", "シニア", "プロ", "サブリーダー", "リーダー", "サブトレーナー", "トレーナー", "スター", "スーパースター", "マスター"};
-        void SetTextIntro()
+        // Set text before game started
+        void SetIntroText()
         {
             // First level/stage entered
             if (state == BattleState.NotStarted && Prefs.level == 1 && stage == 1)
@@ -194,14 +201,15 @@ namespace toio.AI.meicu
                 SetText("もう一度やってみよう！\n次は勝つぞ！");
             }
 
-            textTag.text = "迷キュー・" + classNames[Prefs.level];
         }
 
         void UpdateStageText()
         {
             trLevel.GetComponentInChildren<Text>().text = $"レベル  {Prefs.level}";
             trStage.GetComponentInChildren<UIStage>().SetHand(stage, 5);
+            textTag.text = "迷キュー・" + classNames[Prefs.level];
         }
+
         void UpdateHint()
         {
             if (swHint.isOn)
@@ -216,75 +224,80 @@ namespace toio.AI.meicu
             }
         }
 
+        #endregion
+
+
+        #region ======== Hanlde game result ========
+
         void ProcPlayerWin()
         {
             // Level Clear
             if (stage == Config.levelSettings[Prefs.level - 1].nStages)
             {
+                // Play SE
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.LevelUp);
 
-                if (Prefs.level == Config.nLevels)
+                // Set Result text
+                // Lv.1 cleared
+                if (Prefs.level == 1)
+                {
+                    textResult.text = $"おめでとう！レベル {Prefs.level} クリアだよ！";
+                    textResultQuit.text = "「かいせつ」が開放されたよ。\n見てみてね！";
+                    // btnStart will jump to PageTitle
+                    resultToTitle = true;
+                }
+                // All Lv cleared
+                else if (Prefs.level == Config.nLevels)
                 {
                     textResult.text = "おめでとう！すべてクリアだよ！\n今のボクはキミにかなわない…\nボクももっと「学習」して、もっと強くなったら、また勝負してね！";
+                    textResultQuit.text = "";
                 }
                 else
                 {
                     textResult.text = $"おめでとう！レベル {Prefs.level} クリアだよ！";
+                    textResultQuit.text = "";
                 }
 
-                IEnumerator IE()
-                {
-                    if (Prefs.level == 1)
-                    {
-                        resultToTitle = true;
-                        textResultQuit.text = "「かいせつ」が開放されたよ。\n見てみてね！";
-                    }
-                    else
-                    {
-                        textResultQuit.text = "";
-                    }
-                    yield break;
-                }
-                StartCoroutine(IE());
-
+                // Lv up
                 LevelUp();
             }
             // Stage Clear
             else
             {
+                // Play SE
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Win);
 
-                stage += 1;
+                // Set Result text
                 textResult.text = "おめでとう！きみの勝ち－！！次は負けないぞ！";
+                textResultQuit.text = "";
 
-                IEnumerator IE()
-                {
-                    textResultQuit.text = "";
-                    yield break;
-                }
-                StartCoroutine(IE());
+                // Stage up
+                stage += 1;
             }
 
+            // meicu emotion
             meicuResult.SetState(UIMeicu.State.Regret);
+
+            // show result
             resultObj.SetActive(true);
+
+            // clear text
             SetText("", force:true);
+
+            // update btnStart
             btnStart.transform.GetComponentInChildren<Text>().text = "スタート";
         }
 
         void ProcPlayerLose()
         {
+            // Play SE
             AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Lose);
 
+            // Set Result text
             textResult.text = "どうだっ！ボクの勝ちだよ！";
+            textResultQuit.text = "";
 
-            IEnumerator IE()
-            {
-                textResultQuit.text = "";
-                yield break;
-            }
-            StartCoroutine(IE());
-
-            // Back to Stage 1 or not
+            // Stage down or not
             var failBehaviour = Config.levelSettings[Prefs.level - 1].failBehaviour;
             if (failBehaviour == Config.FailBehaviour.KeepQuest)
             {
@@ -297,31 +310,45 @@ namespace toio.AI.meicu
                 stage = 1;
             }
 
+            // meicu emotion
             meicuResult.SetState(UIMeicu.State.Laugh);
+
+            // show result
             resultObj.SetActive(true);
+
+            // clear text
             SetText("", force:true);
+
+            // update btnStart
             btnStart.transform.GetComponentInChildren<Text>().text = "リトライ";
         }
 
         void ProcDraw()
         {
+            // Play SE
             AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Draw);
 
+            // Set Result text
             textResult.text = "うわっ、まちがえた･･･\n引き分けだね、もういっかいやろう";
+            textResultQuit.text = "";
+
+            // Keep stage and quest
             keepQuest = true;
 
-            IEnumerator IE()
-            {
-                textResultQuit.text = "";
-                yield break;
-            }
-            StartCoroutine(IE());
-
+            // meicu emotion
             meicuResult.SetState(UIMeicu.State.Dull);
+
+            // show result
             resultObj.SetActive(true);
+
+            // clear text
             SetText("", force:true);
+
+            // update btnStart
             btnStart.transform.GetComponentInChildren<Text>().text = "リトライ";
         }
+
+        #endregion
 
 
         #region ======== UI Callbacks ========
@@ -366,7 +393,7 @@ namespace toio.AI.meicu
             {
                 resultObj.SetActive(false);
                 btnStart.gameObject.SetActive(true);
-                SetTextIntro();
+                SetIntroText();
                 UpdateStageText();
             }
         }
@@ -410,21 +437,29 @@ namespace toio.AI.meicu
 
         void OnGameStarted(int countDown)
         {
+            // Countdown
             if (countDown > 0)
             {
+                // Show quest
                 uiQuest.ShowQuest(game.quest);
                 uiBoard.ShowGoal(new Vector2Int(game.quest.goalRow, game.quest.goalCol));
+
+                // Countdown with text
                 SetText($"　　　　　　　<size=120>{countDown}</size>", force:true);
 
+                // Play SE
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StartCount);
             }
+            // Start
             else if (countDown == 0)
             {
                 Debug.Log("Game Started");
                 SetText("　　　　<size=32>ゲームスタート！</size>\n\nお題の順番に合わせて\nキューブを動かそう！", minDuration:1f, force:true);
 
+                // Play SE
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Start);
 
+                // Lv.1~2 Player can restart during game.
                 if (Prefs.level < 3)
                 {
                     btnStart.gameObject.SetActive(true);
@@ -536,6 +571,7 @@ namespace toio.AI.meicu
         #endregion
 
 
+        #region ======== AI controller Callbacks ========
         void OnAIHeatmap()
         {
             if (swHint.isOn)
@@ -554,6 +590,7 @@ namespace toio.AI.meicu
                 SetText(content, wait:false);
             }
         }
+        #endregion
     }
 
 }

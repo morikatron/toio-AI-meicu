@@ -41,13 +41,16 @@ namespace toio.AI.meicu
 
         IEnumerator IE_Refresh()
         {
+            // No cube connected
             if (Device.nConnected == 0)
             {
+                // Only btnConnect available
                 btnConnect.interactable = true;
                 btnTutorial.interactable = false;
                 btnBattle.interactable = false;
                 btnLearn.interactable = false;
 
+                // Only on App opened, make self introduction
                 if (!isHiSaid)
                 {
                     text.text = "こんにちは！\nボクの名前は「迷キュー」";
@@ -56,18 +59,22 @@ namespace toio.AI.meicu
                 }
                 text.text = "左上の「接続」ボタンから\nキューブを接続してね！";
 
+                // Guide to click btnConnect, on first time opening App
                 if (!Prefs.isTutorialCleared)
                     UIFinger.PointAt(btnConnect.transform, biasX:70);
                 else
                     UIFinger.Hide();
             }
+            // One cube connected
             else if (Device.nConnected == 1)
             {
+                // Only btnConnect available
                 btnConnect.interactable = true;
                 btnTutorial.interactable = false;
                 btnBattle.interactable = false;
                 btnLearn.interactable = false;
 
+                // Guide to click btnConnect, on first time opening App
                 if (!Prefs.isTutorialCleared)
                     UIFinger.PointAt(btnConnect.transform, biasX:70);
                 else
@@ -75,23 +82,29 @@ namespace toio.AI.meicu
 
                 text.text = "もう1つ接続してね！";
             }
+            // Connected over
             else if (Device.nConnected == 2)
             {
                 btnConnect.interactable = false;
                 UIFinger.Hide();
 
+                // Tutorial NOT cleared
                 if (!Prefs.isTutorialCleared)
                 {
+                    // Only tutorial available
                     btnTutorial.interactable = true;
                     btnBattle.interactable = false;
                     btnLearn.interactable = false;
 
+                    // Guide to click btnTutorial
                     UIFinger.PointAt(btnTutorial.transform, biasX:130);
 
                     text.text = "まずは迷路パズルのルールを\n説明するよ！";
                 }
+                // Tutorial cleared & Battle lv.1 NOT cleared
                 else if (Prefs.level == 1)
                 {
+                    // Learn NOT available
                     btnTutorial.interactable = true;
                     btnBattle.interactable = true;
                     btnLearn.interactable = false;
@@ -104,12 +117,15 @@ namespace toio.AI.meicu
                         yield return new WaitForSecondsRealtime(2f);
                     }
                 }
+                // Tutorial cleared & Battle lv.1 cleared & Learn NOT cleared
                 else if (!Prefs.isLearnCleared)
                 {
+                    // Unlock Learn
                     btnTutorial.interactable = true;
                     btnBattle.interactable = true;
                     btnLearn.interactable = true;
 
+                    // Guide to Learn
                     UIFinger.PointAt(btnLearn.transform, biasX:130);
 
                     while (true)
@@ -120,13 +136,17 @@ namespace toio.AI.meicu
                         yield return new WaitForSecondsRealtime(2f);
                     }
                 }
+                // Tutorial cleared & Battle lv.1 cleared & Learn cleared
                 else
                 {
+                    // Right after Learn cleared
                     if (!Prefs.isBattleEnteredAfterLearn)
                     {
+                        // Guide to Battle again
                         UIFinger.PointAt(btnBattle.transform, biasX:130);
                     }
 
+                    // All available
                     btnTutorial.interactable = true;
                     btnBattle.interactable = true;
                     btnLearn.interactable = true;

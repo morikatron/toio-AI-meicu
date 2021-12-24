@@ -22,10 +22,10 @@ namespace toio.AI.meicu
         public VideoPlayer videoPlayer;
 
 
-        int phase = 0;
-        float[,] heatmap;
+        private int phase = 0;
         private bool requestBtnNext = false; // btn operation during one phase
 
+        private float[,] heatmap;
         private Quest questForTrial = new Quest(4, 4, new Env.Space[]{Env.Space.R}, 3, 4);
         private Quest questForHint = new Quest(4, 4, new Env.Space[]{Env.Space.Y, Env.Space.R, Env.Space.G, Env.Space.R, Env.Space.Y}, 0, 3);
         private float[,] heatmapForHint = new float[,]
