@@ -23,9 +23,21 @@ namespace toio.AI.meicu
 
 
         int phase = 0;
-        MeiQuest quest = default;
         float[,] heatmap;
         private bool requestBtnNext = false; // btn operation during one phase
+
+        private MeiQuest questForTrial = new MeiQuest(4, 4, new Env.Space[]{Env.Space.R}, 3, 4);
+        private MeiQuest questForHint = new MeiQuest(4, 4, new Env.Space[]{Env.Space.Y, Env.Space.R, Env.Space.G, Env.Space.R, Env.Space.Y}, 0, 3);
+        private float[,] heatmapForHint = new float[,]
+            {{0, 0, 0.06524067f, 0.9997286f, 0.9344879f, 0.9345089f, 0, 0, 0, },
+            {0, 0, 0.06524451f, 0, 0, 0.9345089f, 0, 0, 0, },
+            {0, 0, 0.06524451f, 0, 0, 0.9345105f, 0, 0, 0, },
+            {0, 0.06524598f, 0.06524503f, 0.9345845f, 0.934584f, 0.9345105f, 0, 0, 0, },
+            {0, 0.06524871f, 0.06525027f, 1, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, }};
 
 
         internal void SetActive(bool active)
@@ -41,8 +53,6 @@ namespace toio.AI.meicu
                 uiBoard.Reset();
                 swHint.GetComponent<Button>().interactable = false;
                 swHint.isOn = false;
-
-                MeiPrefs.SetLearnCleared(); // TODO
 
                 phase = 0;
                 requestBtnNext = false;
@@ -75,7 +85,7 @@ namespace toio.AI.meicu
             if (swHint.isOn)
             {
                 ui.transform.Find("ImgThink").gameObject.SetActive(true);
-                uiBoard.ShowHeatmap(heatmap);
+                uiBoard.ShowHeatmap(heatmapForHint);
             }
             else
             {
@@ -136,6 +146,7 @@ namespace toio.AI.meicu
                 ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(false);
                 ui.transform.Find("Indicators").Find("Hint").gameObject.SetActive(false);
                 ui.transform.Find("Indicators").Find("Trials").gameObject.SetActive(false);
+                ui.transform.Find("Indicators").Find("Video").gameObject.SetActive(false);
                 ui.transform.Find("ImgThink").gameObject.SetActive(false);
                 ui.transform.Find("Illust").gameObject.SetActive(false);
                 ui.transform.Find("Illust2").gameObject.SetActive(false);
@@ -145,11 +156,39 @@ namespace toio.AI.meicu
                 uiQuest.gameObject.SetActive(true);
                 uiBoard.HideHeatmap();
 
-                quest = new MeiQuest(4, 4, new Env.Space[]{Env.Space.R}, 3, 4);
-                uiQuest.ShowQuest(quest);
+                uiQuest.ShowQuest(questForTrial);
                 uiQuest.ShowA(0);
                 uiBoard.ShowGoal(3, 4);
                 uiBoard.ShowKomaA(4, 4);
+
+                // AIController.ins.LoadModelByLevel(6);
+                // var env = new Env();
+                // env.Reset();
+                // quest = env.GenerateQuest(5);
+                // env.SetQuest(quest);
+                // uiQuest.ShowQuest(quest);
+                // uiBoard.ShowGoal(quest.goalRow, quest.goalCol);
+                // void foo()
+                // {
+                //     var hm = AIController.ins.Heatmap;
+                //     uiBoard.ShowHeatmap(hm);
+
+                //     string info = "{";
+                //     for (int i=0; i<9; i++)
+                //     {
+                //         info += "{";
+                //         for (int j=0; j<9; j++)
+                //         {
+                //             info += hm[i,j].ToString() + ", ";
+                //         }
+                //         info += "},\n";
+                //     }
+                //     info += "}";
+                //     Debug.Log(info);
+                // }
+                // AIController.ins.heatmapCallback += foo;
+                // yield return AIController.ins.PredictHeatmapOnce(env, 9);
+                // AIController.ins.heatmapCallback -= foo;
 
             }
             else if (phase == 1)
@@ -338,8 +377,10 @@ namespace toio.AI.meicu
 
                 // Back
                 ui.transform.Find("Video").gameObject.SetActive(false);
+                ui.transform.Find("Indicators").Find("Video").gameObject.SetActive(false);
                 uiBoard.gameObject.SetActive(true);
                 uiQuest.gameObject.SetActive(true);
+                uiBoard.ShowHeatmap(heatmap);
                 ui.transform.Find("ImgThink").gameObject.SetActive(true);
             }
             else if (phase == 14)
@@ -353,6 +394,7 @@ namespace toio.AI.meicu
                 ui.transform.Find("ImgThink").gameObject.SetActive(false);
 
                 // Show Video
+                ui.transform.Find("Indicators").Find("Video").gameObject.SetActive(true);
                 ui.transform.Find("Video").gameObject.SetActive(true);
                 videoPlayer.frame = 1;
                 videoPlayer.Pause();
@@ -409,6 +451,7 @@ namespace toio.AI.meicu
             else if (phase == 15)
             {
                 // Hide Video
+                ui.transform.Find("Indicators").Find("Video").gameObject.SetActive(false);
                 ui.transform.Find("Video").gameObject.SetActive(false);
 
                 text.text = "ボクたちAIが学習していく\n\n流れをまとめると...";
@@ -444,6 +487,9 @@ namespace toio.AI.meicu
             }
             else if (phase == 17)
             {
+                // Back
+                ui.transform.Find("Illust3").gameObject.SetActive(false);
+
                 // Hide illust
                 ui.transform.Find("Illust").gameObject.SetActive(false);
 
@@ -488,6 +534,11 @@ namespace toio.AI.meicu
                 // Show Board
                 uiBoard.gameObject.SetActive(true);
                 uiQuest.gameObject.SetActive(true);
+
+                uiBoard.ShowGoal(questForHint.goalRow, questForHint.goalCol);
+                uiQuest.ShowQuest(questForHint);
+                uiBoard.ShowHeatmap(
+                );
 
                 // Show hint
                 swHint.GetComponent<Button>().interactable = true;
