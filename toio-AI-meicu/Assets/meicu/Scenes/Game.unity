@@ -1437,6 +1437,7 @@ MonoBehaviour:
   confirming: {fileID: 8300000, guid: 32ca42e01dedc5248a1ce043d3be59d1, type: 3}
   countdown: {fileID: 8300000, guid: 85c3e112f8dbcb0409527a764ced672e, type: 3}
   start: {fileID: 8300000, guid: b2a07190eb3d5d445bbc761d09eb7623, type: 3}
+  wrong: {fileID: 8300000, guid: 6d2b0d69bda1bc84e97deef337aae1d2, type: 3}
   win: {fileID: 8300000, guid: ca987b339d8012442abea7882b8cbb91, type: 3}
   lose: {fileID: 8300000, guid: 0ae63e7ad8f3dba41b508b189b78180b, type: 3}
   levelup: {fileID: 8300000, guid: 8f2cfc324dea2414b96710b169547185, type: 3}

@@ -494,18 +494,16 @@ namespace toio.AI.meicu
             if (stateP == Game.PlayerState.Fail)
             {
                 PlayerController.ins.PerformRegret();
-                AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Lose);
+                AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Wrong);
                 uiBoard.ShowFailP();
             }
             else if (stateP == Game.PlayerState.Draw)
             {
                 PlayerController.ins.PerformRegret();
-                uiBoard.ShowFailP();
             }
             else if (stateP == Game.PlayerState.LoseFail || stateP == Game.PlayerState.LoseNotFail)
             {
                 PlayerController.ins.PerformSad();
-                uiBoard.ShowFailP();
             }
             else if (stateP == Game.PlayerState.Win)
             {
@@ -522,12 +520,10 @@ namespace toio.AI.meicu
             else if (stateA == Game.PlayerState.Draw)
             {
                 AIController.ins.PerformRegret();
-                uiBoard.ShowFailA();
             }
             else if (stateA == Game.PlayerState.LoseFail || stateA == Game.PlayerState.LoseNotFail)
             {
                 AIController.ins.PerformSad();
-                uiBoard.ShowFailA();
             }
             else if (stateA == Game.PlayerState.Win)
             {

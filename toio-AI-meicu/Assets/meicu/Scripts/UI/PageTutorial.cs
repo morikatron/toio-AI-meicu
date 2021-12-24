@@ -328,22 +328,22 @@ namespace toio.AI.meicu
                 text.text = "まずは「きいろ」";
                 AIController.ins.RequestMove(Env.Action.Left);
                 yield return new WaitUntil(() => !AIController.ins.isMoving);
-                yield return new WaitForSecondsRealtime(1f);
+                yield return new WaitForSecondsRealtime(1.5f);
 
                 text.text = "つぎは「しろ」...";
                 AIController.ins.RequestMove(Env.Action.Down);
                 yield return new WaitUntil(() => !AIController.ins.isMoving);
-                yield return new WaitForSecondsRealtime(1f);
+                yield return new WaitForSecondsRealtime(1.5f);
 
                 text.text = "つぎは「あか」...";
                 AIController.ins.RequestMove(Env.Action.Down);
                 yield return new WaitUntil(() => !AIController.ins.isMoving);
-                yield return new WaitForSecondsRealtime(1f);
+                yield return new WaitForSecondsRealtime(1.5f);
 
                 text.text = "また「しろ」...";
                 AIController.ins.RequestMove(Env.Action.Right);
                 yield return new WaitUntil(() => !AIController.ins.isMoving);
-                yield return new WaitForSecondsRealtime(1f);
+                yield return new WaitForSecondsRealtime(1.5f);
 
                 text.text = "つぎの「みどり」でゴールだけど、\nボクはここで待ってるから、\nキミも同じように\nキューブを動かしてみて！";
                 yield return new WaitForSecondsRealtime(0.1f);

@@ -156,7 +156,7 @@ namespace toio.AI.meicu
             isMoving = true;
 
             float retryTime = 11;
-            byte spd = 70;
+            byte spd = 30;
             if (setting != null)
                 spd = setting.speeds[game.envA.passedSpaceCnt];
             float t = Time.realtimeSinceStartup;

@@ -17,10 +17,13 @@ namespace toio.AI.meicu
         public AudioSource srcPerform;
         public AudioSource srcSE;
 
+        [Header("Audio Clips")]
         public AudioClip confirmed;
         public AudioClip confirming;
         public AudioClip countdown;
         public AudioClip start;
+
+        public AudioClip wrong;
 
         public AudioClip win;
         public AudioClip lose;
@@ -85,6 +88,7 @@ namespace toio.AI.meicu
         {
             StartConfirmed, StartCount, Start,
             StepConfirmed, StepConfirming,
+            Wrong,
             Win, Lose, Draw, LevelUp
         }
         internal void PlaySE(ESE se, float volume=0.5f)
@@ -108,6 +112,10 @@ namespace toio.AI.meicu
             else if (se == ESE.StepConfirmed)
             {
                 srcSE.PlayOneShot(confirmed, volume);
+            }
+            else if (se == ESE.Wrong)
+            {
+                srcSE.PlayOneShot(wrong, volume);
             }
             else if (se == ESE.Win)
             {
