@@ -68,21 +68,16 @@ namespace toio.AI.meicu
             Device.TargetMove(id, 4, 4, -10, 10);
         }
 
+        // Start ienumerator which trys TargetMove in loop until target reached or overwritten.
         internal void RequestMove(Env.Action action, bool useStageSetting = false)
         {
             this.action = action;
             (var r, var c) = Env.Translate(action, game.envA.row, game.envA.col);
 
-            if (ieMotion != null && !isPerforming && this.targetCoords.x == r && this.targetCoords.y == c)
-                return;
-
-            this.targetCoords = new Vector2Int(r, c);
-
-            StopMotion();
-            ieMotion = useStageSetting? IE_Move(setting) : IE_Move();
-            StartCoroutine(ieMotion);
+            RequestMove(r, c, useStageSetting);
         }
 
+        // Start ienumerator which trys TargetMove in loop until target reached or overwritten.
         internal void RequestMove(int row, int col, bool useStageSetting = false)
         {
             if (ieMotion != null && !isPerforming && this.targetCoords.x == row && this.targetCoords.y == col)
@@ -101,7 +96,7 @@ namespace toio.AI.meicu
             base.StopMotion(sendCmd);
         }
 
-
+        // Control Loop in Game
         IEnumerator IE_Think()
         {
             while (true)
@@ -150,6 +145,7 @@ namespace toio.AI.meicu
             }
         }
 
+        // Loop of moving to target
         IEnumerator IE_Move(Config.StageSetting setting = null)
         {
             Debug.Log($"AICon.IE_Move : Begin");
@@ -164,16 +160,19 @@ namespace toio.AI.meicu
             // Wait Cube to Arrive
             while (Device.ID2SpaceCoord(cube.x, cube.y) != targetCoords)
             {
+                // Wait while disconnected
                 if (!cube.isConnected)
                 {
                     yield return new WaitUntil(()=>cube.isConnected);
                     retryTime = 11;
                 }
+                // Move a bit if position ID missed
                 else if (!cube.isGrounded)
                 {
                     cube.Move(20, -20, 400, Cube.ORDER_TYPE.Strong);
                     retryTime = 11;
                 }
+                // Re-send command if timeout
                 else if (retryTime > 10)
                 {
                     retryTime = 0;
@@ -198,15 +197,20 @@ namespace toio.AI.meicu
             isMoving = false;
         }
 
+        // IEnumerator of getting heatmap (Used automatically by IE_Think)
         IEnumerator IE_PredictHeatmap(Env env, int maxSteps=6, float parentProb=1, int step=0)
         {
+            // End condition
             if (maxSteps == step) yield break;
+            // Igonre small prob branches
             if (parentProb < 0.01f) yield break;
 
+            // Request agent act
             this.isActReceived = false;
             this.agent.RequestAct(env);
             yield return new WaitUntil(()=>isActReceived);
 
+            // Get & Process features
             var features = agent.additionalOuput;
             if (features.Count == 0) yield break;
 
@@ -226,6 +230,7 @@ namespace toio.AI.meicu
             // Debug.Log($"e: {e0}, {e1}, {e2}, {e3}");
             // Debug.Log($"p: {ps[0]}, {ps[1]}, {ps[2]}, {ps[3]}");
 
+            // Recursive calls
             for (int actionCode = 0; actionCode < 4; actionCode++)
             {
                 var p = ps[actionCode];
@@ -245,6 +250,7 @@ namespace toio.AI.meicu
             }
         }
 
+        // Get Heatmap manually. Will pause IE_Think if in game.
         internal IEnumerator PredictHeatmapOnce(Env env, int steps)
         {
             if (this.isPredicting)
