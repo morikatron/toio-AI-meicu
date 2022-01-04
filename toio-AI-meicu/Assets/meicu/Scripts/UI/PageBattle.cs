@@ -276,7 +276,7 @@ namespace toio.AI.meicu
             }
 
             // meicu emotion
-            meicuResult.SetState(UIMeicu.State.Regret);
+            meicuResult.SetFace(UIMeicu.Face.Regret);
 
             // show result
             resultObj.SetActive(true);
@@ -311,7 +311,7 @@ namespace toio.AI.meicu
             }
 
             // meicu emotion
-            meicuResult.SetState(UIMeicu.State.Laugh);
+            meicuResult.SetFace(UIMeicu.Face.Laugh);
 
             // show result
             resultObj.SetActive(true);
@@ -336,7 +336,7 @@ namespace toio.AI.meicu
             keepQuest = true;
 
             // meicu emotion
-            meicuResult.SetState(UIMeicu.State.Dull);
+            meicuResult.SetFace(UIMeicu.Face.Dull);
 
             // show result
             resultObj.SetActive(true);
@@ -393,6 +393,7 @@ namespace toio.AI.meicu
             {
                 resultObj.SetActive(false);
                 btnStart.gameObject.SetActive(true);
+                meicu.Reset();
                 SetIntroText();
                 UpdateStageText();
             }
@@ -516,6 +517,7 @@ namespace toio.AI.meicu
             {
                 AIController.ins.PerformRegret();
                 uiBoard.ShowFailA();
+                meicu.PerformFail();
             }
             else if (stateA == Game.PlayerState.Draw)
             {
@@ -577,11 +579,13 @@ namespace toio.AI.meicu
         {
             if (phase == 1)
             {
+                meicu.PerformThinkBegin();
                 var content = Random.Range(0f, 1f) < 0.5f? "考え中…" : "次は…どっちだろう？";
                 SetText(content, wait:false);
             }
             else if (phase == 2)
             {
+                meicu.PerformThinkEnd();
                 var content = Random.Range(0f, 1f) < 0.5f? "そっちか！" : "わかったぞ！";
                 SetText(content, wait:false);
             }

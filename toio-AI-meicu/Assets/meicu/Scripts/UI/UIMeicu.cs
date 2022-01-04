@@ -15,47 +15,68 @@ namespace toio.AI.meicu
         public Sprite spriteRegret;
         public Sprite spriteTrouble;
 
-        private IEnumerator ie = null;
-        private State state = State.Default;
+        // private IEnumerator ie = null;
+        private Face face = Face.Default;
 
 
-        public enum State
+        public enum Face
         {
             Default, Dull, Laugh, Regret, Trouble
         }
 
-        public void SetState(State state)
+        public void SetFace(Face face)
         {
             var tr = img.transform as RectTransform;
 
-            if (this.state != state)
+            if (this.face != face)
             {
-                if (state == State.Default)
+                if (face == Face.Default)
                 {
                     img.sprite = spriteDefault;
                 }
-                else if (state == State.Dull)
+                else if (face == Face.Dull)
                 {
                     img.sprite = spriteDull;
                 }
-                else if (state == State.Laugh)
+                else if (face == Face.Laugh)
                 {
                     img.sprite = spriteLaugh;
                     // IEnumerator Laugh(){
                     //     Debug.Log(tr.localPosition);
                     // }
                 }
-                else if (state == State.Regret)
+                else if (face == Face.Regret)
                 {
                     img.sprite = spriteRegret;
                 }
-                else if (state == State.Trouble)
+                else if (face == Face.Trouble)
                 {
                     img.sprite = spriteTrouble;
                 }
             }
 
-            this.state = state;
+            this.face = face;
+        }
+
+        public void Reset()
+        {
+            GetComponent<Animator>().SetBool("isThinking", false);
+            SetFace(Face.Default);
+        }
+        public void PerformThinkBegin()
+        {
+            GetComponent<Animator>().SetBool("isThinking", true);
+            SetFace(Face.Dull);
+        }
+        public void PerformThinkEnd()
+        {
+            GetComponent<Animator>().SetBool("isThinking", false);
+            SetFace(Face.Default);
+        }
+        public void PerformFail()
+        {
+            // TODO
+            SetFace(Face.Trouble);
         }
     }
 
