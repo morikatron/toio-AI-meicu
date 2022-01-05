@@ -6,7 +6,7 @@
 
 ### システム環境
 
-> toio SDK for Unity 1.4.0 と一致しています。
+> toio SDK for Unity v1.4.0 と一致しています。
 
 - Unity（2020.3.17f1 LTS 推奨）
 - Mac（macOS ver.10.14以上）
@@ -21,23 +21,31 @@
 
 ### 依存パッケージ
 
-- [toio SDK for Unity 1.4.0](https://github.com/morikatron/toio-sdk-for-unity)
-- [ml-agents (Morikatron's Fork)](https://github.com/morikatron/ml-agents/tree/r18_additional_outputs)
+- [toio SDK for Unity v1.4.0](https://github.com/morikatron/toio-sdk-for-unity)
+- [ml-agents (Morikatron's fork) release 18](https://github.com/morikatron/ml-agents/tree/r18_additional_outputs)
 
 <br>
 
 ## セットアップ
 
-### 本レポジトリをクローン
-### toio SDK for Unity 1.4.0 を導入
-### ml-agents (Morikatron's Fork) を導入
+#### 本レポジトリをクローン
+
+本レポジトリをクローンまたはダウンロードして、サブフォルダの `toio-AI-meicu` を Unity で開きます。
+
+#### toio SDK for Unity v1.4.0 を導入
+
+[toio SDK for Unity v1.4.0](https://github.com/morikatron/toio-sdk-for-unity/releases/tag/v1.4.0) の unitypackage をダウンロードして、Unity にドラッグ&ドロップします。
+
+#### ml-agents (Morikatron's fork) を導入
 
 > 元の ml-agents は Barracuda を利用し、Actor モデルの出力だけを取得しています。
 そして mlagents (python pacakge)で作られた Actor モデルの最終出力は、
 行動確率からサンプリングされた行動のインデックスになっています。
 行動確率を取得し迷キューの「思考」を可視化するために、ml-agents を簡単に改造しました。
 
+ml-agents (Morikatron's fork) の [r18_additional_outputs ブランチ](https://github.com/morikatron/ml-agents/tree/r18_additional_outputs) をダウンロードして、中の `com.unity.ml-agents` フォルダを丸ごと `toio-AI-meicu/Packages/` にコピーペーストします。
 
+学習を行う場合には、`mlagents (python package)` をもインストールしてください。詳しくは ml-agents の [【ドキュメント】](https://github.com/Unity-Technologies/ml-agents/blob/main/docs/Installation.md#install-the-mlagents-python-package) を参照してください。
 
 <br>
 
@@ -45,7 +53,7 @@
 
 ビルドの方法や注意事項は toio SDK for Unity の [【ドキュメント】](https://github.com/morikatron/toio-sdk-for-unity/tree/v1.3.0/docs#-3-ビルド) に詳しく記載してありますので、そちらを参照してください。
 
-<br>
+<b
 
 ## Unity プロジェクト構成
 
