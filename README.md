@@ -60,12 +60,16 @@
   - Audio：BGMとSEを管理するスクリプト
 - Canvas：各画面とUIの要素が格納されています、`Script/UI`と名称が対応しています。
 
+`Train.unity` のヒエラルキーはシンプルです。
+- Canvas：学習過程を表示するUI
+- Script：学習用スクリプト
+
 
 <br>
 
 ## 迷キューを学習
 
-
+[【コチラ】](training/Readme.md) を参照してください。
 
 <br>
 
