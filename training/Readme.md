@@ -14,14 +14,13 @@ mlagents (python package) を利用した学習は2つのやり方がありま�
 1. `training` フォルダの位置でターミナルを開きます。セットアップした python 環境に入ります。
 
 1. ターミナルで以下のコマンドを実行します。<br>
-今回は長さ（色マスの数）が4固定の問題のみを対象とする簡単な設定（quest4.yaml）で試してみます。
+今回は長さ（色マスの数）が4固定の問題のみを対象とする簡単な設定（quest4.yaml）で試してみます。<br>
+「Start training by pressing the Play button in the Unity Editor.」が出力されるまでお待ち下さい。
 
+> mlagents-learn [学習設定yaml] --run-id=[今回の学習のIDを設定]
 ```
 mlagents-learn config\quest4.yaml --run-id=quest4
 ```
-> mlagents-learn [学習設定yaml] --run-id=[今回の学習のIDを設定]
-
-「[INFO] Listening on port 5004. Start training by pressing the Play button in the Unity Editor.」が出力されるまでお待ち下さい。
 
 4. Unity Editor のプレイボタンを押して、学習を始めます。
 
@@ -41,12 +40,14 @@ mlagents-learn config\quest4.yaml --run-id=quest4
 1. ターミナルで以下のコマンドを実行します。<br>
 今回は長さ（色マスの数）が4固定の問題のみを対象とする簡単な設定（quest4.yaml）で試してみます。
 
+> mlagents-learn [学習設定yaml] --run-id=[今回の学習のIDを設定] --env=[学習環境所在のフォルダ] --num-envs=[プロセス数] --no-graphics
 ```
 mlagents-learn config\quest4.yaml --env=env --run-id=quest4 --num-envs=8 --no-graphics
 ```
-> mlagents-learn [学習設定yaml] --run-id=[今回の学習のIDを設定] --env=[学習環境所在のフォルダ] --num-envs=[プロセス数] --no-graphics
 
 5. 問題がなければ、学習が始まって、ターミナルの方では学習の進捗が定期的に報告されます。
+
+<br>
 
 ## 学習済みモデルの利用
 
@@ -76,6 +77,8 @@ mlagents-learn config\quest4.yaml --env=env --run-id=quest4 --num-envs=8 --no-gr
 1. Unity Editor のヒエラルキーで、Scripts -> Controller -> AI を選択し、インスペクタの Game Agent -> Additional Output Names の Element 0 に、名前を入れます。
 
 > 注意：現在の実装では、全てのモデルのSoftmaxのinput名が統一しなければなりません。
+
+<br>
 
 ## 学習設定の yaml ファイル
 
