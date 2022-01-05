@@ -24,7 +24,6 @@
 - [toio SDK for Unity v1.4.0](https://github.com/morikatron/toio-sdk-for-unity)
 - [ml-agents (Morikatron's fork) release 18](https://github.com/morikatron/ml-agents/tree/r18_additional_outputs)
 
-<br>
 
 ## セットアップ
 
@@ -47,13 +46,12 @@ ml-agents (Morikatron's fork) の [r18_additional_outputs ブランチ](https://
 
 学習を行う場合には、`mlagents (python package)` をもインストールしてください。詳しくは ml-agents の [【ドキュメント】](https://github.com/Unity-Technologies/ml-agents/blob/main/docs/Installation.md#install-the-mlagents-python-package) を参照してください。
 
-<br>
 
 ## ビルド
 
 ビルドの方法や注意事項は toio SDK for Unity の [【ドキュメント】](https://github.com/morikatron/toio-sdk-for-unity/tree/v1.3.0/docs#-3-ビルド) に詳しく記載してありますので、そちらを参照してください。
 
-<b
+
 
 ## Unity プロジェクト構成
 
@@ -76,18 +74,16 @@ ml-agents (Morikatron's fork) の [r18_additional_outputs ブランチ](https://
 - Script：学習用スクリプト
 
 
-<br>
-
 ## 迷キューを学習
 
 [【コチラ】](training/Readme.md) を参照してください。
 
-<br>
 
 ## ライセンス
 
 
 ### Third Party Notices
 
+- [toio SDK for Unity](https://github.com/morikatron/toio-sdk-for-unity) (MIT License)
 - [ml-agents](https://github.com/Unity-Technologies/ml-agents) (Apache License 2.0)
 - [Noto Sans Japanese](https://fonts.google.com/noto/specimen/Noto+Sans+JP/about) (Open Font License)
