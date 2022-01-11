@@ -68,6 +68,29 @@ namespace toio.AI.meicu
 
         #region ======== Performing ========
 
+        internal virtual void PerformThink()
+        {
+            StopMotion();
+            ieMotion = IE_PerformThink();
+            StartCoroutine(ieMotion);
+        }
+
+        protected virtual IEnumerator IE_PerformThink()
+        {
+            isPerforming = true;
+            var t0 = Time.realtimeSinceStartup;
+            int dir = UnityEngine.Random.Range(-1f, 1f) > 0f? 1 : -1;
+            while (Time.realtimeSinceStartup - t0 < 10f)
+            {
+                var dur = UnityEngine.Random.Range(0.3f, 0.7f);
+                cube.Move(30*dir, -30*dir, (int)(dur*1000), Cube.ORDER_TYPE.Strong);
+                yield return new WaitForSecondsRealtime(dur + 0.6f);
+                dir = -dir;
+            }
+            ieMotion = null;
+            isPerforming = false;
+        }
+
         internal virtual void PerformHappy()
         {
             StopMotion();

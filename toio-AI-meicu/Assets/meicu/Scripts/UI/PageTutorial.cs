@@ -326,22 +326,22 @@ namespace toio.AI.meicu
             else if (phase == 12)
             {
                 text.text = "まずは「きいろ」";
-                AIController.ins.RequestMove(Env.Action.Left);
+                AIController.ins.RequestMove(Env.Action.Left, spd:30);
                 yield return new WaitUntil(() => !AIController.ins.isMoving);
                 yield return new WaitForSecondsRealtime(1.5f);
 
                 text.text = "つぎは「しろ」...";
-                AIController.ins.RequestMove(Env.Action.Down);
+                AIController.ins.RequestMove(Env.Action.Down, spd:30);
                 yield return new WaitUntil(() => !AIController.ins.isMoving);
                 yield return new WaitForSecondsRealtime(1.5f);
 
                 text.text = "つぎは「あか」...";
-                AIController.ins.RequestMove(Env.Action.Down);
+                AIController.ins.RequestMove(Env.Action.Down, spd:30);
                 yield return new WaitUntil(() => !AIController.ins.isMoving);
                 yield return new WaitForSecondsRealtime(1.5f);
 
                 text.text = "また「しろ」...";
-                AIController.ins.RequestMove(Env.Action.Right);
+                AIController.ins.RequestMove(Env.Action.Right, spd:30);
                 yield return new WaitUntil(() => !AIController.ins.isMoving);
                 yield return new WaitForSecondsRealtime(1.5f);
 

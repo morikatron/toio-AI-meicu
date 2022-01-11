@@ -580,6 +580,7 @@ namespace toio.AI.meicu
             if (phase == 1)
             {
                 meicu.PerformThinkBegin();
+                AIController.ins.PerformThink();
                 var content = Random.Range(0f, 1f) < 0.5f? "考え中…" : "次は…どっちだろう？";
                 SetText(content, wait:false);
             }

@@ -125,7 +125,7 @@ namespace toio.AI.meicu
         IEnumerator IE_WaitReady()
         {
             // AI go home
-            AIController.ins.RequestMove(4, 4);
+            AIController.ins.RequestMove(4, 4, spd:80, confirmTime:0f);
 
             while (true)
             {

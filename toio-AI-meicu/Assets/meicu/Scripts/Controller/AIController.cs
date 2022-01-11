@@ -69,24 +69,29 @@ namespace toio.AI.meicu
         }
 
         // Start ienumerator which trys TargetMove in loop until target reached or overwritten.
-        internal void RequestMove(Env.Action action, bool useStageSetting = false)
+        internal void RequestMove(Env.Action action, bool useStageSetting = false, byte spd = 30, float confirmTime = 0.5f)
         {
             this.action = action;
             (var r, var c) = Env.Translate(action, game.envA.row, game.envA.col);
 
-            RequestMove(r, c, useStageSetting);
+            RequestMove(r, c, useStageSetting, spd, confirmTime);
         }
 
         // Start ienumerator which trys TargetMove in loop until target reached or overwritten.
-        internal void RequestMove(int row, int col, bool useStageSetting = false)
+        internal void RequestMove(int row, int col, bool useStageSetting = false, byte spd = 30, float confirmTime = 0.5f)
         {
             if (ieMotion != null && !isPerforming && this.targetCoords.x == row && this.targetCoords.y == col)
                 return;
 
             this.targetCoords = new Vector2Int(row, col);
 
+            if (useStageSetting)
+            {
+                spd = setting.speeds[game.envA.passedSpaceCnt];
+                confirmTime = setting.confirmTimes[game.envA.passedSpaceCnt];
+            }
             StopMotion();
-            ieMotion = useStageSetting? IE_Move(setting) : IE_Move();
+            ieMotion = IE_Move(spd, confirmTime);
             StartCoroutine(ieMotion);
         }
 
@@ -146,15 +151,12 @@ namespace toio.AI.meicu
         }
 
         // Loop of moving to target
-        IEnumerator IE_Move(Config.StageSetting setting = null)
+        IEnumerator IE_Move(byte spd, float confirmTime, bool timeCorrection = false)
         {
             Debug.Log($"AICon.IE_Move : Begin");
             isMoving = true;
 
             float retryTime = 11;
-            byte spd = 30;
-            if (setting != null)
-                spd = setting.speeds[game.envA.passedSpaceCnt];
             float t = Time.realtimeSinceStartup;
 
             // Wait Cube to Arrive
@@ -185,12 +187,9 @@ namespace toio.AI.meicu
             }
 
             // Simulate confirm time
-            if (setting != null)
-            {
-                var interval = setting.confirmTimes[game.envA.passedSpaceCnt];
-                yield return new WaitForSecondsRealtime(interval - (Time.realtimeSinceStartup - t - 25f/spd));
-            }
-            else yield return new WaitForSecondsRealtime(0.5f);
+            if (timeCorrection)
+                confirmTime = confirmTime - (Time.realtimeSinceStartup - t - 25f/spd);
+            yield return new WaitForSecondsRealtime(confirmTime);
 
             // Apply Step to game
             game.MoveA(action);
