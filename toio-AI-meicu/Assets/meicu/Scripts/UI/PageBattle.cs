@@ -206,6 +206,7 @@ namespace toio.AI.meicu
         void UpdateStageText()
         {
             trLevel.GetComponentInChildren<Text>().text = $"レベル  {Prefs.level}";
+            ui.transform.Find("LevelView").GetComponent<UILevelView>().ShowLevel(Prefs.level);
             trStage.GetComponentInChildren<UIStage>().SetHand(stage, 5);
             textTag.text = "迷キュー・" + classNames[Prefs.level];
         }
