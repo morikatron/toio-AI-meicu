@@ -73,6 +73,7 @@ namespace toio.AI.meicu
                 resultObj.SetActive(false);
                 swHint.isOn = false;
 
+                meicu.Reset();
                 SetIntroText();
                 UpdateStageText();
                 UpdateHint();
@@ -193,12 +194,12 @@ namespace toio.AI.meicu
             // P Lose
             else if (state == BattleState.AWin)
             {
-                SetText("もう一度やってみよう！\n次も負けないぞ！");
+                SetText("もう一回やってみよう！\n次も負けないぞ！");
             }
             // Draw
             else if (state == BattleState.Draw)
             {
-                SetText("もう一度やってみよう！\n次は勝つぞ！");
+                SetText("もう一回やってみよう！\n次は勝つぞ！");
             }
 
         }
@@ -286,7 +287,7 @@ namespace toio.AI.meicu
             SetText("", force:true);
 
             // update btnStart
-            btnStart.transform.GetComponentInChildren<Text>().text = "スタート";
+            btnStart.transform.GetComponentInChildren<Text>().text = "次へ";
         }
 
         void ProcPlayerLose()
@@ -321,7 +322,7 @@ namespace toio.AI.meicu
             SetText("", force:true);
 
             // update btnStart
-            btnStart.transform.GetComponentInChildren<Text>().text = "リトライ";
+            btnStart.transform.GetComponentInChildren<Text>().text = "もう一回";
         }
 
         void ProcDraw()
@@ -346,7 +347,7 @@ namespace toio.AI.meicu
             SetText("", force:true);
 
             // update btnStart
-            btnStart.transform.GetComponentInChildren<Text>().text = "リトライ";
+            btnStart.transform.GetComponentInChildren<Text>().text = "もう一回";
         }
 
         #endregion

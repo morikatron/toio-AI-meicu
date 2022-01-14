@@ -5622,7 +5622,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Debugger
+  m_Text: "\u30C6\u30B9\u30C8\u7528\u8A2D\u5B9A"
 --- !u!222 &758795135
 CanvasRenderer:
   m_ObjectHideFlags: 0
