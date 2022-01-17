@@ -99,6 +99,7 @@ namespace toio.AI.meicu
         {
             // TODO Timeout
             var cube = await cubeManager.SingleConnect();
+            if (cube == null) return;
             var cubeIdx = cubes.FindIndex(c => c == cube);
             cubeManager.handles[cubeIdx].SetBorderRect(new RectInt(545, 45, 410, 410));
 
