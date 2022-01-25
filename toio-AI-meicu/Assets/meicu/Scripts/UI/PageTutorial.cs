@@ -312,7 +312,7 @@ namespace toio.AI.meicu
             else if (phase == 10)
             {
                 SetIndicator("Start", false);
-                text.text = "それでは、\nまずはボクが動きながら説明するね。\n\nオレンジ色のキューブがボクだよ。";
+                text.text = "まずはボクが動きながら説明するね。\n\n２つのキューブをマットに置いてね。\n裏のランプがオレンジ色のキューブがボクだよ。";
             }
             else if (phase == 11)
             {

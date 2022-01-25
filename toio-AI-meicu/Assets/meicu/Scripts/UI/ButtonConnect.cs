@@ -18,7 +18,7 @@ namespace toio.AI.meicu
         {
             if (isBusy)
             {
-                busy.eulerAngles += new Vector3(0, 0, 1);
+                busy.eulerAngles += new Vector3(0, 0, 180 * Time.deltaTime);
             }
         }
 

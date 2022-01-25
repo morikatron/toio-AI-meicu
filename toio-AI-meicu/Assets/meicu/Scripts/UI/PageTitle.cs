@@ -41,6 +41,11 @@ namespace toio.AI.meicu
 
         IEnumerator IE_Refresh()
         {
+            // Update icons
+            var icons = ui.transform.Find("ConnectionState");
+            icons.Find("IconP").gameObject.SetActive(PlayerController.ins.isConnected);
+            icons.Find("IconA").gameObject.SetActive(AIController.ins.isConnected);
+
             // No cube connected
             if (Device.nConnected == 0)
             {
@@ -57,7 +62,7 @@ namespace toio.AI.meicu
                     yield return new WaitForSecondsRealtime(2f);
                     isHiSaid = true;
                 }
-                text.text = "左上の「接続」ボタンから\nキューブを接続してね！";
+                text.text = "キューブの電源を入れて\n「接続」ボタンから接続してね！";
 
                 // Guide to click btnConnect, on first time opening App
                 if (!Prefs.isTutorialCleared)

@@ -14,6 +14,7 @@ namespace toio.AI.meicu
 
         static UIFinger ins = null;
 
+        private float biasTime = 0;
 
         void OnEnable()
         {
@@ -23,19 +24,16 @@ namespace toio.AI.meicu
                 Destroy(this.gameObject);
         }
 
-        void Start()
-        {
-            this.gameObject.SetActive(false);
-        }
-
         void Update()
         {
-            var t = Time.time % (showTime + hideTime);
+            var t = (Time.time - biasTime) % (showTime + hideTime);
             GetComponentInChildren<RawImage>().color = new Color32(255, 255, 255, t < showTime? (byte)255 : (byte)0);
         }
 
         internal static void PointAt(Transform tr, float biasX=50, float biasY=-24)
         {
+            ins.biasTime = Time.time;
+
             var scaler = GameObject.Find("Canvas").GetComponent<CanvasScaler>();
             float canvasScale = Screen.height / scaler.referenceResolution.y;
             ins.gameObject.SetActive(true);

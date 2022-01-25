@@ -156,7 +156,8 @@ namespace toio.AI.meicu
             Debug.Log($"AICon.IE_Move : Begin");
             isMoving = true;
 
-            float retryTime = 11;
+            float timeout = 3;
+            float retryTime = timeout + 1;
             float t = Time.realtimeSinceStartup;
 
             // Wait Cube to Arrive
@@ -166,16 +167,16 @@ namespace toio.AI.meicu
                 if (!cube.isConnected)
                 {
                     yield return new WaitUntil(()=>cube.isConnected);
-                    retryTime = 11;
+                    retryTime = timeout + 1;
                 }
                 // Move a bit if position ID missed
                 else if (!cube.isGrounded)
                 {
                     cube.Move(20, -20, 400, Cube.ORDER_TYPE.Strong);
-                    retryTime = 11;
+                    retryTime = timeout + 1;
                 }
                 // Re-send command if timeout
-                else if (retryTime > 10)
+                else if (retryTime > timeout)
                 {
                     retryTime = 0;
                     Debug.Log($"AICon.IE_Move : TargetMove({targetCoords.x}, {targetCoords.y})");
