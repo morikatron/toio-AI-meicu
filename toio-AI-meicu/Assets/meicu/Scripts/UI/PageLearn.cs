@@ -420,7 +420,7 @@ namespace toio.AI.meicu
                 yield return new WaitForSecondsRealtime(0.2f);
                 videoPlayer.Play();
 
-                if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 13);
+                if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 12);
                 else yield return new WaitForSecondsRealtime(2f);
                 videoPlayer.Pause();
                 yield return new WaitForSecondsRealtime(0.2f);
@@ -428,7 +428,7 @@ namespace toio.AI.meicu
                 yield return new WaitForSecondsRealtime(0.2f);
                 videoPlayer.Play();
 
-                if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 20);
+                if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 18);
                 else yield return new WaitForSecondsRealtime(2f);
                 videoPlayer.Pause();
                 yield return new WaitForSecondsRealtime(0.2f);
@@ -436,13 +436,11 @@ namespace toio.AI.meicu
                 yield return new WaitForSecondsRealtime(0.2f);
                 videoPlayer.Play();
 
-                if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 27);
-                else yield return new WaitForSecondsRealtime(2f);
+                if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 25f);
+                else yield return new WaitForSecondsRealtime(1f);
                 videoPlayer.Pause();
                 yield return new WaitForSecondsRealtime(0.2f);
                 text.text = "ほぼカンペキにゴールできるようになるまで、ボクは4000回くらいチャレンジしたんだよ！";
-                yield return new WaitForSecondsRealtime(0.2f);
-                videoPlayer.Play();
 
                 yield return new WaitForSecondsRealtime(0.5f);
             }
