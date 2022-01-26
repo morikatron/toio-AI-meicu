@@ -451,7 +451,7 @@ namespace toio.AI.meicu
                 ui.transform.Find("Indicators").Find("Video").gameObject.SetActive(false);
                 ui.transform.Find("Video").gameObject.SetActive(false);
 
-                text.text = "ボクたちAIが学習していく\n\n流れをまとめると\n右の絵みたいになるよ";
+                text.text = "ボクたちAIが学習していく\n流れをまとめると\n右の絵みたいになるよ";
 
                 // Show Illust
                 var illustTr = ui.transform.Find("Illust");
