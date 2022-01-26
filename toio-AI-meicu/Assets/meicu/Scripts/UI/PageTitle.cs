@@ -19,6 +19,7 @@ namespace toio.AI.meicu
         public Text text;
 
         private bool isHiSaid = false;
+        private bool isError = false;
 
 
         internal void SetActive(bool active)
@@ -27,6 +28,7 @@ namespace toio.AI.meicu
 
             if (active)
             {
+                isError = false;
                 btnBGM.isOn = AudioPlayer.ins.isBGMOn;
                 Refresh();
             }
@@ -46,8 +48,24 @@ namespace toio.AI.meicu
             icons.Find("IconP").gameObject.SetActive(PlayerController.ins.isConnected);
             icons.Find("IconA").gameObject.SetActive(AIController.ins.isConnected);
 
+            if (isError && Device.nConnected < 2)
+            {
+                // Only btnConnect available
+                btnConnect.interactable = true;
+                btnTutorial.interactable = false;
+                btnBattle.interactable = false;
+                btnLearn.interactable = false;
+
+                text.text = "接続できない場合は\nブラウザーを再起動してみてね";
+
+                // Guide to click btnConnect, on first time opening App
+                if (!Prefs.isTutorialCleared)
+                    UIFinger.PointAt(btnConnect.transform, biasX:70);
+                else
+                    UIFinger.Hide();
+            }
             // No cube connected
-            if (Device.nConnected == 0)
+            else if (Device.nConnected == 0)
             {
                 // Only btnConnect available
                 btnConnect.interactable = true;
@@ -173,14 +191,8 @@ namespace toio.AI.meicu
             btnConnect.GetComponent<ButtonConnect>().SetBusy(true);
             UIFinger.Hide();
 
-            try
-            {
-                await Device.Connect();
-            }
-            catch (Exception e)     // Error occurs when user cancels connection request dialog
-            {
-                Debug.LogError(e.Message);
-            }
+            var code = await Device.Connect();
+            isError = code > 0;
 
             btnConnect.GetComponent<ButtonConnect>().SetBusy(false);
 

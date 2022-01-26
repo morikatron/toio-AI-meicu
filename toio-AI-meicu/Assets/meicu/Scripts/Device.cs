@@ -95,11 +95,10 @@ namespace toio.AI.meicu
             }
         }
 
-        internal static async UniTask Connect()
+        internal static async UniTask<int> Connect()
         {
-            // TODO Timeout
             var cube = await cubeManager.SingleConnect();
-            if (cube == null) return;
+            if (cube == null) return 1;
             var cubeIdx = cubes.FindIndex(c => c == cube);
             cubeManager.handles[cubeIdx].SetBorderRect(new RectInt(545, 45, 410, 410));
 
@@ -117,7 +116,7 @@ namespace toio.AI.meicu
             if (id == -1)
             {
                 Debug.LogWarning("Device.Connect: 3rd cube connected.");
-                return;
+                return 2;
             }
 
             // Turn on LED
@@ -131,6 +130,7 @@ namespace toio.AI.meicu
                 var color = Config.LEDOrange;
                 cube.TurnLedOn(color.r, color.g, color.b, 0);
             }
+            return 0;
         }
 
         internal static bool TargetMove(int id, int row, int col, int biasX=0, int biasY=0, byte maxSpd=80)

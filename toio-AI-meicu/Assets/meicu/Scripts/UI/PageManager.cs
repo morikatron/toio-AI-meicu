@@ -64,7 +64,7 @@ namespace toio.AI.meicu
             AudioPlayer.ins.PlayBGM(ePage);
 
             if (page == EPage.Title)
-                ins.dialogConnect.gameObject.SetActive(false);
+                ins.dialogConnect.SetActive(false);
         }
 
         public static void OnBtnHome()
@@ -83,7 +83,7 @@ namespace toio.AI.meicu
                 }
                 else
                 {
-                    dialogConnect.gameObject.SetActive(true);
+                    dialogConnect.SetActive(true);
 
                     if (page == EPage.Tutorial) pageTutorial?.Pause();
                     if (page == EPage.Battle) pageBattle?.Pause();
@@ -95,7 +95,7 @@ namespace toio.AI.meicu
         {
             if (page == EPage.Title) return;
 
-            ins.dialogConnect.gameObject.SetActive(false);
+            ins.dialogConnect.SetActive(false);
 
             if (page == EPage.Tutorial) ins.pageTutorial?.Pause();
             if (page == EPage.Battle) ins.pageBattle?.Pause();

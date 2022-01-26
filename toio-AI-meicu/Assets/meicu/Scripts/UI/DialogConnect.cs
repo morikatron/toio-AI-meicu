@@ -10,22 +10,23 @@ namespace toio.AI.meicu
     public class DialogConnect : MonoBehaviour
     {
         public Text text;
+        public Text textError;
         public Button button;
 
+        public void SetActive(bool active)
+        {
+            gameObject.SetActive(active);
+
+            textError.gameObject.SetActive(false);
+        }
 
         public async void OnBtnConnect()
         {
             button.interactable = false;
             button.GetComponent<ButtonConnect>().SetBusy(true);
 
-            try
-            {
-                await Device.Connect();
-            }
-            catch (Exception e)     // Error occurs when user cancels connection request dialog
-            {
-                Debug.LogError(e.Message);
-            }
+            int code = await Device.Connect();
+            textError.gameObject.SetActive(code > 0);
 
             button.GetComponent<ButtonConnect>().SetBusy(false);
 
