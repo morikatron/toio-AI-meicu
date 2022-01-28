@@ -47,6 +47,8 @@ namespace toio.AI.meicu
 
             if (active)
             {
+                Prefs.SetLearnAccessed();
+
                 btnBGM.isOn = AudioPlayer.ins.isBGMOn;
 
                 uiQuest.Reset();

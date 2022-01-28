@@ -9,7 +9,10 @@ namespace toio.AI.meicu
     internal static class Prefs
     {
         internal static readonly string KeyMute = "MeicuMute";
+        internal static readonly string KeyEverConnected = "MeicuEC";
+        internal static readonly string KeyTutorialAccessed = "MeicuTA";
         internal static readonly string KeyTutorialCleared = "MeicuTC";
+        internal static readonly string KeyLearnAccessed = "MeicuLA";
         internal static readonly string KeyLearnCleared = "MeicuLC";
         internal static readonly string KeyBattleEnteredAfterLearn = "MeicuBEAL";
         internal static readonly string KeyLevel = "MeicuLv";
@@ -26,6 +29,19 @@ namespace toio.AI.meicu
             }
         }
 
+        internal static bool isEverConnected
+        {
+            get {
+                return PlayerPrefs.HasKey(KeyEverConnected);
+            }
+        }
+
+        internal static bool isTutorialAccessed
+        {
+            get {
+                return PlayerPrefs.HasKey(KeyTutorialAccessed);
+            }
+        }
         internal static bool isTutorialCleared
         {
             get {
@@ -33,6 +49,12 @@ namespace toio.AI.meicu
             }
         }
 
+        internal static bool isLearnAccessed
+        {
+            get {
+                return PlayerPrefs.HasKey(KeyLearnAccessed);
+            }
+        }
         internal static bool isLearnCleared
         {
             get {
@@ -74,11 +96,24 @@ namespace toio.AI.meicu
         //     }
         // }
 
+        internal static void SetEverConnected()
+        {
+            PlayerPrefs.SetInt(KeyEverConnected, 1);
+        }
+
+        internal static void SetTutorialAccessed()
+        {
+            PlayerPrefs.SetInt(KeyTutorialAccessed, 1);
+        }
         internal static void SetTutorialCleared()
         {
             PlayerPrefs.SetInt(KeyTutorialCleared, 1);
         }
 
+        internal static void SetLearnAccessed()
+        {
+            PlayerPrefs.SetInt(KeyLearnAccessed, 1);
+        }
         internal static void SetLearnCleared()
         {
             PlayerPrefs.SetInt(KeyLearnCleared, 1);

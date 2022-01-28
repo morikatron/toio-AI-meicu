@@ -43,11 +43,12 @@ namespace toio.AI.meicu
 
         IEnumerator IE_Refresh()
         {
-            // Update icons
+            // Update connected cube icons
             var icons = ui.transform.Find("ConnectionState");
             icons.Find("IconP").gameObject.SetActive(PlayerController.ins.isConnected);
             icons.Find("IconA").gameObject.SetActive(AIController.ins.isConnected);
 
+            // Connection error
             if (isError && Device.nConnected < 2)
             {
                 // Only btnConnect available
@@ -59,7 +60,7 @@ namespace toio.AI.meicu
                 text.text = "接続できない場合は\nブラウザーを再起動してみてね";
 
                 // Guide to click btnConnect, on first time opening App
-                if (!Prefs.isTutorialCleared)
+                if (!Prefs.isEverConnected)
                     UIFinger.PointAt(btnConnect.transform, biasX:70);
                 else
                     UIFinger.Hide();
@@ -83,7 +84,7 @@ namespace toio.AI.meicu
                 text.text = "キューブの電源を入れて\n「接続」ボタンから接続してね！";
 
                 // Guide to click btnConnect, on first time opening App
-                if (!Prefs.isTutorialCleared)
+                if (!Prefs.isEverConnected)
                     UIFinger.PointAt(btnConnect.transform, biasX:70);
                 else
                     UIFinger.Hide();
@@ -98,7 +99,7 @@ namespace toio.AI.meicu
                 btnLearn.interactable = false;
 
                 // Guide to click btnConnect, on first time opening App
-                if (!Prefs.isTutorialCleared)
+                if (!Prefs.isEverConnected)
                     UIFinger.PointAt(btnConnect.transform, biasX:70);
                 else
                     UIFinger.Hide();
@@ -111,12 +112,12 @@ namespace toio.AI.meicu
                 btnConnect.interactable = false;
                 UIFinger.Hide();
 
-                // Tutorial NOT cleared
-                if (!Prefs.isTutorialCleared)
+                // Tutorial NOT accessed
+                if (!Prefs.isTutorialAccessed)
                 {
-                    // Only tutorial available
+                    // Learn NOT available
                     btnTutorial.interactable = true;
-                    btnBattle.interactable = false;
+                    btnBattle.interactable = true;
                     btnLearn.interactable = false;
 
                     // Guide to click btnTutorial
@@ -124,7 +125,7 @@ namespace toio.AI.meicu
 
                     text.text = "まずは迷路パズルのルールを\n説明するよ！";
                 }
-                // Tutorial cleared & Battle lv.1 NOT cleared
+                // Tutorial accessed & Battle lv.1 NOT cleared
                 else if (Prefs.level == 1)
                 {
                     // Learn NOT available
@@ -140,7 +141,7 @@ namespace toio.AI.meicu
                         yield return new WaitForSecondsRealtime(2f);
                     }
                 }
-                // Tutorial cleared & Battle lv.1 cleared & Learn NOT cleared
+                // Tutorial accessed & Battle lv.1 cleared & Learn NOT cleared
                 else if (!Prefs.isLearnCleared)
                 {
                     // Unlock Learn
@@ -195,6 +196,8 @@ namespace toio.AI.meicu
             isError = code > 0;
 
             btnConnect.GetComponent<ButtonConnect>().SetBusy(false);
+
+            if (Device.nConnected == 2) Prefs.SetEverConnected();
 
             Refresh();
         }
