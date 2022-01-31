@@ -118,9 +118,12 @@ namespace toio.AI.meicu
             UpdateDebugSliderLv();
             if (page == EPage.Title) pageTitle.Refresh();
         }
-        public void OnDebugBtnClearFlags()
+        public void OnDebugBtnSetAllFlags()
         {
+            Prefs.SetTutorialAccessed();
             Prefs.SetTutorialCleared();
+            Prefs.SetBattleAccessed();
+            Prefs.SetLearnAccessed();
             Prefs.SetLearnCleared();
             Prefs.SetBattleEnteredAfterLearn();
             if (Prefs.level == 1) Prefs.level = 2;

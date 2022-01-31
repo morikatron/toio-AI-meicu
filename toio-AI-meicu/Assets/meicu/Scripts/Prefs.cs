@@ -14,6 +14,7 @@ namespace toio.AI.meicu
         internal static readonly string KeyTutorialCleared = "MeicuTC";
         internal static readonly string KeyLearnAccessed = "MeicuLA";
         internal static readonly string KeyLearnCleared = "MeicuLC";
+        internal static readonly string KeyBattleAccessed = "MeicuBA";
         internal static readonly string KeyBattleEnteredAfterLearn = "MeicuBEAL";
         internal static readonly string KeyLevel = "MeicuLv";
         // internal static readonly string KeyStage = "MeicuStage";
@@ -62,6 +63,12 @@ namespace toio.AI.meicu
             }
         }
 
+        internal static bool isBattleAccessed
+        {
+            get {
+                return PlayerPrefs.HasKey(KeyBattleAccessed);
+            }
+        }
         internal static bool isBattleEnteredAfterLearn
         {
             get {
@@ -119,6 +126,10 @@ namespace toio.AI.meicu
             PlayerPrefs.SetInt(KeyLearnCleared, 1);
         }
 
+        internal static void SetBattleAccessed()
+        {
+            PlayerPrefs.SetInt(KeyBattleAccessed, 1);
+        }
         internal static void SetBattleEnteredAfterLearn()
         {
             PlayerPrefs.SetInt(KeyBattleEnteredAfterLearn, 1);

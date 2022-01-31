@@ -125,13 +125,26 @@ namespace toio.AI.meicu
 
                     text.text = "まずは迷路パズルのルールを\n説明するよ！";
                 }
-                // Tutorial accessed & Battle lv.1 NOT cleared
-                else if (Prefs.level == 1)
+                else if (!Prefs.isTutorialCleared)
                 {
                     // Learn NOT available
                     btnTutorial.interactable = true;
                     btnBattle.interactable = true;
                     btnLearn.interactable = false;
+
+                    text.text = "まずは迷路パズルのルールを\n説明するよ！";
+                }
+                // Tutorial cleared & Battle NOT accessed or lv = 1
+                else if (!Prefs.isBattleAccessed || Prefs.level == 1)
+                {
+                    // Learn NOT available
+                    btnTutorial.interactable = true;
+                    btnBattle.interactable = true;
+                    btnLearn.interactable = false;
+
+                    // Guide to click btnBattle
+                    if (!Prefs.isBattleAccessed)
+                        UIFinger.PointAt(btnBattle.transform, biasX:130);
 
                     while (true)
                     {
@@ -141,7 +154,7 @@ namespace toio.AI.meicu
                         yield return new WaitForSecondsRealtime(2f);
                     }
                 }
-                // Tutorial accessed & Battle lv.1 cleared & Learn NOT cleared
+                // Tutorial cleared & Battle lv.1 cleared & Learn NOT cleared
                 else if (!Prefs.isLearnCleared)
                 {
                     // Unlock Learn

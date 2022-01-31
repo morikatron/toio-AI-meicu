@@ -43,6 +43,7 @@ namespace toio.AI.meicu
 
             if (active)
             {
+                Prefs.SetBattleAccessed();
                 if (Prefs.isLearnCleared)
                     Prefs.SetBattleEnteredAfterLearn();
 

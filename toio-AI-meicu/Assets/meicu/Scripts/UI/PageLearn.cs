@@ -327,7 +327,7 @@ namespace toio.AI.meicu
                         // Update text
                         if (t < 2)
                         {
-                            text.text = $"　　　　　　試行 {t+1} 回目\n\n「上」に動いてみたらゴールに成功！\nこの時AIは\n「上に行けばゴールの可能性がアップ」\nと学習するんだ。";
+                            text.text = $"　　　　　　試行 {t+1} 回目\n「上」に動いてみたらゴールに成功！\nこの時AIは\n「上に行けばゴールの可能性がアップ」\nと学習するんだ。";
                         }
                         else
                         {
@@ -343,7 +343,7 @@ namespace toio.AI.meicu
                         if (action == 3) actionStr = "左";
                         if (t < 2)
                         {
-                            text.text = $"　　　　　　試行 {t+1} 回目\n\n「{actionStr}」に行ってみたら、今度はゴールに\n失敗しちゃった！\nこの時AIは\n「{actionStr}に行けばゴールの可能性がダウン」\nと学習するんだ。";
+                            text.text = $"　　　　　　試行 {t+1} 回目\n「{actionStr}」に行ってみたら、今度はゴールに\n失敗しちゃった！\nこの時AIは\n「{actionStr}に行けばゴールの可能性がダウン」\nと学習するんだ。";
                         }
                         else
                         {
