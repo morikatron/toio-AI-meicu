@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 
 namespace toio.AI.meicu
@@ -18,7 +19,7 @@ namespace toio.AI.meicu
         public Button btnStart;
         public UISwitch swHint;
         public UISwitch btnBGM;
-        public Text text;
+        public TMP_Text text;
         public Transform trLevel;
         public Transform trStage;
         public UIMeicu meicu;

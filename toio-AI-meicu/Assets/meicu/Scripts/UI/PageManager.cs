@@ -37,7 +37,7 @@ namespace toio.AI.meicu
             // Load video
             videoPlayer.url = Application.streamingAssetsPath + "/training.mp4";
             videoPlayer.Prepare();
-            videoPlayer.prepareCompleted += (vp) => { vp.Pause(); };
+            // videoPlayer.prepareCompleted += (vp) => { vp.Pause(); };
 
             SetPage(EPage.Title);
         }

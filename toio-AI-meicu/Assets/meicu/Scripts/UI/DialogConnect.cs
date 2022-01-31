@@ -3,14 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 
 namespace toio.AI.meicu
 {
     public class DialogConnect : MonoBehaviour
     {
-        public Text text;
-        public Text textError;
+        public TMP_Text text;
+        public TMP_Text textError;
         public Button button;
 
         public void SetActive(bool active)

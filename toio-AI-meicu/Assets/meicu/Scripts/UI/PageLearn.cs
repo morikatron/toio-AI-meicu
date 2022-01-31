@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
+using TMPro;
 
 
 namespace toio.AI.meicu
@@ -13,7 +14,7 @@ namespace toio.AI.meicu
         public GameObject ui;
         public UIBoard uiBoard;
         public UIQuest uiQuest;
-        public Text text;
+        public TMP_Text text;
         public Button btnNext;
         public Button btnBack;
         public UISwitch swHint;
@@ -409,7 +410,7 @@ namespace toio.AI.meicu
                 if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 3);
                 else yield return new WaitForSecondsRealtime(2f);
                 videoPlayer.Pause();
-                yield return new WaitForSecondsRealtime(0.3f);
+                // yield return new WaitForSecondsRealtime(0.3f);
                 text.text = "最初はぜんぜんゴールできない…";
                 yield return new WaitForSecondsRealtime(1f);
                 videoPlayer.Play();
@@ -417,7 +418,7 @@ namespace toio.AI.meicu
                 if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 7);
                 else yield return new WaitForSecondsRealtime(2f);
                 videoPlayer.Pause();
-                yield return new WaitForSecondsRealtime(0.3f);
+                // yield return new WaitForSecondsRealtime(0.3f);
                 text.text = "1000回くらいがんばってもまだまだ…";
                 yield return new WaitForSecondsRealtime(1f);
                 videoPlayer.Play();
@@ -425,7 +426,7 @@ namespace toio.AI.meicu
                 if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 11);
                 else yield return new WaitForSecondsRealtime(2f);
                 videoPlayer.Pause();
-                yield return new WaitForSecondsRealtime(0.3f);
+                // yield return new WaitForSecondsRealtime(0.3f);
                 text.text = "2000回くらいで、やっとゴールできはじめたよ！";
                 yield return new WaitForSecondsRealtime(1f);
                 videoPlayer.Play();
@@ -433,14 +434,14 @@ namespace toio.AI.meicu
                 if (videoPlayer.isPlaying) yield return new WaitUntil(() => videoPlayer.time > 18);
                 else yield return new WaitForSecondsRealtime(2f);
                 videoPlayer.Pause();
-                yield return new WaitForSecondsRealtime(0.3f);
+                // yield return new WaitForSecondsRealtime(0.3f);
                 text.text = "3000回こえたら、ほとんどゴールできるようになってきたね！";
                 yield return new WaitForSecondsRealtime(1f);
                 videoPlayer.Play();
 
                 if (videoPlayer.isPlaying) yield return new WaitUntil(() => !videoPlayer.isPlaying);
                 else yield return new WaitForSecondsRealtime(2f);
-                yield return new WaitForSecondsRealtime(0.3f);
+                // yield return new WaitForSecondsRealtime(0.3f);
                 text.text = "ほぼカンペキにゴールできるようになるまで、ボクは4000回くらいチャレンジしたんだよ！";
 
                 yield return new WaitForSecondsRealtime(0.5f);

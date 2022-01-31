@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 
 namespace toio.AI.meicu
@@ -13,7 +14,7 @@ namespace toio.AI.meicu
         public UIBoard uiBoard;
         public UIQuest uiQuest;
         public Game game;
-        public Text text;
+        public TMP_Text text;
         public Button btnNext;
         public Button btnBack;
         public UISwitch btnBGM;

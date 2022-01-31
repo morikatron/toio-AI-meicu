@@ -1,13 +1,3 @@
-
-# T4U
-/Assets/ble-plugin-unity/
-/Assets/toio-sdk/
-/Assets/TextMesh Pro/
-/Assets/WebGLTemplates/
-/Assets/Plugins/
-/Assets/ML-Agents/
-/Packages/
-
 # This .gitignore file should be placed at the root of your Unity project directory
 #
 # Get latest from https://github.com/github/gitignore/blob/master/Unity.gitignore
@@ -68,3 +58,17 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+# Meicu
+/Assets/ble-plugin-unity/
+/Assets/ble-plugin-unity.meta
+/Assets/toio-sdk/
+/Assets/toio-sdk.meta
+/Assets/TextMesh Pro/
+/Assets/TextMesh Pro.meta
+/Assets/WebGLTemplates/
+/Assets/WebGLTemplates.meta
+/Assets/Plugins/
+/Assets/Plugins.meta
+/Assets/ML-Agents/
+/Assets/ML-Agents.meta
+/Packages/
