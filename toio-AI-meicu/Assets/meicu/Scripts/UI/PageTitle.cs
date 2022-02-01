@@ -113,90 +113,82 @@ namespace toio.AI.meicu
                 btnConnect.interactable = false;
                 UIFinger.Hide();
 
-                // Tutorial NOT accessed
-                if (!Prefs.isTutorialAccessed)
+                // Tutorial, Battle always open
+                btnTutorial.interactable = true;
+                btnBattle.interactable = true;
+
+                // Battle lv.1 NOT cleared
+                if (Prefs.level == 1)
                 {
                     // Learn NOT available
-                    btnTutorial.interactable = true;
-                    btnBattle.interactable = true;
                     btnLearn.interactable = false;
 
-                    // Guide to click btnTutorial
-                    UIFinger.PointAt(btnTutorial.transform, biasX:130);
-
-                    text.text = "まずは迷路パズルのルールを\n説明するよ！";
-                }
-                else if (!Prefs.isTutorialCleared)
-                {
-                    // Learn NOT available
-                    btnTutorial.interactable = true;
-                    btnBattle.interactable = true;
-                    btnLearn.interactable = false;
-
-                    text.text = "まずは迷路パズルのルールを\n説明するよ！";
-                }
-                // Tutorial cleared & Battle NOT accessed or lv = 1
-                else if (!Prefs.isBattleAccessed || Prefs.level == 1)
-                {
-                    // Learn NOT available
-                    btnTutorial.interactable = true;
-                    btnBattle.interactable = true;
-                    btnLearn.interactable = false;
-
-                    // Guide to click btnBattle
-                    if (!Prefs.isBattleAccessed)
-                        UIFinger.PointAt(btnBattle.transform, biasX:130);
-
-                    while (true)
+                    if (!Prefs.isTutorialAccessed)
                     {
-                        text.text = "みんなは迷路が好きかな？";
-                        yield return new WaitForSecondsRealtime(2f);
-                        text.text = "ボクと迷路パズルでバトルしよう！";
-                        yield return new WaitForSecondsRealtime(2f);
+                        // Guide to click btnTutorial
+                        UIFinger.PointAt(btnTutorial.transform, biasX:130);
+
+                        text.text = "まずは迷路パズルのルールを\n説明するよ！";
+                    }
+                    else if (!Prefs.isTutorialCleared)
+                    {
+                        text.text = "まずは迷路パズルのルールを\n説明するよ！";
+                    }
+                    else
+                    {
+                        // Guide to click btnBattle
+                        if (!Prefs.isBattleAccessed)
+                            UIFinger.PointAt(btnBattle.transform, biasX:130);
+
+                        while (true)
+                        {
+                            text.text = "みんなは迷路が好きかな？";
+                            yield return new WaitForSecondsRealtime(2f);
+                            text.text = "ボクと迷路パズルでバトルしよう！";
+                            yield return new WaitForSecondsRealtime(2f);
+                        }
                     }
                 }
-                // Tutorial cleared & Battle lv.1 cleared & Learn NOT cleared
-                else if (!Prefs.isLearnCleared)
-                {
-                    // Unlock Learn
-                    btnTutorial.interactable = true;
-                    btnBattle.interactable = true;
-                    btnLearn.interactable = true;
-
-                    // Guide to Learn
-                    UIFinger.PointAt(btnLearn.transform, biasX:130);
-
-                    while (true)
-                    {
-                        text.text = "レベル1のクリア、おめでとう！";
-                        yield return new WaitForSecondsRealtime(2f);
-                        text.text = "かいせつボタンを押すと、\nボクの強さのひみつが分かるよ";
-                        yield return new WaitForSecondsRealtime(2f);
-                    }
-                }
-                // Tutorial cleared & Battle lv.1 cleared & Learn cleared
+                // Battle lv.1 cleared
                 else
                 {
-                    // Right after Learn cleared
-                    if (!Prefs.isBattleEnteredAfterLearn)
-                    {
-                        // Guide to Battle again
-                        UIFinger.PointAt(btnBattle.transform, biasX:130);
-                    }
-
-                    // All available
-                    btnTutorial.interactable = true;
-                    btnBattle.interactable = true;
+                    // Learn open
                     btnLearn.interactable = true;
 
-                    while (true)
+                    // Learn NOT cleared
+                    if (!Prefs.isLearnCleared)
                     {
-                        text.text = "みんなは迷路が好きかな？";
-                        yield return new WaitForSecondsRealtime(2f);
-                        text.text = "ボクと迷路パズルでバトルしよう！";
-                        yield return new WaitForSecondsRealtime(2f);
+                        // Guide to Learn
+                        UIFinger.PointAt(btnLearn.transform, biasX:130);
+
+                        while (true)
+                        {
+                            text.text = "レベル1のクリア、おめでとう！";
+                            yield return new WaitForSecondsRealtime(2f);
+                            text.text = "かいせつボタンを押すと、\nボクの強さのひみつが分かるよ";
+                            yield return new WaitForSecondsRealtime(2f);
+                        }
+                    }
+                    // Learn Cleared
+                    else
+                    {
+                        // Right after Learn cleared
+                        if (!Prefs.isBattleEnteredAfterLearn)
+                        {
+                            // Guide to Battle again
+                            UIFinger.PointAt(btnBattle.transform, biasX:130);
+                        }
+
+                        while (true)
+                        {
+                            text.text = "みんなは迷路が好きかな？";
+                            yield return new WaitForSecondsRealtime(2f);
+                            text.text = "ボクと迷路パズルでバトルしよう！";
+                            yield return new WaitForSecondsRealtime(2f);
+                        }
                     }
                 }
+
             }
         }
 
