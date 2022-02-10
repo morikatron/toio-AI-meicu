@@ -33,6 +33,10 @@ namespace toio.AI.meicu
                 btnBGM.isOn = AudioPlayer.ins.isBGMOn;
                 Refresh();
             }
+            else
+            {
+                StopAllCoroutines();
+            }
         }
 
 

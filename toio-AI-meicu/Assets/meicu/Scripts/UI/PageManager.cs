@@ -14,6 +14,7 @@ namespace toio.AI.meicu
         public PageTutorial pageTutorial;
         public PageBattle pageBattle;
         public PageLearn pageLearn;
+        public PageTrainer pageTrainer;
         public DialogConnect dialogConnect;
         public VideoPlayer videoPlayer;
 
@@ -45,7 +46,7 @@ namespace toio.AI.meicu
 
         internal enum EPage
         {
-            Title, Tutorial, Battle, Learn
+            Title, Tutorial, Battle, Learn, Trainer
         }
         internal static void SetPage(EPage ePage)
         {
@@ -56,6 +57,7 @@ namespace toio.AI.meicu
             ins.pageTutorial?.SetActive(ePage == EPage.Tutorial);
             ins.pageBattle?.SetActive(ePage == EPage.Battle);
             ins.pageLearn?.SetActive(ePage == EPage.Learn);
+            ins.pageTrainer?.SetActive(ePage == EPage.Trainer);
 
             if (ins.isDebug && ePage == EPage.Title)
                 ins.UpdateDebugSliderLv();
@@ -88,6 +90,7 @@ namespace toio.AI.meicu
                     if (page == EPage.Tutorial) pageTutorial?.Pause();
                     if (page == EPage.Battle) pageBattle?.Pause();
                     if (page == EPage.Learn) pageLearn?.Pause();
+                    if (page == EPage.Trainer) pageTrainer?.Pause();
                 }
             }
         }
@@ -100,6 +103,7 @@ namespace toio.AI.meicu
             if (page == EPage.Tutorial) ins.pageTutorial?.Pause();
             if (page == EPage.Battle) ins.pageBattle?.Pause();
             if (page == EPage.Learn) ins.pageLearn?.Pause();
+            if (page == EPage.Trainer) ins.pageTrainer?.Pause();
         }
 
 
@@ -137,6 +141,10 @@ namespace toio.AI.meicu
 
             UpdateDebugSliderLv();
             if (page == EPage.Title) pageTitle.Refresh();
+        }
+        public void OnDebugBtnTrainer()
+        {
+            SetPage(EPage.Trainer);
         }
 
         #endregion

@@ -1,13 +1,15 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 
 namespace toio.AI.meicu
 {
 
-    public class UIBoard : MonoBehaviour
+    public class UIBoard : MonoBehaviour, IPointerClickHandler
     {
         public static readonly Color BoardBlack = new Color32(55, 55, 55, 255);
         public static readonly Color BoardWhite = new Color32(255, 255, 255, 255);
@@ -19,12 +21,14 @@ namespace toio.AI.meicu
         internal Vector2Int biasP = new Vector2Int(2, 2);
         internal Vector2Int biasA = new Vector2Int(-2, -2);
 
-
+        public GameObject uiRewardPrefab;
+        public event Action<Vector2Int> onSpaceClicked;
         public float heatmapZeroOpacity = 0.1f;
         public float heatmapMinOpacity = 0.2f;
 
         private List<GameObject> trajPObjs = new List<GameObject>();
         private List<GameObject> trajAObjs = new List<GameObject>();
+        private List<GameObject> rewardObjs = new List<GameObject>();
 
 
         internal void Reset()
@@ -35,6 +39,7 @@ namespace toio.AI.meicu
             HideKomaP();
             HideGoal();
             HideFail();
+            ClearRewards();
 
             // Reset Mat
             for (int r = 0; r < 9; r++)
@@ -234,6 +239,35 @@ namespace toio.AI.meicu
             transform.Find("KomaA").Find("ImgFail").gameObject.SetActive(false);
         }
 
+        internal void PutReward(int row, int col, int maxCount=1)
+        {
+            var obj = GameObject.Instantiate(uiRewardPrefab, transform);
+            (obj.transform as RectTransform).anchoredPosition = RowCol2UICoords(row, col);
+            rewardObjs.Add(obj);
+
+            while (rewardObjs.Count > maxCount)
+            {
+                var o = rewardObjs[0];
+                GameObject.Destroy(o);
+                rewardObjs.RemoveAt(0);
+            }
+        }
+        internal void ClearRewards()
+        {
+            rewardObjs.ForEach(o=>GameObject.Destroy(o));
+            rewardObjs.Clear();
+        }
+
+        public void OnPointerClick(PointerEventData e)
+        {
+            var local = (transform as RectTransform).InverseTransformPoint(e.position);
+            if (local.x < -45 || local.x > 45 || local.y < -45 || local.y > 45)
+                return;
+
+            var coords = UI2RowColCoords(local);
+            this.onSpaceClicked?.Invoke(coords);
+        }
+
 
         private RectTransform CreateLine(List<GameObject> addTo, Color color)
         {
@@ -256,6 +290,10 @@ namespace toio.AI.meicu
         internal Vector2Int RowCol2UICoords(int row, int col)
         {
             return new Vector2Int(col * 10 + 5, -row * 10 - 5);
+        }
+        internal Vector2Int UI2RowColCoords(Vector2 uiCoords)
+        {
+            return new Vector2Int((int)((uiCoords.y - 45)/(-10)), (int)((uiCoords.x + 45)/10));
         }
     }
 

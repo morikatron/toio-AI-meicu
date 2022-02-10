@@ -5890,6 +5890,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9083d025da290144990063fab99f47a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  uiRewardPrefab: {fileID: 4159998687626237978, guid: fec3f5cfb6972034a8037127698f04ea, type: 3}
   heatmapZeroOpacity: 0.1
   heatmapMinOpacity: 0.1
 --- !u!1 &1294776362910058050
@@ -6698,7 +6699,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 5, y: -5}
-  m_SizeDelta: {x: 10, y: 10}
+  m_SizeDelta: {x: 9, y: 9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2455723842669764047
 CanvasRenderer:
