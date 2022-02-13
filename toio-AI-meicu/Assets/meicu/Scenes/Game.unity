@@ -7560,6 +7560,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: BtnBGM
       objectReference: {fileID: 0}
+    - target: {fileID: 8039637589356617153, guid: 27d4782fb4a4cbd40bddb9a0628925da, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8039637589356617155, guid: 27d4782fb4a4cbd40bddb9a0628925da, type: 3}
       propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -11859,7 +11863,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 0.9
-  m_Text: v0.9.0 (build220203-1)
+  m_Text: v0.9.1 (build220214-1)
 --- !u!222 &1277490925
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -20087,7 +20091,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 0.8
-  m_Text: "\u300C\u5831\u916C\u300D\u3067\n\u9577\u3055\uFF13\u306E\u554F\u984C\u3092\u5B66\u7FD2\uFF01"
+  m_Text: "\u300C\u5831\u916C\u300D\u3067\n\u9577\u3055\uFF12\u306E\u554F\u984C\u3092\u5B66\u7FD2\uFF01"
 --- !u!222 &2068901741
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -22,11 +22,16 @@ namespace toio.AI.meicu
         private Env env = new Env();
         private QAgent agent;
         private Phase phase;
+        private bool inTraining = false;
         private int stageIdx = 0;
         private List<Vector2Int> rewardCoords = new List<Vector2Int>();
 
         private int episodesTurn;
         private int episodesTurnLeft;
+        private float loss;
+        private List<bool> testLog = new List<bool>();
+
+        private int clearedStages = 1; // TODO move to Prefs in future
 
 
         void OnEnable()
@@ -48,6 +53,7 @@ namespace toio.AI.meicu
                 env.Reset();
                 uiBoard.Reset();
                 uiQuest.Reset();
+                inTraining = false;
 
                 Refresh();
             }
@@ -82,6 +88,9 @@ namespace toio.AI.meicu
             {
                 text.text = "課題をせんたくしてください。";
 
+                ui.transform.Find("Entries").Find("Btn1").GetComponent<Button>().interactable = clearedStages > 0;
+                // ui.transform.Find("Entries").Find("Btn2").GetComponent<Button>().interactable = clearedStages > 1;
+
                 // TODO Finger?
             }
             else if (phase == Phase.Quest)
@@ -95,33 +104,48 @@ namespace toio.AI.meicu
             }
             else if (phase == Phase.Plan)
             {
-                if (stageIdx == 0)
+                if (stageIdx == 0 || stageIdx == 1)
                 {
                     text.text = "マスをクリックして、「報酬」を１つ配置してください!";
                     yield return new WaitUntil(() => rewardCoords.Count>0);
                 }
-                else if (stageIdx == 1)
+                else if (stageIdx == 2)
                 {
-                    text.text = "マスをクリックして、「報酬」を１つ配置してください!";
+                    text.text = "マスをクリックして、「報酬」を２つ配置してください!";
                     yield return new WaitUntil(() => rewardCoords.Count>0);
                 }
             }
             else if (phase == Phase.Train)
             {
-
+                while (this.inTraining)
+                {
+                    text.text = $"試行回数： {this.episodesTurn-this.episodesTurnLeft} / {this.episodesTurn}\n" +
+                        $"ロス(仮)： {this.loss}";
+                    yield return new WaitForSecondsRealtime(0.01f);
+                }
+                text.text += "\n\n学習終了。";
+            }
+            else if (phase == Phase.Test)
+            {
+                // text.text += "\n\n学習終了。";
             }
 
-            yield return new WaitForSecondsRealtime(0.5f);
+            // yield return new WaitForSecondsRealtime(0.5f);
             btnNext.interactable = true;
         }
 
         private IEnumerator IE_Train()
         {
             if (phase != Phase.Train) yield break;
+            this.inTraining = true;
 
             while (this.episodesTurnLeft-- > 0)
             {
                 env.Reset();
+                // UI
+                uiBoard.ShowKomaP(env.row, env.col);
+                uiQuest.ShowP(env.passedSpaceCnt);
+                yield return new WaitForSecondsRealtime(0.05f);
 
                 agent.e = EpsilonScheduler(episodesTurnLeft, episodesTurn);
 
@@ -149,33 +173,85 @@ namespace toio.AI.meicu
                         done = true;
                     }
 
-                    if (this.rewardCoords.Contains(new Vector2Int(row_, col_)))
+                    if (!Env.IsResponseFail(res) && this.rewardCoords.Contains(new Vector2Int(row_, col_)))
                     {
                         reward += 1;
                     }
                     agent.Collect(row, col, (int)action, reward, done, row_, col_);
 
-                    yield return new WaitForSecondsRealtime(0.1f);
+                    yield return new WaitForSecondsRealtime(0.05f);
                     if (done) break;
                 }
 
-                // if (episodesTurnLeft % 5 == 0 && agent.bufferLength > 5)
-                agent.Train();
+                if (agent.bufferLength > 5)
+                    this.loss = agent.Train();
             }
+
+            this.inTraining = false;
+        }
+
+        private IEnumerator IE_Test()
+        {
+            btnNext.interactable = false;
+            text.text = "試験\n";
+            testLog.Clear();
+
+            int successCnt = 0;
+            for (int ieps = 0; ieps < 10; ieps ++)
+            {
+                env.Reset();
+                // UI
+                uiBoard.ShowKomaP(env.row, env.col);
+                uiQuest.ShowP(env.passedSpaceCnt);
+                yield return new WaitForSecondsRealtime(0.4f);
+
+                while (true)
+                {
+                    // Step
+                    var row = env.row; var col = env.col;
+                    var action = agent.GetActionTest(env.row, env.col);
+                    var res = env.Step(action);
+                    bool done = Env.IsResponseFail(res) || res == Env.Response.Goal;
+
+                    // UI
+                    uiBoard.ShowKomaP(env.row, env.col);
+                    uiQuest.ShowP(env.passedSpaceCnt);
+                    if (done)
+                    {
+                        successCnt += res == Env.Response.Goal? 1: 0;
+                        testLog.Add(res == Env.Response.Goal);
+                        text.text += res == Env.Response.Goal? "O" : "X";
+                    }
+
+                    yield return new WaitForSecondsRealtime(0.4f);
+                    if (done) break;
+                }
+            }
+
+            text.text += $"\n点数 = {successCnt}/10";
+
+            if (successCnt > 5)
+            {
+                text.text += "\n6点以上なので合格! ";
+                clearedStages = Mathf.Max(clearedStages, stageIdx+1);
+            }
+            else
+            {
+                text.text += "\n6未満なので不合格！リトライしてね";
+            }
+
+            btnNext.interactable = true;
         }
 
         private float EpsilonScheduler(int epsLeft, int nEps)
         {
-            if (stageIdx == 0)
-            {
-                return (float)epsLeft/nEps * 0.4f + 0.1f;
-            }
-            return 0.1f;
+            return (float)epsLeft/nEps * 0.4f + 0.1f;
         }
 
 
         private void InitQuest()
         {
+            env.Reset();
             uiBoard.Reset();
             uiQuest.Reset();
             rewardCoords.Clear();
@@ -189,7 +265,12 @@ namespace toio.AI.meicu
             }
             else if (stageIdx == 1)
             {
-                var quest = env.GenerateQuest(1);
+                var quest = env.GenerateQuest(2);
+                env.SetQuest(quest);
+            }
+            else if (stageIdx == 2)
+            {
+                var quest = env.GenerateQuest(3);
                 env.SetQuest(quest);
             }
         }
@@ -198,6 +279,16 @@ namespace toio.AI.meicu
             if (phase != Phase.Plan) return;
 
             if (stageIdx == 0)
+            {
+                this.episodesTurn = 100;
+                this.episodesTurnLeft = this.episodesTurn;
+            }
+            else if (stageIdx == 1)
+            {
+                this.episodesTurn = 500;
+                this.episodesTurnLeft = this.episodesTurn;
+            }
+            else if (stageIdx == 2)
             {
                 this.episodesTurn = 100;
                 this.episodesTurnLeft = this.episodesTurn;
@@ -222,9 +313,13 @@ namespace toio.AI.meicu
         {
             if (phase != Phase.Plan) return;
 
-            if (stageIdx == 0)
+            if (stageIdx == 0 || stageIdx == 1)
             {
                 this.PutReward(rowCol.x, rowCol.y, 1);
+            }
+            else if (stageIdx == 2)
+            {
+                this.PutReward(rowCol.x, rowCol.y, 2);
             }
         }
 
@@ -240,6 +335,17 @@ namespace toio.AI.meicu
             {
                 phase = Phase.Train;
                 StartCoroutine(IE_Train());
+                Refresh();
+            }
+            else if (phase == Phase.Train)
+            {
+                phase = Phase.Test;
+                StartCoroutine(IE_Test());
+                // Refresh();
+            }
+            else if (phase == Phase.Test)
+            {
+                phase = Phase.Entry;
                 Refresh();
             }
         }
@@ -275,7 +381,7 @@ namespace toio.AI.meicu
             for (int r = 0; r < 9; r++)
                 for (int c = 0; c < 9; c++)
                     for (int a = 0; a < 4; a++)
-                        this.Q[r, c, a] = UnityEngine.Random.Range(-0.3f, 0.3f);
+                        this.Q[r, c, a] = UnityEngine.Random.Range(0f, 0.1f);
         }
 
         public Env.Action GetBestAction(int row, int col)
@@ -300,8 +406,7 @@ namespace toio.AI.meicu
         public Env.Action GetActionTest(int row, int col)
         {
             var qs = Enumerable.Range(0, 4).Select(x => this.Q[row, col, x]).ToArray();
-            var i = SampleIdx(qs);
-            return (Env.Action)i;
+            return (Env.Action)SampleFromQ(qs);
         }
 
         private List<int> rowBuffer = new List<int>();
@@ -354,7 +459,7 @@ namespace toio.AI.meicu
                 var q_s = row_ == -1 || done? new float[]{0, 0, 0, 0} : Enumerable.Range(0, 4).Select(x => this.Q[row_, col_, x]).ToArray();
                 var dq = reward + this.gamma * q_s.Max() - qs[action];
                 this.QUpdate[row, col, action] += dq / this.rowBuffer.Count;
-                lossSum += dq / this.rowBuffer.Count;
+                lossSum += Mathf.Abs(dq) / this.rowBuffer.Count;
             }
 
             // Update
@@ -364,7 +469,6 @@ namespace toio.AI.meicu
                         this.Q[r, c, a] += this.QUpdate[r, c, a] * this.lr;
 
             Debug.Log($"[{this.Q[4, 4, 0]} {this.Q[4, 4, 1]} {this.Q[4, 4, 2]} {this.Q[4, 4, 3]}]");
-            Debug.Log(lossSum);
 
             // Clear buffer
             this.rowBuffer.Clear();
@@ -378,6 +482,22 @@ namespace toio.AI.meicu
             return lossSum;
         }
 
+        // Simulate Stochastic Policy from Q values using softmax
+        static int SampleFromQ(float[] qs, float max_return = 1)
+        {
+            float scale = 4f / max_return;
+            var qs_scaled = Array.ConvertAll(qs, q => q * scale);
+            var softmax = Softmax(qs_scaled);
+            var i = SampleIdx(softmax);
+            return i;
+        }
+        static float[] Softmax(float[] logits)
+        {
+            var exps = Array.ConvertAll(logits, q => Mathf.Exp(q));
+            float sum = 0;
+            foreach (var e in exps) sum += e;
+            return Array.ConvertAll(exps, e=>e/sum);
+        }
         static int SampleIdx(float[] probs)
         {
             var p = UnityEngine.Random.Range(0f, 1f);
