@@ -22,6 +22,8 @@ namespace toio.AI.meicu
         private Env env = new Env();
         private QAgent agent;
         private Phase phase;
+        private bool waitBtn = false;
+        private bool isSt2Failed = false;
         private bool inTraining = false;
         private int stageIdx = 0;
         private List<Vector2Int> rewardCoords = new List<Vector2Int>();
@@ -55,10 +57,11 @@ namespace toio.AI.meicu
                 uiQuest.Reset();
                 inTraining = false;
 
-                Refresh();
+                BeginPhaseEntry();
             }
             else
             {
+                StopAllCoroutines();
             }
         }
 
@@ -67,190 +70,34 @@ namespace toio.AI.meicu
 
         }
 
-        private IEnumerator ie_Refresh;
-        internal void Refresh()
+        private void BeginPhaseEntry()
         {
-            if (ie_Refresh != null) StopCoroutine(ie_Refresh);
-            ie_Refresh = IE_Refresh();
-            StartCoroutine(ie_Refresh);
-        }
+            if (phase != Phase.Entry) return;
 
-        private IEnumerator IE_Refresh()
-        {
-            uiBoard.gameObject.SetActive(phase != Phase.Entry);
-            uiQuest.gameObject.SetActive(phase != Phase.Entry);
-            ui.transform.Find("Entries").gameObject.SetActive(phase == Phase.Entry);
-            btnNext.gameObject.SetActive(phase != Phase.Entry);
-
-            btnNext.interactable = false;
-
-            if (phase == Phase.Entry)
+            IEnumerator IE_Entry()
             {
+                waitBtn = false;
+
+                uiBoard.gameObject.SetActive(phase != Phase.Entry);
+                uiQuest.gameObject.SetActive(phase != Phase.Entry);
+                ui.transform.Find("Entries").gameObject.SetActive(phase == Phase.Entry);
+                btnNext.gameObject.SetActive(phase != Phase.Entry);
+
                 text.text = "課題をせんたくしてください。";
 
                 ui.transform.Find("Entries").Find("Btn1").GetComponent<Button>().interactable = clearedStages > 0;
                 ui.transform.Find("Entries").Find("Btn2").GetComponent<Button>().interactable = clearedStages > 1;
 
-                // TODO Finger?
+                yield break;
             }
-            else if (phase == Phase.Quest)
-            {
-                text.text = "この課題を解けるように\n自分のキューブを学習させてみよう！";
-
-                uiBoard.ShowGoal(env.quest.goalRow, env.quest.goalCol);
-                uiBoard.ShowKomaP(4, 4);
-                uiQuest.ShowQuest(env.quest);
-                uiQuest.ShowP(0);
-            }
-            else if (phase == Phase.Plan)
-            {
-                if (stageIdx == 0 || stageIdx == 1)
-                {
-                    text.text = "マスをクリックして、「報酬」を１つ配置してください!";
-                    yield return new WaitUntil(() => rewardCoords.Count>0);
-                }
-                else if (stageIdx == 2)
-                {
-                    text.text = "マスをクリックして、「報酬」を２つ配置してください!";
-                    yield return new WaitUntil(() => rewardCoords.Count>0);
-                }
-            }
-            else if (phase == Phase.Train)
-            {
-                while (this.inTraining)
-                {
-                    text.text = $"試行回数： {this.episodesTurn-this.episodesTurnLeft} / {this.episodesTurn}\n" +
-                        $"ロス(仮)： {this.loss}";
-                    yield return new WaitForSecondsRealtime(0.01f);
-                }
-                text.text += "\n\n学習終了。";
-            }
-            else if (phase == Phase.Test)
-            {
-                // text.text += "\n\n学習終了。";
-            }
-
-            // yield return new WaitForSecondsRealtime(0.5f);
-            btnNext.interactable = true;
+            StopAllCoroutines();
+            StartCoroutine(IE_Entry());
         }
 
-        private IEnumerator IE_Train()
+        private void BeginPhaseQuest()
         {
-            if (phase != Phase.Train) yield break;
-            this.inTraining = true;
+            if (phase != Phase.Quest) return;
 
-            while (this.episodesTurnLeft-- > 0)
-            {
-                env.Reset();
-                // UI
-                uiBoard.ShowKomaP(env.row, env.col);
-                uiQuest.ShowP(env.passedSpaceCnt);
-                yield return new WaitForSecondsRealtime(0.05f);
-
-                agent.e = EpsilonScheduler(episodesTurnLeft, episodesTurn);
-
-                while (true)
-                {
-                    // Step
-                    var row = env.row; var col = env.col;
-                    var action = agent.GetActionTraining(env.row, env.col);
-                    var res = env.Step(action);
-                    var row_ = env.row; var col_ = env.col;
-                    float reward = 0;
-                    bool done = false;
-
-                    // UI
-                    uiBoard.ShowKomaP(row_, col_);
-                    uiQuest.ShowP(env.passedSpaceCnt);
-
-                    // Collect
-                    if (Env.IsResponseFail(res))
-                    {
-                        row_ = -1; col_ = -1; done = true;
-                    }
-                    if (res == Env.Response.Goal)
-                    {
-                        done = true;
-                    }
-
-                    if (!Env.IsResponseFail(res) && this.rewardCoords.Contains(new Vector2Int(row_, col_)))
-                    {
-                        reward += 1;
-                    }
-                    agent.Collect(row, col, (int)action, reward, done, row_, col_);
-
-                    yield return new WaitForSecondsRealtime(0.05f);
-                    if (done) break;
-                }
-
-                if (agent.bufferLength > 5)
-                    this.loss = agent.Train();
-            }
-
-            this.inTraining = false;
-        }
-
-        private IEnumerator IE_Test()
-        {
-            btnNext.interactable = false;
-            text.text = "試験\n";
-            testLog.Clear();
-
-            int successCnt = 0;
-            for (int ieps = 0; ieps < 10; ieps ++)
-            {
-                env.Reset();
-                // UI
-                uiBoard.ShowKomaP(env.row, env.col);
-                uiQuest.ShowP(env.passedSpaceCnt);
-                yield return new WaitForSecondsRealtime(0.4f);
-
-                while (true)
-                {
-                    // Step
-                    var row = env.row; var col = env.col;
-                    var action = agent.GetActionTest(env.row, env.col);
-                    var res = env.Step(action);
-                    bool done = Env.IsResponseFail(res) || res == Env.Response.Goal;
-
-                    // UI
-                    uiBoard.ShowKomaP(env.row, env.col);
-                    uiQuest.ShowP(env.passedSpaceCnt);
-                    if (done)
-                    {
-                        successCnt += res == Env.Response.Goal? 1: 0;
-                        testLog.Add(res == Env.Response.Goal);
-                        text.text += res == Env.Response.Goal? "O" : "X";
-                    }
-
-                    yield return new WaitForSecondsRealtime(0.4f);
-                    if (done) break;
-                }
-            }
-
-            text.text += $"\n点数 = {successCnt}/10";
-
-            if (successCnt > 5)
-            {
-                text.text += "\n6点以上なので合格! ";
-                clearedStages = Mathf.Max(clearedStages, stageIdx+1);
-            }
-            else
-            {
-                text.text += "\n6未満なので不合格！リトライしてね";
-            }
-
-            btnNext.interactable = true;
-        }
-
-        private float EpsilonScheduler(int epsLeft, int nEps)
-        {
-            return (float)epsLeft/nEps * 0.4f + 0.1f;
-        }
-
-
-        private void InitQuest()
-        {
             env.Reset();
             uiBoard.Reset();
             uiQuest.Reset();
@@ -273,8 +120,35 @@ namespace toio.AI.meicu
                 var quest = env.GenerateQuest(3);
                 env.SetQuest(quest);
             }
+
+            IEnumerator IE_Quest()
+            {
+                waitBtn = false;
+
+                uiBoard.gameObject.SetActive(phase != Phase.Entry);
+                uiQuest.gameObject.SetActive(phase != Phase.Entry);
+                ui.transform.Find("Entries").gameObject.SetActive(phase == Phase.Entry);
+                btnNext.gameObject.SetActive(phase != Phase.Entry);
+
+                if (stageIdx == 0)
+                    text.text = "このお題を解けるように\n自分のキューブを学習させてみよう！\n\n最初は長さ1のお題";
+                else if (stageIdx == 1)
+                    text.text = "もう少し長い問題にチャレンジしてみよう！\n\n今回は試行錯誤を500回するよ。";
+                else if (stageIdx == 2)
+                    text.text = "長さ3のお題も500回で学習できるかな？";
+
+                uiBoard.ShowGoal(env.quest.goalRow, env.quest.goalCol);
+                uiBoard.ShowKomaP(4, 4);
+                uiQuest.ShowQuest(env.quest);
+                uiQuest.ShowP(0);
+                btnNext.interactable = true;
+                yield break;
+            }
+            StopAllCoroutines();
+            StartCoroutine(IE_Quest());
         }
-        private void InitPlan()
+
+        private void BeginPhasePlan()
         {
             if (phase != Phase.Plan) return;
 
@@ -293,6 +167,222 @@ namespace toio.AI.meicu
                 this.episodesTurn = 500;
                 this.episodesTurnLeft = this.episodesTurn;
             }
+
+            if (isSt2Failed)
+                agent.Reset();
+
+            IEnumerator IE_Plan()
+            {
+                if (stageIdx == 0)
+                {
+                    btnNext.interactable = true;
+                    waitBtn = true;
+                    text.text = "キューブは色もゴールも見えないので、\n最初はてきとうに動くけど、";
+                    yield return new WaitUntil(() => !waitBtn);
+
+                    waitBtn = true;
+                    text.text = "報酬（ほうしゅう）をマスにおいて、\nキューブがたまたまそこに着いたら、\n今の動きは正しいとわかるのだ";
+                    yield return new WaitUntil(() => !waitBtn);
+
+                    btnNext.interactable = false;
+                    text.text = "ゴールのマスをクリックして、\n報酬をおいてみてください";
+                    yield return new WaitUntil(() => rewardCoords.Count > 0);
+
+                    btnNext.interactable = true;
+                    text.text = "OKボタン押すと、学習が始まるよ\n\n今回は試行錯誤を100回するよ";
+                }
+                else if (stageIdx == 1)
+                {
+                    btnNext.interactable = false;
+                    text.text = "マスをクリックして、「報酬」を１つおいてください!";
+                    yield return new WaitUntil(() => rewardCoords.Count > 0);
+                    btnNext.interactable = true;
+                }
+                else if (stageIdx == 2)
+                {
+                    btnNext.interactable = false;
+                    if (!isSt2Failed)
+                    {
+                        text.text = "とりあえず「報酬」１つだけで試してみよう";
+                        yield return new WaitUntil(() => rewardCoords.Count > 0);
+                    }
+                    else
+                    {
+                        text.text = "さて、「報酬」を２つを置いてみてください";
+                        yield return new WaitUntil(() => rewardCoords.Count == 2);
+                    }
+                    btnNext.interactable = true;
+                }
+            }
+            StopAllCoroutines();
+            StartCoroutine(IE_Plan());
+        }
+
+        private void BeginPhaseTrain()
+        {
+            if (phase != Phase.Train) return;
+
+            IEnumerator IE_Train()
+            {
+                btnNext.interactable = false;
+                this.inTraining = true;
+
+                while (this.episodesTurnLeft-- > 0)
+                {
+                    env.Reset();
+                    // UI
+                    uiBoard.ShowKomaP(env.row, env.col);
+                    uiQuest.ShowP(env.passedSpaceCnt);
+                    text.text = $"試行回数： {this.episodesTurn-this.episodesTurnLeft} / {this.episodesTurn}\n" + $"ロス(仮)： {this.loss}";
+                    yield return new WaitForSecondsRealtime(0.05f);
+
+                    agent.e = EpsilonScheduler(episodesTurnLeft, episodesTurn);
+
+                    while (true)
+                    {
+                        // Step
+                        var row = env.row; var col = env.col;
+                        var action = agent.GetActionTraining(env.row, env.col);
+                        var res = env.Step(action);
+                        var row_ = env.row; var col_ = env.col;
+                        float reward = 0;
+                        bool done = false;
+
+                        // UI
+                        uiBoard.ShowKomaP(row_, col_);
+                        uiQuest.ShowP(env.passedSpaceCnt);
+
+                        // Collect
+                        if (Env.IsResponseFail(res))
+                        {
+                            row_ = -1; col_ = -1; done = true;
+                        }
+                        if (res == Env.Response.Goal)
+                        {
+                            done = true;
+                        }
+
+                        if (!Env.IsResponseFail(res) && this.rewardCoords.Contains(new Vector2Int(row_, col_)))
+                        {
+                            reward += 1;
+                        }
+                        agent.Collect(row, col, (int)action, reward, done, row_, col_);
+
+                        yield return new WaitForSecondsRealtime(0.05f);
+                        if (done) break;
+                    }
+
+                    if (agent.bufferLength > 5)
+                        this.loss = agent.Train();
+                }
+
+                this.inTraining = false;
+
+                text.text += "\n\n学習終了。OKボタンで試験を受けよう！";
+                btnNext.interactable = true;
+            }
+            StopAllCoroutines();
+            StartCoroutine(IE_Train());
+        }
+
+        private void BeginPhaseTest()
+        {
+            if (phase != Phase.Test) return;
+
+            IEnumerator IE_Test()
+            {
+                btnNext.interactable = false;
+                text.text = "試験\n";
+                testLog.Clear();
+
+                int successCnt = 0;
+                for (int ieps = 0; ieps < 10; ieps ++)
+                {
+                    env.Reset();
+                    // UI
+                    uiBoard.ShowKomaP(env.row, env.col);
+                    uiQuest.ShowP(env.passedSpaceCnt);
+                    yield return new WaitForSecondsRealtime(0.4f);
+
+                    while (true)
+                    {
+                        // Step
+                        var row = env.row; var col = env.col;
+                        var action = agent.GetActionTest(env.row, env.col);
+                        var res = env.Step(action);
+                        bool done = Env.IsResponseFail(res) || res == Env.Response.Goal;
+
+                        // UI
+                        uiBoard.ShowKomaP(env.row, env.col);
+                        uiQuest.ShowP(env.passedSpaceCnt);
+                        if (done)
+                        {
+                            successCnt += res == Env.Response.Goal? 1: 0;
+                            testLog.Add(res == Env.Response.Goal);
+                            text.text += res == Env.Response.Goal? "O" : "X";
+                        }
+
+                        yield return new WaitForSecondsRealtime(0.4f);
+                        if (done) break;
+                    }
+                }
+
+                text.text += $"\n点数 = {successCnt}/10";
+
+                if (successCnt > 5)
+                {
+                    text.text += "\n6点以上なので合格! ";
+                    clearedStages = Mathf.Max(clearedStages, stageIdx+1);
+
+                    btnNext.interactable = true;
+                    waitBtn = true;
+                    yield return new WaitUntil(() => !waitBtn);
+
+                    if (stageIdx == 0)
+                        text.text = "報酬をゴールにおくことで、\nキューブにゴールへの動きかたを\n学習させることができたね!";
+                    else if (stageIdx == 1)
+                        text.text = "お題が長くなると、\n学習に必要な試行回数がも多くなったね";
+                    else if (stageIdx == 2 && isSt2Failed)
+                        text.text = "報酬を2つ置くことで、\nキューブをとおいゴールまでゆうどうできたね!";
+
+                }
+                else
+                {
+                    text.text += "\n6未満なので不合格！";
+                    btnNext.interactable = true;
+                    waitBtn = true;
+                    yield return new WaitUntil(() => !waitBtn);
+
+                    if (stageIdx == 0)
+                    {
+                        text.text = "報酬をちゃんとゴールに置いたかな？\nリトライしてね";
+                    }
+                    else if (stageIdx == 1)
+                    {
+                        text.text = "報酬の位置を変えてリトライしてね";
+                    }
+                    else if (stageIdx == 2)
+                    {
+                        if (!isSt2Failed)
+                        {
+                            text.text = "長さ3のお題に\n報酬1つで試行500回は足りないね...\n\n報酬2つならどうかな？";
+                        }
+                        else
+                        {
+                            text.text = "報酬の位置を変えてリトライしてね";
+                        }
+                    }
+                }
+
+                btnNext.interactable = true;
+            }
+            StopAllCoroutines();
+            StartCoroutine(IE_Test());
+        }
+
+        private float EpsilonScheduler(int epsLeft, int nEps)
+        {
+            return (float)epsLeft/nEps * 0.4f + 0.1f;
         }
 
         private void PutReward(int row, int col, int maxCount)
@@ -325,28 +415,39 @@ namespace toio.AI.meicu
 
         public void OnBtnNext()
         {
+            if (waitBtn)
+            {
+                waitBtn = false;
+                return;
+            }
+
             if (phase == Phase.Quest)
             {
                 phase = Phase.Plan;
-                InitPlan();
-                Refresh();
+                BeginPhasePlan();
             }
             else if (phase == Phase.Plan)
             {
                 phase = Phase.Train;
-                StartCoroutine(IE_Train());
-                Refresh();
+                BeginPhaseTrain();
             }
             else if (phase == Phase.Train)
             {
                 phase = Phase.Test;
-                StartCoroutine(IE_Test());
-                // Refresh();
+                BeginPhaseTest();
             }
             else if (phase == Phase.Test)
             {
+                if (stageIdx == 2 && !isSt2Failed)
+                {
+                    isSt2Failed = true;
+                    phase = Phase.Plan;
+                    BeginPhasePlan();
+                    return;
+                }
+
                 phase = Phase.Entry;
-                Refresh();
+                BeginPhaseEntry();
             }
         }
 
@@ -355,8 +456,7 @@ namespace toio.AI.meicu
             if (phase != Phase.Entry) return;
             this.phase = Phase.Quest;
             this.stageIdx = idx;
-            InitQuest();
-            Refresh();
+            BeginPhaseQuest();
         }
         #endregion
 
@@ -377,10 +477,23 @@ namespace toio.AI.meicu
         public QAgent()
         {
             this.Q = new float[9, 9, 4];
+            Reset();
+        }
+
+        public void Reset()
+        {
             for (int r = 0; r < 9; r++)
                 for (int c = 0; c < 9; c++)
                     for (int a = 0; a < 4; a++)
                         this.Q[r, c, a] = UnityEngine.Random.Range(0f, 0.1f);
+
+            this.rowBuffer.Clear();
+            this.colBuffer.Clear();
+            this.actionBuffer.Clear();
+            this.rewardBuffer.Clear();
+            this.doneBuffer.Clear();
+            this.row_Buffer.Clear();
+            this.col_Buffer.Clear();
         }
 
         public Env.Action GetBestAction(int row, int col)

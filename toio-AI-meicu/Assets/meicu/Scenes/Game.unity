@@ -1096,7 +1096,6 @@ MonoBehaviour:
   pageTrainer: {fileID: 1027149205}
   dialogConnect: {fileID: 228623823}
   videoPlayer: {fileID: 227772473}
-  isDebug: 1
   uiDebug: {fileID: 552893864}
 --- !u!1 &69135851
 GameObject:
@@ -5665,7 +5664,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 489.5036, y: -128.96}
+  m_AnchoredPosition: {x: 488, y: -119}
   m_SizeDelta: {x: 189.5821, y: 257.91}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &599051800
@@ -10585,7 +10584,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "\u30C1\u30E5\u30FC\u30C8\u30EA\u30A2\u30EB"
+  m_Text: "\u3042\u305D\u3073\u304B\u305F"
 --- !u!222 &1122112290
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -11863,7 +11862,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 0.9
-  m_Text: v0.9.1 (build220214-1)
+  m_Text: v0.9.2 (build220215-1)
 --- !u!222 &1277490925
 CanvasRenderer:
   m_ObjectHideFlags: 0
