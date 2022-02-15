@@ -17,12 +17,10 @@ namespace toio.AI.meicu
         public PageTrainer pageTrainer;
         public DialogConnect dialogConnect;
         public VideoPlayer videoPlayer;
-
-        [Header("Debug")]
-        public bool isDebug;
         public Transform uiDebug;
 
 
+        private bool isDebug;
         static PageManager ins;
         static EPage page;
 
@@ -43,6 +41,15 @@ namespace toio.AI.meicu
             SetPage(EPage.Title);
         }
 
+        void Update()
+        {
+            if ((Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftControl)) && Input.GetKeyDown(KeyCode.D))
+            {
+                isDebug = !isDebug;
+                uiDebug.gameObject.SetActive(isDebug);
+                UpdateDebugSliderLv();
+            }
+        }
 
         internal enum EPage
         {

@@ -401,7 +401,7 @@ namespace toio.AI.meicu
 
             else if (phase == 21)
             {
-                text.text = "遊び方をまた見たくなったら\n「チュートリアル」をえらんでね！";
+                text.text = "遊び方をまた見たくなったら\n「あそびかた」をえらんでね！";
             }
             else if (phase == 22)
             {
