@@ -31,7 +31,7 @@ namespace toio.AI.meicu
         private float loss;
         private List<bool> testLog = new List<bool>();
 
-        private int clearedStages = 1; // TODO move to Prefs in future
+        private int clearedStages = 2; // TODO move to Prefs in future
 
 
         void OnEnable()
@@ -89,7 +89,7 @@ namespace toio.AI.meicu
                 text.text = "課題をせんたくしてください。";
 
                 ui.transform.Find("Entries").Find("Btn1").GetComponent<Button>().interactable = clearedStages > 0;
-                // ui.transform.Find("Entries").Find("Btn2").GetComponent<Button>().interactable = clearedStages > 1;
+                ui.transform.Find("Entries").Find("Btn2").GetComponent<Button>().interactable = clearedStages > 1;
 
                 // TODO Finger?
             }
@@ -290,7 +290,7 @@ namespace toio.AI.meicu
             }
             else if (stageIdx == 2)
             {
-                this.episodesTurn = 100;
+                this.episodesTurn = 500;
                 this.episodesTurnLeft = this.episodesTurn;
             }
         }
@@ -371,13 +371,12 @@ namespace toio.AI.meicu
     {
         public float[,,] Q;
         public float e = 0.5f;
-        public float lr = 0.1f;
+        public float lr = 0.2f;
         public float gamma = 0.95f;
 
         public QAgent()
         {
             this.Q = new float[9, 9, 4];
-            // Clear QUpdate
             for (int r = 0; r < 9; r++)
                 for (int c = 0; c < 9; c++)
                     for (int a = 0; a < 4; a++)
@@ -445,7 +444,9 @@ namespace toio.AI.meicu
 
             // Calc. gradient
             float lossSum = 0;
-            for (int t = 0; t < this.rowBuffer.Count; t++)
+            float returns = 0;
+            int nsteps = this.rowBuffer.Count;
+            for (int t = nsteps-1; t >=0; t--)
             {
                 var row = this.rowBuffer[t];
                 var col = this.colBuffer[t];
@@ -457,9 +458,10 @@ namespace toio.AI.meicu
 
                 var qs = Enumerable.Range(0, 4).Select(x => this.Q[row, col, x]).ToArray();
                 var q_s = row_ == -1 || done? new float[]{0, 0, 0, 0} : Enumerable.Range(0, 4).Select(x => this.Q[row_, col_, x]).ToArray();
-                var dq = reward + this.gamma * q_s.Max() - qs[action];
-                this.QUpdate[row, col, action] += dq / this.rowBuffer.Count;
-                lossSum += Mathf.Abs(dq) / this.rowBuffer.Count;
+                returns = (done || t == nsteps-1)? reward + this.gamma * q_s.Max() : reward + this.gamma * returns;
+                var dq = returns - qs[action];
+                this.QUpdate[row, col, action] += dq / nsteps;
+                lossSum += Mathf.Abs(dq) / nsteps;
             }
 
             // Update
