@@ -22,13 +22,14 @@ namespace toio.AI.meicu
         internal Vector2Int biasA = new Vector2Int(-2, -2);
 
         public GameObject uiRewardPrefab;
-        public event Action<Vector2Int> onSpaceClicked;
+        public event Action<Vector2Int, RewardPositionType> onSpaceClicked;
         public float heatmapZeroOpacity = 0.1f;
         public float heatmapMinOpacity = 0.2f;
 
         private List<GameObject> trajPObjs = new List<GameObject>();
         private List<GameObject> trajAObjs = new List<GameObject>();
-        private List<GameObject> rewardObjs = new List<GameObject>();
+
+        private Dictionary<Vector3Int, GameObject> rewards = new Dictionary<Vector3Int, GameObject>(); // 3rd dim: 0 for right, 1 for bottom
 
 
         internal void Reset()
@@ -239,23 +240,99 @@ namespace toio.AI.meicu
             transform.Find("KomaA").Find("ImgFail").gameObject.SetActive(false);
         }
 
-        internal void PutReward(int row, int col, int maxCount=1)
-        {
-            var obj = GameObject.Instantiate(uiRewardPrefab, transform);
-            (obj.transform as RectTransform).anchoredPosition = RowCol2UICoords(row, col);
-            rewardObjs.Add(obj);
 
-            while (rewardObjs.Count > maxCount)
+        #region ======== Reward ========
+        internal int RewardCount => rewards.Count;
+        internal void PutReward(int row, int col, RewardPositionType type, int maxCount=1)
+        {
+            if (!IsRewardPositionLegal(row, col, type)) return;
+
+            Vector3Int pos = new Vector3Int(row, col, (int)type);
+            // Delete if exist
+            if (rewards.ContainsKey(pos))
             {
-                var o = rewardObjs[0];
-                GameObject.Destroy(o);
-                rewardObjs.RemoveAt(0);
+                GameObject.Destroy(rewards[pos]);
+                rewards.Remove(pos);
             }
+            // Add if max not reached
+            else if (rewards.Count < maxCount)
+            {
+                var obj = GameObject.Instantiate(uiRewardPrefab, transform.Find("Rewards"));
+                (obj.transform as RectTransform).anchoredPosition = GetRewardUICoords(row, col, type);
+                rewards.Add(pos, obj);
+            }
+        }
+        protected Vector2Int GetRewardUICoords(int row, int col, RewardPositionType type)
+        {
+            var uiCoords = RowCol2UICoords(row, col);
+            if (type == RewardPositionType.Center) {}
+            else if (type == RewardPositionType.RightBorder) uiCoords.x += 5;
+            else if (type == RewardPositionType.BottomBorder) uiCoords.y -= 5;
+            return uiCoords;
         }
         internal void ClearRewards()
         {
-            rewardObjs.ForEach(o=>GameObject.Destroy(o));
-            rewardObjs.Clear();
+            foreach (var o in rewards.Values) GameObject.Destroy(o);
+            rewards.Clear();
+        }
+        internal int GetReward(int row, int col, Env.Action action)
+        {
+            (int row_, int col_) = Env.Translate(action, row, col);
+            int r = 0;
+            if (IsRewardAvailable(row_, col_, RewardPositionType.Center))
+            {
+                r++;
+                PerformRewardGot(row_, col_, RewardPositionType.Center);
+            }
+            if (IsRewardAvailable(row, col, RewardPositionType.RightBorder) && action == Env.Action.Right)
+            {
+                r++;
+                PerformRewardGot(row, col, RewardPositionType.RightBorder);
+            }
+            if (IsRewardAvailable(row, col, RewardPositionType.BottomBorder) && action == Env.Action.Down)
+            {
+                r++;
+                PerformRewardGot(row, col, RewardPositionType.BottomBorder);
+            }
+            if (IsRewardAvailable(row, col-1, RewardPositionType.RightBorder) && action == Env.Action.Left)
+            {
+                r++;
+                PerformRewardGot(row, col-1, RewardPositionType.RightBorder);
+            }
+            if (IsRewardAvailable(row-1, col, RewardPositionType.BottomBorder) && action == Env.Action.Up)
+            {
+                r++;
+                PerformRewardGot(row-1, col, RewardPositionType.BottomBorder);
+            }
+            return r;
+        }
+        protected bool IsRewardAvailable(int row, int col, RewardPositionType type)
+        {
+            Vector3Int pos = new Vector3Int(row, col, (int)type);
+            if (!rewards.ContainsKey(pos)) return false;
+            var reward = rewards[pos];
+            return reward.gameObject.activeSelf;
+        }
+        protected void PerformRewardGot(int row, int col, RewardPositionType type, bool disable = true)
+        {
+            if (!IsRewardAvailable(row, col, type)) return;
+            Vector3Int pos = new Vector3Int(row, col, (int)type);
+            var reward = rewards[pos];
+            if (disable) reward.gameObject.SetActive(false);
+
+            var obj = GameObject.Instantiate(uiRewardPrefab, transform.Find("RewardsAnim"));
+            (obj.transform as RectTransform).anchoredPosition = (reward.transform as RectTransform).anchoredPosition;
+            var anim = obj.GetComponentInChildren<Animator>();
+            anim.SetBool("Got", true);
+            Destroy(obj, 0.5f);
+        }
+        internal void ResetRewardGot()
+        {
+            foreach (var o in rewards.Values)
+            {
+                // o.GetComponentInChildren<Animator>().SetBool("Got", false);
+                o.SetActive(true);
+            }
         }
 
         public void OnPointerClick(PointerEventData e)
@@ -264,9 +341,56 @@ namespace toio.AI.meicu
             if (local.x < -45 || local.x > 45 || local.y < -45 || local.y > 45)
                 return;
 
-            var coords = UI2RowColCoords(local);
-            this.onSpaceClicked?.Invoke(coords);
+            var posPlace = UI2RowColCoords(local);
+            // this.onSpaceClicked?.Invoke(coords);
+
+            var placeCenter = RowCol2UICoords(posPlace);
+            Vector2 diff = new Vector2(local.x+45, local.y-45) - placeCenter;   // convert to top-left coords
+
+            Debug.Log($"local:{local}\n place:{posPlace}\n cen:{placeCenter} diff:{diff}");
+
+            // Inside place
+            if (Mathf.Abs(diff.x) <= 3.3f && Mathf.Abs(diff.y) <= 3.3f)
+            {
+                this.onSpaceClicked?.Invoke(posPlace, RewardPositionType.Center);
+            }
+            // On border
+            else
+            {
+                if (diff.x > Mathf.Abs(diff.y))  // right
+                {
+                    this.onSpaceClicked?.Invoke(new Vector2Int(posPlace.x, posPlace.y), RewardPositionType.RightBorder);
+                }
+                else if (diff.x < -Mathf.Abs(diff.y))  // left
+                {
+                    if (posPlace.y > 0)
+                        this.onSpaceClicked?.Invoke(new Vector2Int(posPlace.x, posPlace.y-1), RewardPositionType.RightBorder);
+                }
+                else if (diff.y < -Mathf.Abs(diff.x))    // bottom
+                {
+                    this.onSpaceClicked?.Invoke(new Vector2Int(posPlace.x, posPlace.y), RewardPositionType.BottomBorder);
+                }
+                else if (diff.y > Mathf.Abs(diff.x))    // top
+                {
+                    if (posPlace.x > 0)
+                        this.onSpaceClicked?.Invoke(new Vector2Int(posPlace.x-1, posPlace.y), RewardPositionType.BottomBorder);
+                }
+            }
         }
+        internal bool IsRewardPositionLegal(int row, int col, RewardPositionType type)
+        {
+            if (row < 0 || row > 8 || col < 0 || col > 8) return false;
+            if (type == RewardPositionType.RightBorder && col > 7) return false;
+            if (type == RewardPositionType.BottomBorder && row > 7) return false;
+            return true;
+        }
+
+        public enum RewardPositionType
+        {
+            Center, RightBorder, BottomBorder,
+        }
+
+        #endregion
 
 
         private RectTransform CreateLine(List<GameObject> addTo, Color color)
@@ -283,14 +407,23 @@ namespace toio.AI.meicu
             return tr;
         }
 
+        /// <summary>
+        /// UI coords is relative to top-left corder of mat.
+        /// </summary>
         internal Vector2Int RowCol2UICoords(Vector2Int rowCol)
         {
             return new Vector2Int(rowCol.y * 10 + 5, -rowCol.x * 10 - 5);
         }
+        /// <summary>
+        /// UI coords is relative to top-left corder of mat.
+        /// </summary>
         internal Vector2Int RowCol2UICoords(int row, int col)
         {
             return new Vector2Int(col * 10 + 5, -row * 10 - 5);
         }
+        /// <summary>
+        /// UI coords is relative to center of mat.
+        /// </summary>
         internal Vector2Int UI2RowColCoords(Vector2 uiCoords)
         {
             return new Vector2Int((int)((uiCoords.y - 45)/(-10)), (int)((uiCoords.x + 45)/10));

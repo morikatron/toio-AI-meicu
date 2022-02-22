@@ -43,7 +43,7 @@ namespace toio.AI.meicu
 
         void Update()
         {
-            if ((Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftControl)) && Input.GetKeyDown(KeyCode.D))
+            if ((Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftControl)) && Input.GetKeyDown(KeyCode.Q))
             {
                 isDebug = !isDebug;
                 uiDebug.gameObject.SetActive(isDebug);

@@ -14,6 +14,7 @@ namespace toio.AI.meicu
         public GameObject ui;
         public UIBoard uiBoard;
         public UIQuest uiQuest;
+        public Text textCaption;
         public TMP_Text text;
         public Button btnNext;
         public UISwitch btnBGM;
@@ -26,7 +27,6 @@ namespace toio.AI.meicu
         private bool isSt2Failed = false;
         private bool inTraining = false;
         private int stageIdx = 0;
-        private List<Vector2Int> rewardCoords = new List<Vector2Int>();
 
         private int episodesTurn;
         private int episodesTurnLeft;
@@ -55,6 +55,7 @@ namespace toio.AI.meicu
                 env.Reset();
                 uiBoard.Reset();
                 uiQuest.Reset();
+                uiQuest.HideA();
                 inTraining = false;
 
                 BeginPhaseEntry();
@@ -77,6 +78,8 @@ namespace toio.AI.meicu
             IEnumerator IE_Entry()
             {
                 waitBtn = false;
+
+                textCaption.text = "キミだけのAIを育てよう";
 
                 uiBoard.gameObject.SetActive(phase != Phase.Entry);
                 uiQuest.gameObject.SetActive(phase != Phase.Entry);
@@ -101,29 +104,30 @@ namespace toio.AI.meicu
             env.Reset();
             uiBoard.Reset();
             uiQuest.Reset();
-            rewardCoords.Clear();
 
             agent = new QAgent();
 
             if (stageIdx == 0)
             {
-                var quest = env.GenerateQuest(1);
+                var quest = env.GenerateQuest(2);
                 env.SetQuest(quest);
             }
             else if (stageIdx == 1)
             {
-                var quest = env.GenerateQuest(2);
+                var quest = env.GenerateQuest(3);
                 env.SetQuest(quest);
             }
             else if (stageIdx == 2)
             {
-                var quest = env.GenerateQuest(3);
+                var quest = env.GenerateQuest(6);
                 env.SetQuest(quest);
             }
 
             IEnumerator IE_Quest()
             {
                 waitBtn = false;
+
+                textCaption.text = "AIを育てよう";
 
                 uiBoard.gameObject.SetActive(phase != Phase.Entry);
                 uiQuest.gameObject.SetActive(phase != Phase.Entry);
@@ -154,7 +158,7 @@ namespace toio.AI.meicu
 
             if (stageIdx == 0)
             {
-                this.episodesTurn = 100;
+                this.episodesTurn = 300;
                 this.episodesTurnLeft = this.episodesTurn;
             }
             else if (stageIdx == 1)
@@ -164,12 +168,17 @@ namespace toio.AI.meicu
             }
             else if (stageIdx == 2)
             {
-                this.episodesTurn = 500;
+                this.episodesTurn = 1000;
                 this.episodesTurnLeft = this.episodesTurn;
             }
 
             if (isSt2Failed)
+            {
+                uiQuest.ShowP(0);
+                uiBoard.ShowKomaP(4, 4);
+                uiBoard.HideTrajP();
                 agent.Reset();
+            }
 
             IEnumerator IE_Plan()
             {
@@ -186,7 +195,7 @@ namespace toio.AI.meicu
 
                     btnNext.interactable = false;
                     text.text = "ゴールのマスをクリックして、\n報酬をおいてみてください";
-                    yield return new WaitUntil(() => rewardCoords.Count > 0);
+                    yield return new WaitUntil(() => uiBoard.RewardCount > 0);
 
                     btnNext.interactable = true;
                     text.text = "OKボタン押すと、学習が始まるよ\n\n今回は試行錯誤を100回するよ";
@@ -195,7 +204,7 @@ namespace toio.AI.meicu
                 {
                     btnNext.interactable = false;
                     text.text = "マスをクリックして、「報酬」を１つおいてください!";
-                    yield return new WaitUntil(() => rewardCoords.Count > 0);
+                    yield return new WaitUntil(() => uiBoard.RewardCount > 0);
                     btnNext.interactable = true;
                 }
                 else if (stageIdx == 2)
@@ -204,12 +213,12 @@ namespace toio.AI.meicu
                     if (!isSt2Failed)
                     {
                         text.text = "とりあえず「報酬」１つだけで試してみよう";
-                        yield return new WaitUntil(() => rewardCoords.Count > 0);
+                        yield return new WaitUntil(() => uiBoard.RewardCount > 0);
                     }
                     else
                     {
                         text.text = "さて、「報酬」を２つを置いてみてください";
-                        yield return new WaitUntil(() => rewardCoords.Count == 2);
+                        yield return new WaitUntil(() => uiBoard.RewardCount == 2);
                     }
                     btnNext.interactable = true;
                 }
@@ -227,14 +236,20 @@ namespace toio.AI.meicu
                 btnNext.interactable = false;
                 this.inTraining = true;
 
+                float stepTime = 0.01f;
+                // if (stageIdx == 0) stepTime = 0.04f;
+
                 while (this.episodesTurnLeft-- > 0)
                 {
                     env.Reset();
                     // UI
+                    List<Vector2Int> traj = new List<Vector2Int>();
                     uiBoard.ShowKomaP(env.row, env.col);
+                    uiBoard.HideTrajP();
+                    uiBoard.ResetRewardGot();
                     uiQuest.ShowP(env.passedSpaceCnt);
                     text.text = $"試行回数： {this.episodesTurn-this.episodesTurnLeft} / {this.episodesTurn}\n" + $"ロス(仮)： {this.loss}";
-                    yield return new WaitForSecondsRealtime(0.05f);
+                    yield return new WaitForSecondsRealtime(stepTime);
 
                     agent.e = EpsilonScheduler(episodesTurnLeft, episodesTurn);
 
@@ -249,7 +264,9 @@ namespace toio.AI.meicu
                         bool done = false;
 
                         // UI
+                        traj.Add(new Vector2Int(row_, col_));
                         uiBoard.ShowKomaP(row_, col_);
+                        uiBoard.ShowTrajP(traj.ToArray());
                         uiQuest.ShowP(env.passedSpaceCnt);
 
                         // Collect
@@ -262,13 +279,12 @@ namespace toio.AI.meicu
                             done = true;
                         }
 
-                        if (!Env.IsResponseFail(res) && this.rewardCoords.Contains(new Vector2Int(row_, col_)))
-                        {
-                            reward += 1;
+                        if (!Env.IsResponseFail(res)){
+                            reward += uiBoard.GetReward(row, col, action);
                         }
                         agent.Collect(row, col, (int)action, reward, done, row_, col_);
 
-                        yield return new WaitForSecondsRealtime(0.05f);
+                        yield return new WaitForSecondsRealtime(stepTime);
                         if (done) break;
                     }
 
@@ -296,11 +312,13 @@ namespace toio.AI.meicu
                 testLog.Clear();
 
                 int successCnt = 0;
-                for (int ieps = 0; ieps < 10; ieps ++)
+                for (int ieps = 0; ieps < 5; ieps ++)
                 {
                     env.Reset();
                     // UI
+                    List<Vector2Int> traj = new List<Vector2Int>();
                     uiBoard.ShowKomaP(env.row, env.col);
+                    uiBoard.HideTrajP();
                     uiQuest.ShowP(env.passedSpaceCnt);
                     yield return new WaitForSecondsRealtime(0.4f);
 
@@ -313,7 +331,9 @@ namespace toio.AI.meicu
                         bool done = Env.IsResponseFail(res) || res == Env.Response.Goal;
 
                         // UI
+                        traj.Add(new Vector2Int(env.row, env.col));
                         uiBoard.ShowKomaP(env.row, env.col);
+                        uiBoard.ShowTrajP(traj.ToArray());
                         uiQuest.ShowP(env.passedSpaceCnt);
                         if (done)
                         {
@@ -329,9 +349,9 @@ namespace toio.AI.meicu
 
                 text.text += $"\n点数 = {successCnt}/10";
 
-                if (successCnt > 5)
+                if (successCnt > 2)
                 {
-                    text.text += "\n6点以上なので合格! ";
+                    text.text += "\n3点以上なので合格! ";
                     clearedStages = Mathf.Max(clearedStages, stageIdx+1);
 
                     btnNext.interactable = true;
@@ -348,7 +368,7 @@ namespace toio.AI.meicu
                 }
                 else
                 {
-                    text.text += "\n6未満なので不合格！";
+                    text.text += "\n3未満なので不合格！";
                     btnNext.interactable = true;
                     waitBtn = true;
                     yield return new WaitUntil(() => !waitBtn);
@@ -385,31 +405,19 @@ namespace toio.AI.meicu
             return (float)epsLeft/nEps * 0.4f + 0.1f;
         }
 
-        private void PutReward(int row, int col, int maxCount)
-        {
-            Vector2Int coords = new Vector2Int(row, col);
-            if (this.rewardCoords.Contains(coords)) return;
-
-            this.rewardCoords.Add(coords);
-            while (this.rewardCoords.Count > maxCount)
-                this.rewardCoords.RemoveAt(0);
-            uiBoard.PutReward(row, col, maxCount);
-        }
-
-
         #region ========== Callbacks ==========
 
-        private void OnSpaceClicked(Vector2Int rowCol)
+        private void OnSpaceClicked(Vector2Int rowCol, UIBoard.RewardPositionType type)
         {
             if (phase != Phase.Plan) return;
 
             if (stageIdx == 0 || stageIdx == 1)
             {
-                this.PutReward(rowCol.x, rowCol.y, 1);
+                uiBoard.PutReward(rowCol.x, rowCol.y, type, 1);
             }
             else if (stageIdx == 2)
             {
-                this.PutReward(rowCol.x, rowCol.y, 2);
+                uiBoard.PutReward(rowCol.x, rowCol.y, type, 8);
             }
         }
 
@@ -470,8 +478,8 @@ namespace toio.AI.meicu
     internal class QAgent
     {
         public float[,,] Q;
-        public float e = 0.5f;
-        public float lr = 0.2f;
+        public float e = 0.8f;
+        public float lr = 0.3f;
         public float gamma = 0.95f;
 
         public QAgent()
@@ -518,7 +526,7 @@ namespace toio.AI.meicu
         public Env.Action GetActionTest(int row, int col)
         {
             var qs = Enumerable.Range(0, 4).Select(x => this.Q[row, col, x]).ToArray();
-            return (Env.Action)SampleFromQ(qs);
+            return (Env.Action)SampleFromQ(qs, scale:8);
         }
 
         private List<int> rowBuffer = new List<int>();
@@ -598,9 +606,8 @@ namespace toio.AI.meicu
         }
 
         // Simulate Stochastic Policy from Q values using softmax
-        static int SampleFromQ(float[] qs, float max_return = 1)
+        static int SampleFromQ(float[] qs, float scale = 4)
         {
-            float scale = 4f / max_return;
             var qs_scaled = Array.ConvertAll(qs, q => q * scale);
             var softmax = Softmax(qs_scaled);
             var i = SampleIdx(softmax);
