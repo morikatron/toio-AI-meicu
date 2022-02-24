@@ -37,11 +37,10 @@ for scene in scenes:
             if not line:
                 break
 
-            idx = line.find('m_Text: "')
-            if idx == -1:
+            if line.find('m_Text: "') < 0 and line.find('m_text: "') < 0:
                 continue
 
-            string = line[11:].split('"')[0]
+            string = line.split('"')[1]
             string = string.encode('utf-8').decode('unicode-escape')
 
             for cha in string:
@@ -53,6 +52,7 @@ for scene in scenes:
 
 chas = ''.join(chas)
 print('=> Find {} characters.'.format(len(chas)))
+print(chas)
 
 with open('charaters.txt', mode='w+', encoding='utf-8') as file:
     file.write(chas)
