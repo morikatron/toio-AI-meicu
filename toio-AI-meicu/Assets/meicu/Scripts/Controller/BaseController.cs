@@ -9,10 +9,12 @@ namespace toio.AI.meicu
 {
     public class BaseController : MonoBehaviour
     {
-        protected virtual int id { get; } = -1;
+        protected virtual int id => -1;
         protected Cube cube => Device.GetCube(id);
         protected IEnumerator ieMotion;
-        protected bool isPerforming = false;
+        internal bool isPerforming { get; private set; } = false;
+        internal bool isMoving { get; private set; } = false;
+        internal virtual Vector2Int targetBias { get; set; } = Vector2Int.zero;
 
         internal bool isGrounded { get {
             if (cube == null) return false;
@@ -52,17 +54,82 @@ namespace toio.AI.meicu
 
         internal virtual void StopMotion(bool sendCmd = false)
         {
+            isMoving = false;
+            isPerforming = false;
             if (ieMotion != null)
             {
                 StopCoroutine(ieMotion);
                 ieMotion = null;
             }
-            isPerforming = false;
 
             if (sendCmd)
             {
                 cube.Move(0, 0, 0, Cube.ORDER_TYPE.Strong);
             }
+        }
+
+        internal void Move2Center()
+        {
+            Device.TargetMove(id, 4, 4, targetBias.x, targetBias.y);
+        }
+
+        protected Vector2Int targetCoords;
+
+        // Start ienumerator which trys TargetMove in loop until target reached or overwritten.
+        internal void RequestMove(int row, int col, byte spd = 30, float confirmTime = 0.5f)
+        {
+            if (ieMotion != null && !isPerforming && this.targetCoords.x == row && this.targetCoords.y == col)
+                return;
+            this.targetCoords = new Vector2Int(row, col);
+
+            StopMotion();
+            ieMotion = IE_Move(spd, confirmTime);
+            StartCoroutine(ieMotion);
+        }
+
+        // Loop of moving to target
+        protected IEnumerator IE_Move(byte spd, float confirmTime, bool timeCorrection = false)
+        {
+            Debug.Log($"IE_Move : Begin");
+            isMoving = true;
+
+            float timeout = 3;
+            float retryTime = timeout + 1;
+            float t = Time.realtimeSinceStartup;
+
+            // Wait Cube to Arrive
+            while (Device.ID2SpaceCoord(cube.x, cube.y) != targetCoords)
+            {
+                // Wait while disconnected
+                if (!cube.isConnected)
+                {
+                    yield return new WaitUntil(()=>cube.isConnected);
+                    retryTime = timeout + 1;
+                }
+                // Move a bit if position ID missed
+                else if (!cube.isGrounded)
+                {
+                    cube.Move(20, -20, 400, Cube.ORDER_TYPE.Strong);
+                    retryTime = timeout + 1;
+                }
+                // Re-send command if timeout
+                else if (retryTime > timeout)
+                {
+                    retryTime = 0;
+                    Debug.Log($"IE_Move : TargetMove({targetCoords.x}, {targetCoords.y})");
+                    Device.TargetMove(id, targetCoords.x, targetCoords.y, targetBias.x, targetBias.y, maxSpd:spd);
+                }
+
+                yield return new WaitForSecondsRealtime(0.1f);
+                retryTime += 0.1f;
+            }
+
+            // Simulate confirm time
+            if (timeCorrection)
+                confirmTime = confirmTime - (Time.realtimeSinceStartup - t - 25f/spd);
+            yield return new WaitForSecondsRealtime(confirmTime);
+
+            isMoving = false;
         }
 
 

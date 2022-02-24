@@ -14,6 +14,7 @@ namespace toio.AI.meicu
         public Game game;
 
         protected override int id => 0;
+        internal override Vector2Int targetBias { get; set; } = new Vector2Int(10, -10);
 
         internal bool isPause = false;
 

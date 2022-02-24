@@ -95,6 +95,7 @@ namespace toio.AI.meicu
         public static readonly int nLevels = 11;
         public static readonly string bestModelName = "meicu-models\\M1024x2_L3to8_b1_2e7\\meicu-20000014";
         public static List<LevelSetting> levelSettings = new List<LevelSetting>();
+        public static StageSetting trainerStageSetting = null;
 
 
         public enum FailBehaviour
@@ -281,6 +282,8 @@ namespace toio.AI.meicu
                 lv.stageSettings.Add(StageSetting.CreatePattern1(13, 80, 80, 2.5f, 4, 1.0f));
                 levelSettings.Add(lv);
             }
+
+            trainerStageSetting = StageSetting.CreatePattern1(11, 70, 80, 4.0f, 10, 1.0f);
         }
 
     }

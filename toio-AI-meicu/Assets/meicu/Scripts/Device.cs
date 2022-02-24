@@ -138,10 +138,15 @@ namespace toio.AI.meicu
             if (!IdxTable.ContainsKey(id)) return false;
             int idx = IdxTable[id];
 
+            row = Mathf.Clamp(row, 0, 8);
+            col = Mathf.Clamp(col, 0, 8);
+            biasX = Mathf.Clamp(biasX, -20, 20);
+            biasY = Mathf.Clamp(biasY, -20, 20);
+
             if (cubeManager.cubes.Count < idx+1) return false;
             var pos = SpaceCoords2ID(row, col);
             cubeManager.cubes[idx].TargetMove(
-                pos.x, pos.y, 0,
+                pos.x + biasX, pos.y + biasY, 0,
                 timeOut: 2,
                 maxSpd: maxSpd,
                 targetMoveType:Cube.TargetMoveType.RoundBeforeMove,

@@ -101,11 +101,11 @@ namespace toio.AI.meicu
             StartCoroutine(IE_WaitReady());
         }
 
-        internal void StartGame()
+        internal void StartGame(int countdown = 3)
         {
             if (!Device.isTwoConnected) return;
 
-            StartCoroutine(IE_Starting());
+            StartCoroutine(IE_Starting(countdown));
         }
 
         internal void StopGame()
@@ -143,10 +143,10 @@ namespace toio.AI.meicu
             }
         }
 
-        IEnumerator IE_Starting()
+        IEnumerator IE_Starting(int countdown = 3)
         {
             // Count Down
-            for (int t = 3; t >0; t--)
+            for (int t = countdown; t > 0; t--)
             {
                 startCallback?.Invoke(t);
                 yield return new WaitForSecondsRealtime(1f);

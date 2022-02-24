@@ -16,6 +16,7 @@ namespace toio.AI.meicu
         public int heatmapPredictSteps = 8;
 
         protected override int id => 1;
+        internal override Vector2Int targetBias { get; set; } = new Vector2Int(-10, 10);
 
         internal bool isPredicting { get; private set; } = false;
         internal event Action heatmapCallback;
@@ -23,11 +24,9 @@ namespace toio.AI.meicu
         internal bool isPause = false;
         internal Config.StageSetting setting;
         internal ref readonly float[,] Heatmap => ref heatmap;
-        internal bool isMoving { get; private set; } = false;
 
         bool isActReceived = false;
         Env.Action action;
-        Vector2Int targetCoords;
         float[,] heatmap = new float[9, 9];
         float[,] heatmapBuffer = new float[9, 9];
 
@@ -63,42 +62,35 @@ namespace toio.AI.meicu
             agent.LoadModelByName(Config.bestModelName);
         }
 
-        internal void Move2Center()
-        {
-            Device.TargetMove(id, 4, 4, -10, 10);
-        }
-
         // Start ienumerator which trys TargetMove in loop until target reached or overwritten.
-        internal void RequestMove(Env.Action action, bool useStageSetting = false, byte spd = 30, float confirmTime = 0.5f)
+        protected void RequestMoveWithSetting(Env.Action action)
         {
             this.action = action;
             (var r, var c) = Env.Translate(action, game.envA.row, game.envA.col);
-
-            RequestMove(r, c, useStageSetting, spd, confirmTime);
+            RequestMoveWithSetting(r, c);
         }
 
         // Start ienumerator which trys TargetMove in loop until target reached or overwritten.
-        internal void RequestMove(int row, int col, bool useStageSetting = false, byte spd = 30, float confirmTime = 0.5f)
+        protected void RequestMoveWithSetting(int row, int col)
         {
             if (ieMotion != null && !isPerforming && this.targetCoords.x == row && this.targetCoords.y == col)
                 return;
 
             this.targetCoords = new Vector2Int(row, col);
 
-            if (useStageSetting)
-            {
-                spd = setting.speeds[game.envA.passedSpaceCnt];
-                confirmTime = setting.confirmTimes[game.envA.passedSpaceCnt];
-            }
+            var spd = setting.speeds[game.envA.passedSpaceCnt];
+            var confirmTime = setting.confirmTimes[game.envA.passedSpaceCnt];
+
             StopMotion();
-            ieMotion = IE_Move(spd, confirmTime);
+            ieMotion = IE_MoveInGame(spd, confirmTime);
             StartCoroutine(ieMotion);
         }
 
-        internal override void StopMotion(bool sendCmd = false)
+        IEnumerator IE_MoveInGame(byte spd, float confirmTime, bool timeCorrection = false)
         {
-            isMoving = false;
-            base.StopMotion(sendCmd);
+            yield return IE_Move(spd, confirmTime, timeCorrection);
+            // Apply Step to game
+            game.MoveA(action);
         }
 
         // Control Loop in Game
@@ -150,52 +142,6 @@ namespace toio.AI.meicu
             }
         }
 
-        // Loop of moving to target
-        IEnumerator IE_Move(byte spd, float confirmTime, bool timeCorrection = false)
-        {
-            Debug.Log($"AICon.IE_Move : Begin");
-            isMoving = true;
-
-            float timeout = 3;
-            float retryTime = timeout + 1;
-            float t = Time.realtimeSinceStartup;
-
-            // Wait Cube to Arrive
-            while (Device.ID2SpaceCoord(cube.x, cube.y) != targetCoords)
-            {
-                // Wait while disconnected
-                if (!cube.isConnected)
-                {
-                    yield return new WaitUntil(()=>cube.isConnected);
-                    retryTime = timeout + 1;
-                }
-                // Move a bit if position ID missed
-                else if (!cube.isGrounded)
-                {
-                    cube.Move(20, -20, 400, Cube.ORDER_TYPE.Strong);
-                    retryTime = timeout + 1;
-                }
-                // Re-send command if timeout
-                else if (retryTime > timeout)
-                {
-                    retryTime = 0;
-                    Debug.Log($"AICon.IE_Move : TargetMove({targetCoords.x}, {targetCoords.y})");
-                    Device.TargetMove(id, targetCoords.x, targetCoords.y, -10, 10, maxSpd:spd);
-                }
-
-                yield return new WaitForSecondsRealtime(0.1f);
-                retryTime += 0.1f;
-            }
-
-            // Simulate confirm time
-            if (timeCorrection)
-                confirmTime = confirmTime - (Time.realtimeSinceStartup - t - 25f/spd);
-            yield return new WaitForSecondsRealtime(confirmTime);
-
-            // Apply Step to game
-            game.MoveA(action);
-            isMoving = false;
-        }
 
         // IEnumerator of getting heatmap (Used automatically by IE_Think)
         IEnumerator IE_PredictHeatmap(Env env, int maxSteps=6, float parentProb=1, int step=0)
@@ -311,7 +257,7 @@ namespace toio.AI.meicu
             this.isActReceived = true;
 
             if (!isPredicting)
-                RequestMove(action, useStageSetting:true);
+                RequestMoveWithSetting(action);
         }
 
         void ClearHeatmap()

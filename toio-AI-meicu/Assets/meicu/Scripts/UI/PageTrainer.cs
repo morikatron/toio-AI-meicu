@@ -19,19 +19,19 @@ namespace toio.AI.meicu
         public Button btnNext;
         public UISwitch btnBGM;
         public UIMeicu meicu;
+        public Game game;
 
         private Env env = new Env();
         private QAgent agent;
         private Phase phase;
-        private bool waitBtn = false;
-        private bool isSt2Failed = false;
         private bool inTraining = false;
         private int stageIdx = 0;
+        private bool isSt0Failed = false;
+        private bool isFail = false;
 
         private int episodesTurn;
         private int episodesTurnLeft;
         private float loss;
-        private List<bool> testLog = new List<bool>();
 
         private int clearedStages = 2; // TODO move to Prefs in future
 
@@ -44,7 +44,6 @@ namespace toio.AI.meicu
         internal void SetActive(bool active)
         {
             if (ui.activeSelf == active) return;
-            ui.SetActive(active);
 
             phase = Phase.Entry;
 
@@ -58,12 +57,25 @@ namespace toio.AI.meicu
                 uiQuest.HideA();
                 inTraining = false;
 
+                game.stepCallbackP += OnGameStepP;
+                game.overCallbackP += OnGameOverP;
+
                 BeginPhaseEntry();
             }
             else
             {
+                game.StopGame();
+                game.stepCallbackP -= OnGameStepP;
+                game.overCallbackP -= OnGameOverP;
+
+                AIController.ins.StopMotion();
+                AIController.ins.StopAllCoroutines();
+                PlayerController.ins.Stop();
+
                 StopAllCoroutines();
             }
+
+            ui.SetActive(active);
         }
 
         internal void Pause()
@@ -75,21 +87,44 @@ namespace toio.AI.meicu
         {
             if (phase != Phase.Entry) return;
 
+            // Init UI
+            var entriesTr = ui.transform.Find("PhaseEntry");
+            textCaption.text = "キミだけのAIを育てよう";
+            ui.transform.Find("PhasePlan").gameObject.SetActive(false);
+            ui.transform.Find("TextSteps").gameObject.SetActive(false);
+            uiBoard.gameObject.SetActive(false);
+            uiQuest.gameObject.SetActive(false);
+            entriesTr.gameObject.SetActive(true);
+            btnNext.gameObject.SetActive(true);
+            btnNext.interactable = true;
+
+            var entryBtn0 = entriesTr.Find("Btn0").GetComponent<Button>();
+            var entryBtn1 = entriesTr.Find("Btn1").GetComponent<Button>();
+            var entryBtn2 = entriesTr.Find("Btn2").GetComponent<Button>();
+            entryBtn0.interactable = false;
+            entryBtn1.interactable = false;
+            entryBtn2.interactable = false;
+
             IEnumerator IE_Entry()
             {
-                waitBtn = false;
+                text.text = "こんにちは！\nここでは「キミだけのAI」を育ててみる事ができるよ！";
+                yield return WaitButton();
 
-                textCaption.text = "キミだけのAIを育てよう";
+                text.text = "「AIを育てる」には、キミと同じようにAIも「学習」する必要があるんだ。";
+                yield return WaitButton();
 
-                uiBoard.gameObject.SetActive(phase != Phase.Entry);
-                uiQuest.gameObject.SetActive(phase != Phase.Entry);
-                ui.transform.Find("Entries").gameObject.SetActive(phase == Phase.Entry);
-                btnNext.gameObject.SetActive(phase != Phase.Entry);
+                text.text = "え？「学習」ってどのようにするのかって？";
+                yield return WaitButton();
 
-                text.text = "課題をせんたくしてください。";
+                text.text = "任せて！ボクがこれからひとつひとつ説明していくよ！";
+                yield return WaitButton();
 
-                ui.transform.Find("Entries").Find("Btn1").GetComponent<Button>().interactable = clearedStages > 0;
-                ui.transform.Find("Entries").Find("Btn2").GetComponent<Button>().interactable = clearedStages > 1;
+                text.text = "キミだけのAIを育てて、ボクと勝負だ！";
+                if (clearedStages == 0)
+                    text.text += "\n\nまずは最初、「ごほうびを使ってAIを育てよう」を選択してみよう！";
+                entryBtn0.interactable = true;
+                entryBtn1.interactable = clearedStages > 0;
+                entryBtn2.interactable = clearedStages > 1;
 
                 yield break;
             }
@@ -101,51 +136,70 @@ namespace toio.AI.meicu
         {
             if (phase != Phase.Quest) return;
 
+            // Init training agent and environment
             env.Reset();
-            uiBoard.Reset();
-            uiQuest.Reset();
-
             agent = new QAgent();
 
+            // Generate Quest by Stage Settings
+            int questSize = 2;
             if (stageIdx == 0)
-            {
-                var quest = env.GenerateQuest(2);
-                env.SetQuest(quest);
-            }
+                questSize = 2;
             else if (stageIdx == 1)
-            {
-                var quest = env.GenerateQuest(3);
-                env.SetQuest(quest);
-            }
+                questSize = 3;
             else if (stageIdx == 2)
-            {
-                var quest = env.GenerateQuest(6);
-                env.SetQuest(quest);
-            }
+                questSize = 6;
+            Quest quest = env.GenerateQuest(questSize);
+            env.SetQuest(quest);
+
+            // Update UI
+            textCaption.text = "AIを育てよう";
+            uiBoard.gameObject.SetActive(true);
+            uiQuest.gameObject.SetActive(true);
+            btnNext.gameObject.SetActive(true);
+            ui.transform.Find("PhaseEntry").gameObject.SetActive(false);
+
+            uiQuest.Reset();
+            uiQuest.HideA();
+            uiQuest.ShowP(0);
+            uiQuest.ShowQuest(env.quest);
+            uiBoard.Reset();
+            uiBoard.ShowGoal(env.quest.goalRow, env.quest.goalCol);
+            uiBoard.ShowKomaP(4, 4);
+
 
             IEnumerator IE_Quest()
             {
-                waitBtn = false;
-
-                textCaption.text = "AIを育てよう";
-
-                uiBoard.gameObject.SetActive(phase != Phase.Entry);
-                uiQuest.gameObject.SetActive(phase != Phase.Entry);
-                ui.transform.Find("Entries").gameObject.SetActive(phase == Phase.Entry);
-                btnNext.gameObject.SetActive(phase != Phase.Entry);
-
                 if (stageIdx == 0)
-                    text.text = "このお題を解けるように\n自分のキューブを学習させてみよう！\n\n最初は長さ1のお題";
+                {
+                    text.text = "ようこそ！\nここでは、「ごほうび」を使ってAIを育ててみるよ！";
+                    yield return WaitButton();
+                    text.text = "「バトル」と同じように、スタートとゴール、そして「どの色を通過するか」という問題が出されているね。";
+                    yield return WaitButton();
+                    text.text = "キミはスグに「こう進めばいい」と分かったと思うけど、AIは最初は色も場所も分かってないから、「どっちに進めば正解なのか」も全く分からないんだったよね。";
+                    yield return WaitButton();
+                    text.text = "そんなAIにどうやって「学習」させるのか、それは……。";
+                    yield return WaitButton();
+                    text.text = "「ごほうび」を使うんだよ！";
+                    yield return WaitButton();
+                    text.text = "道に「ごほうび」をおいておくと、AIはごほうびをたどって「こっちが正しい道だぞ！」とおぼえていくんだ。";
+                    yield return WaitButton();
+                    text.text = "そうやって繰り返して覚えていくのが「学習する」ということになるんだ。";
+                    yield return WaitButton();
+                    text.text = "「ごほうび」を使うんだよ！";
+                    yield return WaitButton();
+                    text.text = "じゃあ、今度は実際にやってみよう！";
+                }
                 else if (stageIdx == 1)
+                {
+                    // TODO
                     text.text = "もう少し長い問題にチャレンジしてみよう！\n\n今回は試行錯誤を500回するよ。";
+                }
                 else if (stageIdx == 2)
+                {
+                    // TODO
                     text.text = "長さ3のお題も500回で学習できるかな？";
+                }
 
-                uiBoard.ShowGoal(env.quest.goalRow, env.quest.goalCol);
-                uiBoard.ShowKomaP(4, 4);
-                uiQuest.ShowQuest(env.quest);
-                uiQuest.ShowP(0);
-                btnNext.interactable = true;
                 yield break;
             }
             StopAllCoroutines();
@@ -156,14 +210,15 @@ namespace toio.AI.meicu
         {
             if (phase != Phase.Plan) return;
 
+            // Stage Settings
             if (stageIdx == 0)
             {
-                this.episodesTurn = 300;
+                this.episodesTurn = 100;
                 this.episodesTurnLeft = this.episodesTurn;
             }
             else if (stageIdx == 1)
             {
-                this.episodesTurn = 500;
+                this.episodesTurn = 300;
                 this.episodesTurnLeft = this.episodesTurn;
             }
             else if (stageIdx == 2)
@@ -171,55 +226,61 @@ namespace toio.AI.meicu
                 this.episodesTurn = 1000;
                 this.episodesTurnLeft = this.episodesTurn;
             }
+                btnNext.GetComponentInChildren<Text>().text = "O K";
+            ui.transform.Find("TextSteps").GetComponent<Text>().text = $"試行回数  {this.episodesTurnLeft}";
 
-            if (isSt2Failed)
+            if (isSt0Failed)
             {
-                uiQuest.ShowP(0);
-                uiBoard.ShowKomaP(4, 4);
-                uiBoard.HideTrajP();
-                agent.Reset();
+                ui.transform.Find("SliderSteps").gameObject.SetActive(true);
+                ui.transform.Find("SliderSteps").GetComponent<Slider>().value = 1;
             }
+
+            uiQuest.ShowP(0);
+            uiQuest.HideA();
+            uiBoard.ShowKomaP(4, 4);
+            uiBoard.HideTrajP();
+            agent.Reset();
 
             IEnumerator IE_Plan()
             {
                 if (stageIdx == 0)
                 {
-                    btnNext.interactable = true;
-                    waitBtn = true;
-                    text.text = "キューブは色もゴールも見えないので、\n最初はてきとうに動くけど、";
-                    yield return new WaitUntil(() => !waitBtn);
+                    if (!isSt0Failed)
+                    {
+                        btnNext.interactable = true;
+                        isWaitButton = true;
+                        text.text = "キューブは色もゴールも見えないので、\n最初はてきとうに動くけど、";
+                        yield return new WaitUntil(() => !isWaitButton);
 
-                    waitBtn = true;
-                    text.text = "報酬（ほうしゅう）をマスにおいて、\nキューブがたまたまそこに着いたら、\n今の動きは正しいとわかるのだ";
-                    yield return new WaitUntil(() => !waitBtn);
+                        isWaitButton = true;
+                        text.text = "報酬（ほうしゅう）をマスにおいて、\nキューブがたまたまそこに着いたら、\n今の動きは正しいとわかるのだ";
+                        yield return new WaitUntil(() => !isWaitButton);
 
-                    btnNext.interactable = false;
-                    text.text = "ゴールのマスをクリックして、\n報酬をおいてみてください";
-                    yield return new WaitUntil(() => uiBoard.RewardCount > 0);
+                        btnNext.interactable = false;
+                        text.text = "ゴールのマスをクリックして、\n報酬をおいてみてください";
+                        yield return new WaitUntil(() => uiBoard.RewardCount > 0);
 
-                    btnNext.interactable = true;
-                    text.text = "OKボタン押すと、学習が始まるよ\n\n今回は試行錯誤を100回するよ";
+                        text.text = $"OKボタン押すと、学習が始まるよ\n\nまず試行錯誤を{episodesTurnLeft}回するよ";
+                        btnNext.interactable = true;
+                    }
+                    else
+                    {
+                        text.text = "100回じゃたりないね。スライダーで試行回数を増やして再学習しよう。";
+                        btnNext.interactable = true;
+                    }
                 }
                 else if (stageIdx == 1)
                 {
                     btnNext.interactable = false;
-                    text.text = "マスをクリックして、「報酬」を１つおいてください!";
+                    text.text = "「報酬」を２つ置いてみてください";
                     yield return new WaitUntil(() => uiBoard.RewardCount > 0);
                     btnNext.interactable = true;
                 }
                 else if (stageIdx == 2)
                 {
                     btnNext.interactable = false;
-                    if (!isSt2Failed)
-                    {
-                        text.text = "とりあえず「報酬」１つだけで試してみよう";
-                        yield return new WaitUntil(() => uiBoard.RewardCount > 0);
-                    }
-                    else
-                    {
-                        text.text = "さて、「報酬」を２つを置いてみてください";
-                        yield return new WaitUntil(() => uiBoard.RewardCount == 2);
-                    }
+                    text.text = "「報酬」を置いてみてください";
+                    yield return new WaitUntil(() => uiBoard.RewardCount == 2);
                     btnNext.interactable = true;
                 }
             }
@@ -230,6 +291,8 @@ namespace toio.AI.meicu
         private void BeginPhaseTrain()
         {
             if (phase != Phase.Train) return;
+
+            ui.transform.Find("PhasePlan").gameObject.SetActive(false);
 
             IEnumerator IE_Train()
             {
@@ -309,12 +372,16 @@ namespace toio.AI.meicu
             {
                 btnNext.interactable = false;
                 text.text = "試験\n";
-                testLog.Clear();
 
                 int successCnt = 0;
                 for (int ieps = 0; ieps < 5; ieps ++)
                 {
                     env.Reset();
+
+                    // Control cubes
+                    PlayerController.ins.Move2Center();
+                    yield return new WaitUntil(() => PlayerController.ins.IsAtCenter);
+
                     // UI
                     List<Vector2Int> traj = new List<Vector2Int>();
                     uiBoard.ShowKomaP(env.row, env.col);
@@ -326,72 +393,82 @@ namespace toio.AI.meicu
                     {
                         // Step
                         var row = env.row; var col = env.col;
-                        var action = agent.GetActionTest(env.row, env.col);
+                        var action = agent.GetActionTest(row, col);
                         var res = env.Step(action);
                         bool done = Env.IsResponseFail(res) || res == Env.Response.Goal;
+
+                        // Control cubes
+                        PlayerController.ins.RequestMove(env.row, env.col, spd:50);
+                        yield return new WaitUntil(() => !PlayerController.ins.isMoving);
+                        AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StepConfirmed);
 
                         // UI
                         traj.Add(new Vector2Int(env.row, env.col));
                         uiBoard.ShowKomaP(env.row, env.col);
                         uiBoard.ShowTrajP(traj.ToArray());
                         uiQuest.ShowP(env.passedSpaceCnt);
+
                         if (done)
                         {
                             successCnt += res == Env.Response.Goal? 1: 0;
-                            testLog.Add(res == Env.Response.Goal);
                             text.text += res == Env.Response.Goal? "O" : "X";
                         }
 
                         yield return new WaitForSecondsRealtime(0.4f);
                         if (done) break;
                     }
+
+                    if (ieps < 4)
+                        yield return new WaitForSecondsRealtime(0.5f);
                 }
 
-                text.text += $"\n点数 = {successCnt}/10";
+                text.text += $"\n点数 = {successCnt}/5";
 
                 if (successCnt > 2)
                 {
+                    isFail = false;
+
+                    // Control cubes: Perform
+                    PlayerController.ins.PerformHappy();
+
+                    // UI
                     text.text += "\n3点以上なので合格! ";
                     clearedStages = Mathf.Max(clearedStages, stageIdx+1);
 
                     btnNext.interactable = true;
-                    waitBtn = true;
-                    yield return new WaitUntil(() => !waitBtn);
+                    isWaitButton = true;
+                    yield return new WaitUntil(() => !isWaitButton);
 
                     if (stageIdx == 0)
                         text.text = "報酬をゴールにおくことで、\nキューブにゴールへの動きかたを\n学習させることができたね!";
                     else if (stageIdx == 1)
                         text.text = "お題が長くなると、\n学習に必要な試行回数がも多くなったね";
-                    else if (stageIdx == 2 && isSt2Failed)
-                        text.text = "報酬を2つ置くことで、\nキューブをとおいゴールまでゆうどうできたね!";
-
                 }
                 else
                 {
+                    isFail = true;
+
+                    // Control cubes: Perform
+                    PlayerController.ins.PerformRegret();
+
+                    // UI
                     text.text += "\n3未満なので不合格！";
                     btnNext.interactable = true;
-                    waitBtn = true;
-                    yield return new WaitUntil(() => !waitBtn);
+                    isWaitButton = true;
+                    yield return new WaitUntil(() => !isWaitButton);
 
                     if (stageIdx == 0)
                     {
-                        text.text = "報酬をちゃんとゴールに置いたかな？\nリトライしてね";
+                        if (!isSt0Failed)
+                            text.text = "100じゃたりないみたいね。\nリトライしよう";
+                        else
+                            text.text = "報酬をちゃんとゴールに置いたかな？\nリトライしよう";
                     }
                     else if (stageIdx == 1)
                     {
-                        text.text = "報酬の位置を変えてリトライしてね";
+                        text.text = "報酬の位置を変えてリトライしよう";
                     }
-                    else if (stageIdx == 2)
-                    {
-                        if (!isSt2Failed)
-                        {
-                            text.text = "長さ3のお題に\n報酬1つで試行500回は足りないね...\n\n報酬2つならどうかな？";
-                        }
-                        else
-                        {
-                            text.text = "報酬の位置を変えてリトライしてね";
-                        }
-                    }
+                    btnNext.GetComponentInChildren<Text>().text = "リトライ";
                 }
 
                 btnNext.interactable = true;
@@ -400,10 +477,138 @@ namespace toio.AI.meicu
             StartCoroutine(IE_Test());
         }
 
+        private void BeginPhaseBattle()
+        {
+            if (phase != Phase.Battle) return;
+
+            text.text = "迷キューとバトル\n\n";
+            int successCnt = 0;
+
+            game.StopGame();
+            AIController.ins.setting = Config.trainerStageSetting;
+
+            IEnumerator IE_Battle()
+            {
+                btnNext.interactable = false;
+
+                for (int ieps=0; ieps < 5; ieps++)
+                {
+                    // Control Cubes
+                    AIController.ins.RequestMove(4, 4, 80, 0);
+                    PlayerController.ins.RequestMove(4, 4, 80, 0);
+                    yield return new WaitUntil(() => AIController.ins.IsAtCenter);
+                    yield return new WaitUntil(() => PlayerController.ins.IsAtCenter);
+
+                    // UI
+                    // List<Vector2Int> traj = new List<Vector2Int>();
+                    uiBoard.ShowKomaP(4, 4);
+                    uiBoard.HideTrajP();
+                    uiQuest.ShowP(0);
+
+                    // Start Game
+                    game.InitGame(env.quest);
+                    game.StartGame(0);
+                    isGameOverP = false;
+
+                    // Control loop for player cube
+                    while (true)
+                    {
+                        // Get action with trained agent
+                        var row = game.envP.row; var col = game.envP.col;
+                        var action = agent.GetActionTest(row, col);
+
+                        // Delay
+                        yield return new WaitForSecondsRealtime(0.5f);
+
+                        if (game.stateP == Game.PlayerState.InGame)
+                        {
+                            // Move cube
+                            (var tarRow, var tarCol) = Env.Translate(action, row, col);
+                            PlayerController.ins.RequestMove(tarRow, tarCol, spd:80);  // TODO speed depends on probs
+
+                            // Wait step complete or game over
+                            isGameStepP = false;
+                            yield return new WaitUntil(() => isGameStepP || isGameOverP);
+                        }
+
+                        if (game.stateP == Game.PlayerState.InGame)
+                            continue;
+                        if (game.stateP == Game.PlayerState.Fail)
+                            yield return new WaitUntil(() => game.stateP == Game.PlayerState.LoseFail);
+                        break;
+                    }
+
+                    // Count
+                    if (game.stateP == Game.PlayerState.Win)
+                    {
+                        text.text += "O";
+                        successCnt += 1;
+                    }
+                    else if (game.stateP == Game.PlayerState.Draw)
+                    {
+                        text.text += "-";
+                    }
+                    else
+                    {
+                        text.text += 'X';
+                    }
+                    yield return new WaitForSecondsRealtime(2);
+                }
+
+                if (successCnt > 2)
+                {
+                    isFail = false;
+                    text.text += "\nキミの勝ち！";
+                }
+                else
+                {
+                    isFail = true;
+                    text.text += "\nボクの勝ち！";
+                    btnNext.GetComponentInChildren<Text>().text = "リトライ";
+                }
+
+                btnNext.interactable = true;
+            }
+            StopAllCoroutines();
+            StartCoroutine(IE_Battle());
+        }
+
         private float EpsilonScheduler(int epsLeft, int nEps)
         {
-            return (float)epsLeft/nEps * 0.4f + 0.1f;
+            return (float)epsLeft/nEps * 0.4f + 0.3f;
         }
+
+
+        #region ========== Game Callbacks ==========
+
+        private bool isGameStepP = false;
+        private void OnGameStepP(Env.Response res)
+        {
+            isGameStepP = true;
+        }
+        private bool isGameOverP = false;
+        private void OnGameOverP(Game.PlayerState state)
+        {
+            isGameOverP = true;
+            if (state == Game.PlayerState.Win)
+            {
+                PlayerController.ins.PerformHappy();
+                AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Win);
+            }
+            else if (state == Game.PlayerState.Fail)
+            {
+                PlayerController.ins.PerformRegret();
+                AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Wrong);
+            }
+            else if (state == Game.PlayerState.LoseFail || state == Game.PlayerState.LoseNotFail || state == Game.PlayerState.Draw)
+            {
+                PlayerController.ins.PerformSad();
+                AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Lose);
+            }
+        }
+
+        #endregion
+
 
         #region ========== Callbacks ==========
 
@@ -411,9 +616,13 @@ namespace toio.AI.meicu
         {
             if (phase != Phase.Plan) return;
 
-            if (stageIdx == 0 || stageIdx == 1)
+            if (stageIdx == 0)
             {
                 uiBoard.PutReward(rowCol.x, rowCol.y, type, 1);
+            }
+            else if (stageIdx == 1)
+            {
+                uiBoard.PutReward(rowCol.x, rowCol.y, type, 2);
             }
             else if (stageIdx == 2)
             {
@@ -423,9 +632,9 @@ namespace toio.AI.meicu
 
         public void OnBtnNext()
         {
-            if (waitBtn)
+            if (isWaitButton)
             {
-                waitBtn = false;
+                isWaitButton = false;
                 return;
             }
 
@@ -441,21 +650,49 @@ namespace toio.AI.meicu
             }
             else if (phase == Phase.Train)
             {
-                phase = Phase.Test;
-                BeginPhaseTest();
+                if (stageIdx == 0 || stageIdx == 1)
+                {
+                    phase = Phase.Test;
+                    BeginPhaseTest();
+                }
+                else if (stageIdx == 2)
+                {
+                    phase = Phase.Battle;
+                    BeginPhaseBattle();
+                }
             }
             else if (phase == Phase.Test)
             {
-                if (stageIdx == 2 && !isSt2Failed)
+                if (stageIdx == 0 && !isSt0Failed)
                 {
-                    isSt2Failed = true;
+                    isSt0Failed = true;
                     phase = Phase.Plan;
                     BeginPhasePlan();
                     return;
                 }
-
-                phase = Phase.Entry;
-                BeginPhaseEntry();
+                else if (isFail)
+                {
+                    phase = Phase.Plan;
+                    BeginPhasePlan();
+                }
+                else
+                {
+                    phase = Phase.Entry;
+                    BeginPhaseEntry();
+                }
+            }
+            else if (phase == Phase.Battle)
+            {
+                if (isFail)
+                {
+                    phase = Phase.Plan;
+                    BeginPhasePlan();
+                }
+                else
+                {
+                    phase = Phase.Entry;
+                    BeginPhaseEntry();
+                }
             }
         }
 
@@ -466,20 +703,36 @@ namespace toio.AI.meicu
             this.stageIdx = idx;
             BeginPhaseQuest();
         }
+
+        public void OnSliderSteps()
+        {
+            int v = (int)ui.transform.Find("SliderSteps").GetComponent<Slider>().value * 100;
+            ui.transform.Find("TextSteps").GetComponent<Text>().text = $"試行回数  {v}";
+            this.episodesTurnLeft = v;
+            this.episodesTurn = v;
+        }
         #endregion
 
 
+        private bool isWaitButton = false;
+        private IEnumerator WaitButton()
+        {
+            isWaitButton = true;
+            yield return new WaitUntil(() => !isWaitButton);
+        }
+
         internal enum Phase {
-            Entry, Quest, Plan, Train, Test
+            Entry, Quest, Plan, Train, Test, Battle
         }
 
     }
+
 
     internal class QAgent
     {
         public float[,,] Q;
         public float e = 0.8f;
-        public float lr = 0.3f;
+        public float lr = 0.25f;
         public float gamma = 0.95f;
 
         public QAgent()
