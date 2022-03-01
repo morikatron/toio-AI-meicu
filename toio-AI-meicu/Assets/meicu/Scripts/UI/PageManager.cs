@@ -141,6 +141,7 @@ namespace toio.AI.meicu
             Prefs.SetLearnCleared();
             Prefs.SetBattleEnteredAfterLearn();
             if (Prefs.level == 1) Prefs.level = 2;
+            Prefs.trainerStage = 2;
 
             UpdateDebugSliderLv();
             if (page == EPage.Title) pageTitle.Refresh();

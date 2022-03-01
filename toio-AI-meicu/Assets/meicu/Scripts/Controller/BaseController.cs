@@ -14,7 +14,7 @@ namespace toio.AI.meicu
         protected IEnumerator ieMotion;
         internal bool isPerforming { get; private set; } = false;
         internal bool isMoving { get; private set; } = false;
-        internal virtual Vector2Int targetBias { get; set; } = Vector2Int.zero;
+        internal Vector2Int targetMatCoordBias { get; set; } = Vector2Int.zero;
 
         internal bool isGrounded { get {
             if (cube == null) return false;
@@ -70,7 +70,7 @@ namespace toio.AI.meicu
 
         internal void Move2Center()
         {
-            Device.TargetMove(id, 4, 4, targetBias.x, targetBias.y);
+            Device.TargetMove(id, 4, 4, targetMatCoordBias.x, targetMatCoordBias.y);
         }
 
         protected Vector2Int targetCoords;
@@ -117,7 +117,7 @@ namespace toio.AI.meicu
                 {
                     retryTime = 0;
                     Debug.Log($"IE_Move : TargetMove({targetCoords.x}, {targetCoords.y})");
-                    Device.TargetMove(id, targetCoords.x, targetCoords.y, targetBias.x, targetBias.y, maxSpd:spd);
+                    Device.TargetMove(id, targetCoords.x, targetCoords.y, targetMatCoordBias.x, targetMatCoordBias.y, maxSpd:spd);
                 }
 
                 yield return new WaitForSecondsRealtime(0.1f);

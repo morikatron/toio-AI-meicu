@@ -24,21 +24,20 @@ namespace toio.AI.meicu
         private Env env = new Env();
         private QAgent agent;
         private Phase phase;
-        private bool inTraining = false;
         private int stageIdx = 0;
         private bool isSt0Failed = false;
         private bool isFail = false;
+        private bool isRetry = false;
 
         private int episodesTurn;
         private int episodesTurnLeft;
         private float loss;
 
-        private int clearedStages = 2; // TODO move to Prefs in future
-
 
         void OnEnable()
         {
             uiBoard.onSpaceClicked += OnSpaceClicked;
+            agent = agent = new QAgent();
         }
 
         internal void SetActive(bool active)
@@ -55,10 +54,11 @@ namespace toio.AI.meicu
                 uiBoard.Reset();
                 uiQuest.Reset();
                 uiQuest.HideA();
-                inTraining = false;
 
                 game.stepCallbackP += OnGameStepP;
                 game.overCallbackP += OnGameOverP;
+
+                PlayerController.ins.targetMatCoordBias = new Vector2Int(0, 0);
 
                 BeginPhaseEntry();
             }
@@ -67,6 +67,8 @@ namespace toio.AI.meicu
                 game.StopGame();
                 game.stepCallbackP -= OnGameStepP;
                 game.overCallbackP -= OnGameOverP;
+
+                PlayerController.ins.targetMatCoordBias = new Vector2Int(10, -10);
 
                 AIController.ins.StopMotion();
                 AIController.ins.StopAllCoroutines();
@@ -86,6 +88,8 @@ namespace toio.AI.meicu
         private void BeginPhaseEntry()
         {
             if (phase != Phase.Entry) return;
+
+            isRetry = false;
 
             // Init UI
             var entriesTr = ui.transform.Find("PhaseEntry");
@@ -107,24 +111,37 @@ namespace toio.AI.meicu
 
             IEnumerator IE_Entry()
             {
-                text.text = "こんにちは！\nここでは「キミだけのAI」を育ててみる事ができるよ！";
-                yield return WaitButton();
+                if (Prefs.trainerStage == 0)
+                {
+                    text.text = "こんにちは！\nここでは「キミだけのAI」を育ててみる事ができるよ！";
+                    yield return WaitButton();
+                    text.text = "「AIを育てる」には、キミと同じようにAIも「学習」する必要があるんだ。";
+                    yield return WaitButton();
+                    text.text = "え？「学習」ってどのようにするのかって？";
+                    yield return WaitButton();
+                    text.text = "任せて！ボクがこれからひとつひとつ説明していくよ！";
+                    yield return WaitButton();
+                    text.text = "キミだけのAIを育てて、ボクと勝負だ！";
+                    yield return WaitButton();
+                    text.text += "まずは最初、「ごほうびを使ってAIを育てよう」を選択してみよう！";
+                }
+                else if (Prefs.trainerStage == 1)
+                {
+                    text.text = "「長い問題にチャレンジしてみよう」が選べるようになったよ！";
+                    yield return WaitButton();
+                    text.text += "どこに「ごほうび」を置くのか、何回学習するのか、よく考えて挑戦してみよう！";
+                }
+                else if (Prefs.trainerStage == 2)
+                {
+                    text.text = "いよいよボクと対戦だよ！";
+                    yield return WaitButton();
+                    text.text = "まずキミがAIを学習させてから、ボクと勝負するよ！";
+                }
 
-                text.text = "「AIを育てる」には、キミと同じようにAIも「学習」する必要があるんだ。";
-                yield return WaitButton();
-
-                text.text = "え？「学習」ってどのようにするのかって？";
-                yield return WaitButton();
-
-                text.text = "任せて！ボクがこれからひとつひとつ説明していくよ！";
-                yield return WaitButton();
-
-                text.text = "キミだけのAIを育てて、ボクと勝負だ！";
-                if (clearedStages == 0)
-                    text.text += "\n\nまずは最初、「ごほうびを使ってAIを育てよう」を選択してみよう！";
                 entryBtn0.interactable = true;
-                entryBtn1.interactable = clearedStages > 0;
-                entryBtn2.interactable = clearedStages > 1;
+                entryBtn1.interactable = Prefs.trainerStage > 0;
+                entryBtn2.interactable = Prefs.trainerStage > 1;
+                btnNext.gameObject.SetActive(false);
 
                 yield break;
             }
@@ -138,7 +155,6 @@ namespace toio.AI.meicu
 
             // Init training agent and environment
             env.Reset();
-            agent = new QAgent();
 
             // Generate Quest by Stage Settings
             int questSize = 2;
@@ -147,12 +163,13 @@ namespace toio.AI.meicu
             else if (stageIdx == 1)
                 questSize = 3;
             else if (stageIdx == 2)
-                questSize = 6;
+                questSize = 4;
             Quest quest = env.GenerateQuest(questSize);
             env.SetQuest(quest);
 
             // Update UI
             textCaption.text = "AIを育てよう";
+            btnNext.gameObject.SetActive(true);
             uiBoard.gameObject.SetActive(true);
             uiQuest.gameObject.SetActive(true);
             btnNext.gameObject.SetActive(true);
@@ -183,21 +200,36 @@ namespace toio.AI.meicu
                     yield return WaitButton();
                     text.text = "道に「ごほうび」をおいておくと、AIはごほうびをたどって「こっちが正しい道だぞ！」とおぼえていくんだ。";
                     yield return WaitButton();
-                    text.text = "そうやって繰り返して覚えていくのが「学習する」ということになるんだ。";
-                    yield return WaitButton();
-                    text.text = "「ごほうび」を使うんだよ！";
-                    yield return WaitButton();
-                    text.text = "じゃあ、今度は実際にやってみよう！";
+                    text.text = "そうやって繰り返して覚えていくのが「学習する」ということになるんだ。どう？分かったかな？";
                 }
                 else if (stageIdx == 1)
                 {
-                    // TODO
-                    text.text = "もう少し長い問題にチャレンジしてみよう！\n\n今回は試行錯誤を500回するよ。";
+                    text.text = "よくきたね！\nここでは「長い問題」に挑戦するよ！";
+                    yield return WaitButton();
+                    text.text = "問題が長くなれば…さっきよりもたくさんの学習回数が必要になるんだ。";
+                    yield return WaitButton();
+                    text.text = "この問題を見て！さっきよりも長くなっているでしょ？さっきの問題をクリアするには、400回学習必要だったけど…";
+                    yield return WaitButton();
+                    text.text = "この問題の場合（通過する色のマスが3つある場合）、だいたい1000回は学習しないと、うまくゴールまでの道を覚えられないんだ…";
+                    yield return WaitButton();
+                    text.text = "つまり「学習にかかる時間」がとっても長くなっちゃうんだ…";
+                    yield return WaitButton();
+                    text.text = "それって、とても面倒だよね。";
+
+                    yield return WaitButton();
+                    text.text = "そこで！必殺技！";
+                    yield return WaitButton();
+                    text.text = "「ごほうび」を<color=red>2個</color>使ってみるよ！";
+                    yield return WaitButton();
+                    text.text = "「ごほうび」を2個使うことで、400回まで回数をへらすことができるんだ！";
                 }
                 else if (stageIdx == 2)
                 {
-                    // TODO
-                    text.text = "長さ3のお題も500回で学習できるかな？";
+                    text.text = "いよいよボクとバトルだ！";
+                    yield return WaitButton();
+                    text.text = "ここでは、「ごほうび」の置き方、「学習」の回数はキミ次第！";
+                    yield return WaitButton();
+                    text.text = "自由に学習させて、学習が終わったら「バトル」ボタンを押してみてね！";
                 }
 
                 yield break;
@@ -213,26 +245,30 @@ namespace toio.AI.meicu
             // Stage Settings
             if (stageIdx == 0)
             {
-                this.episodesTurn = 100;
+                this.episodesTurn = 50;
                 this.episodesTurnLeft = this.episodesTurn;
             }
             else if (stageIdx == 1)
             {
-                this.episodesTurn = 300;
+                this.episodesTurn = 400;
                 this.episodesTurnLeft = this.episodesTurn;
             }
             else if (stageIdx == 2)
             {
-                this.episodesTurn = 1000;
+                this.episodesTurn = 100;
                 this.episodesTurnLeft = this.episodesTurn;
             }
-                btnNext.GetComponentInChildren<Text>().text = "O K";
-            ui.transform.Find("TextSteps").GetComponent<Text>().text = $"試行回数  {this.episodesTurnLeft}";
 
-            if (isSt0Failed)
+            // Update UI
+            btnNext.interactable = true;
+            btnNext.GetComponentInChildren<Text>().text = "O K";
+            ui.transform.Find("TextSteps").gameObject.SetActive(true);
+            ui.transform.Find("TextSteps").GetComponent<Text>().text = $"試行回数  {this.episodesTurn}";
+
+            if (stageIdx == 0 && isSt0Failed || stageIdx == 2)
             {
-                ui.transform.Find("SliderSteps").gameObject.SetActive(true);
-                ui.transform.Find("SliderSteps").GetComponent<Slider>().value = 1;
+                ui.transform.Find("PhasePlan").gameObject.SetActive(true);
+                ui.transform.Find("PhasePlan").Find("SliderSteps").GetComponent<Slider>().value = episodesTurn/100;
             }
 
             uiQuest.ShowP(0);
@@ -241,46 +277,56 @@ namespace toio.AI.meicu
             uiBoard.HideTrajP();
             agent.Reset();
 
+
             IEnumerator IE_Plan()
             {
                 if (stageIdx == 0)
                 {
                     if (!isSt0Failed)
                     {
-                        btnNext.interactable = true;
-                        isWaitButton = true;
-                        text.text = "キューブは色もゴールも見えないので、\n最初はてきとうに動くけど、";
-                        yield return new WaitUntil(() => !isWaitButton);
+                        text.text = "じゃあ、今度は実際にやってみよう！";
+                        yield return WaitButton();
+                        text.text = "今回のゴールはスタートのすぐそばだから「ごほうび」もゴールに置けばよさそうだね！";
+                        yield return WaitButton();
 
-                        isWaitButton = true;
-                        text.text = "報酬（ほうしゅう）をマスにおいて、\nキューブがたまたまそこに着いたら、\n今の動きは正しいとわかるのだ";
-                        yield return new WaitUntil(() => !isWaitButton);
-
+                        text.text = "マウスでゴール（はたが立っているマス）をクリックしてみてね。";
                         btnNext.interactable = false;
-                        text.text = "ゴールのマスをクリックして、\n報酬をおいてみてください";
                         yield return new WaitUntil(() => uiBoard.RewardCount > 0);
-
-                        text.text = $"OKボタン押すと、学習が始まるよ\n\nまず試行錯誤を{episodesTurnLeft}回するよ";
                         btnNext.interactable = true;
+
+                        text.text = $"よし！それでは学習開始！{episodesTurn}回試行錯誤（しこうさくご）してみるよ！";
                     }
                     else
                     {
-                        text.text = "100回じゃたりないね。スライダーで試行回数を増やして再学習しよう。";
+                        text.text = "スライダーで試行回数を増やして再学習しよう。";
                         btnNext.interactable = true;
                     }
                 }
                 else if (stageIdx == 1)
                 {
                     btnNext.interactable = false;
-                    text.text = "「報酬」を２つ置いてみてください";
-                    yield return new WaitUntil(() => uiBoard.RewardCount > 0);
+
+                    if (!isRetry)
+                    {
+                        text.text = "まず、たどり着きたいゴールに「ごほうび」を1つ置いてみて。";
+                        yield return new WaitUntil(() => uiBoard.RewardCount > 0);
+                        text.text = "オッケー！つぎはどこに置くのがいいかな？キミが考えて置いてみて！";
+                        yield return new WaitUntil(() => uiBoard.RewardCount > 1);
+                    }
+                    else
+                    {
+                        text.text = "「ごほうび」の場所を決めてね。";
+                        yield return new WaitUntil(() => uiBoard.RewardCount > 0);
+                    }
                     btnNext.interactable = true;
+
+                    text.text = "よし！今回も「学習回数」は400回でやってみるよ！\n\n準備はいいかな？";
                 }
                 else if (stageIdx == 2)
                 {
                     btnNext.interactable = false;
-                    text.text = "「報酬」を置いてみてください";
-                    yield return new WaitUntil(() => uiBoard.RewardCount == 2);
+                    text.text = "準備はいいかな？";
+                    yield return new WaitUntil(() => uiBoard.RewardCount > 0);
                     btnNext.interactable = true;
                 }
             }
@@ -297,10 +343,8 @@ namespace toio.AI.meicu
             IEnumerator IE_Train()
             {
                 btnNext.interactable = false;
-                this.inTraining = true;
 
                 float stepTime = 0.01f;
-                // if (stageIdx == 0) stepTime = 0.04f;
 
                 while (this.episodesTurnLeft-- > 0)
                 {
@@ -355,10 +399,17 @@ namespace toio.AI.meicu
                         this.loss = agent.Train();
                 }
 
-                this.inTraining = false;
-
-                text.text += "\n\n学習終了。OKボタンで試験を受けよう！";
                 btnNext.interactable = true;
+                if (stageIdx == 0 && isSt0Failed)
+                {
+                    text.text = "かんりょうー！";
+                    yield return WaitButton();
+                    text.text = "やっぱり、学習回数が多い分、ちょっと時間がかかったね…";
+                }
+                else
+                {
+                    text.text = "かんりょうー！";
+                }
             }
             StopAllCoroutines();
             StartCoroutine(IE_Train());
@@ -368,18 +419,39 @@ namespace toio.AI.meicu
         {
             if (phase != Phase.Test) return;
 
+            // Update UI
+            uiQuest.ShowP(0);
+            uiBoard.HideTrajP();
+            uiBoard.ShowKomaP(4, 4);
+
+
             IEnumerator IE_Test()
             {
+                btnNext.interactable = true;
+
+                text.text = "それでは、どれくらい学習できたか、テストで試してみよう！";
+                yield return WaitButton();
+
+                if (stageIdx == 0 && !isSt0Failed)
+                {
+                    text.text = "テストは、「5回のうち何回ゴールにたどりつけるか」で判定するよ。";
+                    yield return WaitButton();
+                    text.text = "3回以上が合格だよ！";
+                    yield return WaitButton();
+                    text.text = "テストは、マットの上で実際にキューブを動かして行うよ。";
+                    yield return WaitButton();
+                }
+
                 btnNext.interactable = false;
-                text.text = "試験\n";
 
                 int successCnt = 0;
+                string textLog = "";
                 for (int ieps = 0; ieps < 5; ieps ++)
                 {
                     env.Reset();
 
                     // Control cubes
-                    PlayerController.ins.Move2Center();
+                    PlayerController.ins.RequestMove(4, 4, 80, 0);
                     yield return new WaitUntil(() => PlayerController.ins.IsAtCenter);
 
                     // UI
@@ -387,6 +459,7 @@ namespace toio.AI.meicu
                     uiBoard.ShowKomaP(env.row, env.col);
                     uiBoard.HideTrajP();
                     uiQuest.ShowP(env.passedSpaceCnt);
+                    text.text = $"試験 {ieps+1} 回目\n" + textLog;
                     yield return new WaitForSecondsRealtime(0.4f);
 
                     while (true)
@@ -411,7 +484,8 @@ namespace toio.AI.meicu
                         if (done)
                         {
                             successCnt += res == Env.Response.Goal? 1: 0;
-                            text.text += res == Env.Response.Goal? "O" : "X";
+                            textLog += res == Env.Response.Goal? "O" : "X";
+                            text.text = $"試験 {ieps+1} 回目\n" + textLog;
                         }
 
                         yield return new WaitForSecondsRealtime(0.4f);
@@ -422,28 +496,57 @@ namespace toio.AI.meicu
                         yield return new WaitForSecondsRealtime(0.5f);
                 }
 
-                text.text += $"\n点数 = {successCnt}/5";
-
                 if (successCnt > 2)
                 {
                     isFail = false;
+                    Prefs.trainerStage = Mathf.Max(Prefs.trainerStage, stageIdx+1);
 
                     // Control cubes: Perform
                     PlayerController.ins.PerformHappy();
 
                     // UI
-                    text.text += "\n3点以上なので合格! ";
-                    clearedStages = Mathf.Max(clearedStages, stageIdx+1);
-
                     btnNext.interactable = true;
-                    isWaitButton = true;
-                    yield return new WaitUntil(() => !isWaitButton);
 
+                    text.text += $"\n{successCnt}回たどり着けたので…合格ー！";
+                    yield return WaitButton();
+                    text.text = "おめでとう！キミのAIも正しい道を学習できてきたね！";
+
+                    // UI conclusion
                     if (stageIdx == 0)
-                        text.text = "報酬をゴールにおくことで、\nキューブにゴールへの動きかたを\n学習させることができたね!";
+                    {
+                        if (isSt0Failed)
+                        {
+                            yield return WaitButton();
+                            text.text = $"「50回」だとうまくいかなかったけど、「{episodesTurn}回」にしたらうまくいったね！";
+                            yield return WaitButton();
+                            text.text = $"つまり、問題の長さ（難しさ）によって、必要な「学習の量」が変わるんだ。";
+                            yield return WaitButton();
+                            text.text = $"キミだって、簡単な問題はすぐわかるけど、難しい問題はいっぱい考えなきゃいけないでしょ？";
+                            yield return WaitButton();
+                            text.text = $"つぎはもっと問題が長くなるよ！\nぜひ次の課題にも挑戦してみてね！";
+                        }
+                    }
                     else if (stageIdx == 1)
-                        text.text = "お題が長くなると、\n学習に必要な試行回数がも多くなったね";
+                    {
+                        yield return WaitButton();
+                        text.text = "うまく学習できたね！";
+                        yield return WaitButton();
+                        text.text = "AIを育てるには、「ごほうび」をあげたり、「学習回数」を変えたり、うまく育つようにいろんな事を考えて試す必要があるんだ。";
+                        yield return WaitButton();
+                        text.text = "問題が難しくなればなるほど、育てるのも難しくなったり、時間が掛かったりする…";
+                        yield return WaitButton();
+                        text.text = "だから「はやく・うまくAIを育てる」ためには、色んな工夫が必要なんだ。";
+                        yield return WaitButton();
+                        text.text = "今は「ごほうびをあげる」「回数を変えてみる」だけだったけど、本当は失敗したら怒ったり（マイナスのほうしゅうと言います）など...";
+                        yield return WaitButton();
+                        text.text = "AIの学習には色々な調節するもの（パラメータと言います）があるんだ。これは難しいので、またの機会に説明するね！";
+                        yield return WaitButton();
+                        text.text = "次は、いよいよキミが育てたAIと、ボクが対決するよ！";
+                        yield return WaitButton();
+                        text.text = "キミのAIと勝負だ！";
+                    }
                 }
+                // Fail
                 else
                 {
                     isFail = true;
@@ -452,7 +555,7 @@ namespace toio.AI.meicu
                     PlayerController.ins.PerformRegret();
 
                     // UI
-                    text.text += "\n3未満なので不合格！";
+                    text.text += $"\n\n{successCnt}回しかたどり着けなかったね…残念…";
                     btnNext.interactable = true;
                     isWaitButton = true;
                     yield return new WaitUntil(() => !isWaitButton);
@@ -460,13 +563,17 @@ namespace toio.AI.meicu
                     if (stageIdx == 0)
                     {
                         if (!isSt0Failed)
-                            text.text = "100じゃたりないみたいね。\nリトライしよう";
+                        {
+                            text.text = $"「{episodesTurn}回」じゃ学習回数が足りなかったみたい。";
+                            yield return WaitButton();
+                            text.text = "今度は、回数を増やしてやってみよう！";
+                        }
                         else
                             text.text = "報酬をちゃんとゴールに置いたかな？\nリトライしよう";
                     }
                     else if (stageIdx == 1)
                     {
-                        text.text = "報酬の位置を変えてリトライしよう";
+                        text.text = "「ごほうび」の場所が悪かったみたい。\n「ごほうび」の場所を変えて、もう一度やってみよう！";
                     }
                     btnNext.GetComponentInChildren<Text>().text = "リトライ";
                 }
@@ -489,9 +596,18 @@ namespace toio.AI.meicu
 
             IEnumerator IE_Battle()
             {
+                btnNext.interactable = true;
+                text.text = "それでは、ボクとバトルしよう！";
+                yield return WaitButton();
+                text.text = "どちらが先に、間違えずにゴールにたどりつけるかな？";
+                yield return WaitButton();
+                text.text = "バトルも、マットの上で実際にキューブを動かして行うよ。";
+                yield return WaitButton();
+                text.text = "バトルスタート！";
+
                 btnNext.interactable = false;
 
-                for (int ieps=0; ieps < 5; ieps++)
+                // for (int ieps=0; ieps < 5; ieps++)
                 {
                     // Control Cubes
                     AIController.ins.RequestMove(4, 4, 80, 0);
@@ -541,33 +657,40 @@ namespace toio.AI.meicu
                     // Count
                     if (game.stateP == Game.PlayerState.Win)
                     {
-                        text.text += "O";
+                        // text.text += "O";
                         successCnt += 1;
                     }
                     else if (game.stateP == Game.PlayerState.Draw)
                     {
-                        text.text += "-";
+                        // text.text += "-";
                     }
                     else
                     {
-                        text.text += 'X';
+                        // text.text += 'X';
                     }
                     yield return new WaitForSecondsRealtime(2);
                 }
 
-                if (successCnt > 2)
+                btnNext.interactable = true;
+                if (successCnt > 0)
                 {
                     isFail = false;
-                    text.text += "\nキミの勝ち！";
+                    text.text = "おめでとう！キミの勝ちだ！";
+                    yield return WaitButton();
+                    text.text = "同じ問題でも、「ごほうび」や「学習回数」を変えると結果が変わるよ！";
+                    yield return WaitButton();
+                    text.text = "できるだけ少ない回数（早い時間）で、ボクに勝てるように工夫してみてね！";
+                    // yield return WaitButton();
+                    // text.text = "次の問題に挑戦する？";
                 }
                 else
                 {
                     isFail = true;
-                    text.text += "\nボクの勝ち！";
+                    text.text = "ざんねん！ボクの勝ちー！";
+                    yield return WaitButton();
+                    text.text = "もう一度学習をやり直してみる？";
                     btnNext.GetComponentInChildren<Text>().text = "リトライ";
                 }
-
-                btnNext.interactable = true;
             }
             StopAllCoroutines();
             StartCoroutine(IE_Battle());
@@ -575,7 +698,7 @@ namespace toio.AI.meicu
 
         private float EpsilonScheduler(int epsLeft, int nEps)
         {
-            return (float)epsLeft/nEps * 0.4f + 0.3f;
+            return (float)epsLeft/nEps * 0.4f + 0.2f;
         }
 
 
@@ -610,7 +733,7 @@ namespace toio.AI.meicu
         #endregion
 
 
-        #region ========== Callbacks ==========
+        #region ========== UI Callbacks ==========
 
         private void OnSpaceClicked(Vector2Int rowCol, UIBoard.RewardPositionType type)
         {
@@ -626,7 +749,7 @@ namespace toio.AI.meicu
             }
             else if (stageIdx == 2)
             {
-                uiBoard.PutReward(rowCol.x, rowCol.y, type, 8);
+                uiBoard.PutReward(rowCol.x, rowCol.y, type, 4);
             }
         }
 
@@ -673,6 +796,7 @@ namespace toio.AI.meicu
                 else if (isFail)
                 {
                     phase = Phase.Plan;
+                    isRetry = true;
                     BeginPhasePlan();
                 }
                 else
@@ -696,6 +820,17 @@ namespace toio.AI.meicu
             }
         }
 
+        public void OnBtnHome()
+        {
+            if (phase == Phase.Entry)
+                PageManager.OnBtnHome();
+            else
+            {
+                phase = Phase.Entry;
+                BeginPhaseEntry();
+            }
+        }
+
         public void OnBtnEntry(int idx)
         {
             if (phase != Phase.Entry) return;
@@ -706,7 +841,7 @@ namespace toio.AI.meicu
 
         public void OnSliderSteps()
         {
-            int v = (int)ui.transform.Find("SliderSteps").GetComponent<Slider>().value * 100;
+            int v = (int)ui.transform.Find("PhasePlan").Find("SliderSteps").GetComponent<Slider>().value * 100;
             ui.transform.Find("TextSteps").GetComponent<Text>().text = $"試行回数  {v}";
             this.episodesTurnLeft = v;
             this.episodesTurn = v;
@@ -732,7 +867,7 @@ namespace toio.AI.meicu
     {
         public float[,,] Q;
         public float e = 0.8f;
-        public float lr = 0.25f;
+        public float lr = 0.2f;
         public float gamma = 0.95f;
 
         public QAgent()

@@ -17,6 +17,7 @@ namespace toio.AI.meicu
         internal static readonly string KeyBattleAccessed = "MeicuBA";
         internal static readonly string KeyBattleEnteredAfterLearn = "MeicuBEAL";
         internal static readonly string KeyLevel = "MeicuLv";
+        internal static readonly string KeyTrainerStage = "MeicuTrSt";
         // internal static readonly string KeyStage = "MeicuStage";
 
         internal static bool isMute
@@ -87,6 +88,19 @@ namespace toio.AI.meicu
             set {
                 value = Mathf.Clamp(value, 1, Config.nLevels);
                 PlayerPrefs.SetInt(KeyLevel, value);
+            }
+        }
+
+        internal static int trainerStage
+        {
+            get {
+                if (!PlayerPrefs.HasKey(KeyTrainerStage))
+                    PlayerPrefs.SetInt(KeyTrainerStage, 0);
+                return PlayerPrefs.GetInt(KeyTrainerStage, 0);
+            }
+            set {
+                value = Mathf.Clamp(value, 0, 2);
+                PlayerPrefs.SetInt(KeyTrainerStage, value);
             }
         }
 

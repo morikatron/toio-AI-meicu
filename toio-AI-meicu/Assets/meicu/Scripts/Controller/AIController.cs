@@ -16,7 +16,6 @@ namespace toio.AI.meicu
         public int heatmapPredictSteps = 8;
 
         protected override int id => 1;
-        internal override Vector2Int targetBias { get; set; } = new Vector2Int(-10, 10);
 
         internal bool isPredicting { get; private set; } = false;
         internal event Action heatmapCallback;
@@ -35,6 +34,8 @@ namespace toio.AI.meicu
         {
             base.Awake();
             ins = this;
+            targetMatCoordBias = new Vector2Int(-10, 10);
+
             agent.actCallback = OnAgentAct;
             game.startCallback += OnGameStarted;
             game.stepCallbackA += OnGameStep;
