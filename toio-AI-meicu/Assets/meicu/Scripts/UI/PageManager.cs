@@ -20,7 +20,7 @@ namespace toio.AI.meicu
         public Transform uiDebug;
 
 
-        private bool isDebug;
+        private bool isDebug = true;
         static PageManager ins;
         static EPage page;
 
