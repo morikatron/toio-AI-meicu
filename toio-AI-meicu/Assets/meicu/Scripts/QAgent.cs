@@ -28,7 +28,7 @@ namespace toio.AI.meicu
             for (int r = 0; r < 9; r++)
                 for (int c = 0; c < 9; c++)
                     for (int a = 0; a < 4; a++)
-                        this.Q[r, c, a] = UnityEngine.Random.Range(0f, 0.1f);
+                        this.Q[r, c, a] = UnityEngine.Random.Range(0.1f, 0.2f);
 
             this.rowBuffer.Clear();
             this.colBuffer.Clear();
@@ -46,7 +46,7 @@ namespace toio.AI.meicu
             return (Env.Action)i;
         }
 
-        public Env.Action GetActionTraining(int row, int col)
+        public Env.Action GetActionEpsilon(int row, int col)
         {
             if (UnityEngine.Random.Range(0f, 1f) > e)
             {
@@ -58,7 +58,31 @@ namespace toio.AI.meicu
             }
         }
 
-        public Env.Action GetActionTest(int row, int col)
+        /// <summary>
+        /// Lower progress & higher Q give lower Curiocity.
+        /// Curiocity is used to scale this.e.
+        /// Equals to GetActionEpsilon when progress = 1.
+        /// </summary>
+        public Env.Action GetActionCurious(int row, int col, float progress=1)
+        {
+            // Curiocity
+            var qs = Enumerable.Range(0, 4).Select(x => this.Q[row, col, x]).ToArray();
+            var qmax = qs.Max();
+            var curiocity = 1 - Mathf.Min(1, qmax) * (1-progress);
+
+            float e = this.e * curiocity;
+
+            if (UnityEngine.Random.Range(0f, 1f) > e)
+            {
+                return GetBestAction(row, col);
+            }
+            else
+            {
+                return (Env.Action)(UnityEngine.Random.Range(0, 4));
+            }
+        }
+
+        public Env.Action GetActionStochastic(int row, int col)
         {
             var qs = Enumerable.Range(0, 4).Select(x => this.Q[row, col, x]).ToArray();
             return (Env.Action)SampleFromQ(qs, scale:8);
@@ -114,7 +138,7 @@ namespace toio.AI.meicu
 
                 var qs = Enumerable.Range(0, 4).Select(x => this.Q[row, col, x]).ToArray();
                 var q_s = row_ == -1 || done? new float[]{0, 0, 0, 0} : Enumerable.Range(0, 4).Select(x => this.Q[row_, col_, x]).ToArray();
-                returns = (done || t == nsteps-1)? reward + this.gamma * q_s.Max() : reward + this.gamma * returns;
+                returns = (done || t == nsteps-1)? reward + this.gamma * q_s.Max() * (done?0:1) : reward + this.gamma * returns;
                 var dq = returns - qs[action];
                 this.QUpdate[row, col, action] += dq / nsteps;
                 lossSum += Mathf.Abs(dq) / nsteps;
@@ -126,7 +150,7 @@ namespace toio.AI.meicu
                     for (int a = 0; a < 4; a++)
                         this.Q[r, c, a] += this.QUpdate[r, c, a] * this.lr;
 
-            Debug.Log($"[{this.Q[4, 4, 0]} {this.Q[4, 4, 1]} {this.Q[4, 4, 2]} {this.Q[4, 4, 3]}]");
+            // Debug.Log($"[{this.Q[4, 4, 0]} {this.Q[4, 4, 1]} {this.Q[4, 4, 2]} {this.Q[4, 4, 3]}]");
 
             // Clear buffer
             this.rowBuffer.Clear();
