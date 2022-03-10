@@ -515,11 +515,13 @@ namespace toio.AI.meicu
                             {
                                 text.text = "「ごほうび」の場所を決めてね。";
                                 btnNext.interactable = false;
+                                yield return new WaitForSeconds(0.2f);
                             }
                             else
                             {
                                 text.text = "よし！それでは学習開始！";
                                 btnNext.interactable = true;
+                                yield return new WaitForSeconds(0.1f);
                             }
 
                         }
