@@ -17,6 +17,7 @@ namespace toio.AI.meicu
         public UIMeicu meicu;
         public UIBoard uiBoard;
         public UIQuest uiQuest;
+        public Transform uiIndicators;
         public Text textCaption;
         public TMP_Text text;
 
@@ -249,7 +250,7 @@ namespace toio.AI.meicu
                         }
                         if (uiIdx == cnt++)
                         {
-                            text.text = "どこに「ごほうび♥」を置くのか、何回学習するのか、よく考えて挑戦してみよう！";
+                            text.text = "どこに「ごほうび」を置くのか、何回学習するのか、よく考えて挑戦してみよう！";
                             btnNext.interactable = false;
                             yield break;
                         }
@@ -283,37 +284,43 @@ namespace toio.AI.meicu
                     {
                         if (uiIdx == cnt++)
                         {
-                            text.text = "ようこそ！\nここでは、「ごほうび♥」を使ってAIを育ててみるよ！";
+                            text.text = "ようこそ！\nここでは、「ごほうび」を使ってAIを育ててみるよ！";
+                            uiIndicators.Find("Quest").gameObject.SetActive(false);
                             yield break;
                         }
                         if (uiIdx == cnt++)
                         {
                             text.text = "「バトル」と同じように、スタートとゴール、そして「どの色を通過するか」という問題が出されているね。";
+                            uiIndicators.Find("Quest").gameObject.SetActive(true);
                             yield break;
                         }
                         if (uiIdx == cnt++)
                         {
                             text.text = "キミはスグに「こう進めばいい」と分かったと思うけど、AIは最初は色も場所も分かってないから、「どっちに進めば正解なのか」も全く分からないんだったよね。";
+                            uiIndicators.Find("Quest").gameObject.SetActive(false);
                             yield break;
                         }
                         if (uiIdx == cnt++)
                         {
                             text.text = "そんなAIにどうやって「学習」させるのか、それは……。";
+                            uiIndicators.Find("Reward").gameObject.SetActive(false);
                             yield break;
                         }
                         if (uiIdx == cnt++)
                         {
-                            text.text = "「ごほうび♥」を使うんだよ！";
+                            text.text = "<color=#b00>「ごほうび」</color>を使うんだよ！";
+                            uiIndicators.Find("Reward").gameObject.SetActive(true);
                             yield break;
                         }
                         if (uiIdx == cnt++)
                         {
-                            text.text = "道に「ごほうび♥」をおいておくと、AIはごほうびをたどって「こっちが正しい道だぞ！」とおぼえていくんだ。";
+                            text.text = "道に「ごほうび」をおいておくと、AIはごほうびをたどって「こっちが正しい道だぞ！」とおぼえていくんだ。";
+                            uiIndicators.Find("Reward").gameObject.SetActive(false);
                             yield break;
                         }
                         if (uiIdx == cnt++)
                         {
-                            text.text = "そうやって繰り返して覚えていくのが「学習する」ということになるんだ。どう？分かったかな？";
+                            text.text = "そうやって繰り返して覚えていくのが「学習する」ということになるんだ。\nどう？分かったかな？";
                             yield break;
                         }
                         Debug.LogWarning("Invalid uiIdx");
@@ -328,21 +335,25 @@ namespace toio.AI.meicu
                         if (uiIdx == cnt++)
                         {
                             text.text = "問題が長くなれば…さっきよりもたくさんの試行回数が必要になるんだ。";
+                            uiIndicators.Find("Quest").gameObject.SetActive(false);
                             yield break;
                         }
                         if (uiIdx == cnt++)
                         {
                             text.text = "この問題を見て！さっきよりも長くなっているでしょ？さっきの問題をクリアするには、400回学習必要だったけど…";
+                            uiIndicators.Find("Quest").gameObject.SetActive(true);
                             yield break;
                         }
                         if (uiIdx == cnt++)
                         {
                             text.text = "この問題の場合（通過する色のマスが3つある場合）、だいたい1000回は学習しないと、うまくゴールまでの道を覚えられないんだ…";
+                            uiIndicators.Find("Quest").gameObject.SetActive(true);
                             yield break;
                         }
                         if (uiIdx == cnt++)
                         {
                             text.text = "つまり「学習にかかる時間」がとっても長くなっちゃうんだ…";
+                            uiIndicators.Find("Quest").gameObject.SetActive(false);
                             yield break;
                         }
                         if (uiIdx == cnt++)
@@ -357,12 +368,12 @@ namespace toio.AI.meicu
                         }
                         if (uiIdx == cnt++)
                         {
-                            text.text = "「ごほうび♥」を<color=red>2個</color>使ってみるよ！";
+                            text.text = "「ごほうび」を<color=red>2個</color>使ってみるよ！";
                             yield break;
                         }
                         if (uiIdx == cnt++)
                         {
-                            text.text = "「ごほうび♥」を2個使うことで、400回まで回数をへらすことができるんだ！";
+                            text.text = "「ごほうび」を2個使うことで、400回まで回数をへらすことができるんだ！";
                             yield break;
                         }
                         Debug.LogWarning("Invalid uiIdx");
@@ -376,7 +387,7 @@ namespace toio.AI.meicu
                         }
                         if (uiIdx == cnt++)
                         {
-                            text.text = "ここでは、「ごほうび♥」の置き方、「学習」の回数はキミ次第！";
+                            text.text = "ここでは、「ごほうび」の置き方、「学習」の回数はキミ次第！";
                             yield break;
                         }
                         if (uiIdx == cnt++)
@@ -402,14 +413,17 @@ namespace toio.AI.meicu
                             }
                             if (uiIdx == cnt++)
                             {
-                                text.text = "今回のゴールはスタートのすぐそばだから「ごほうび♥」もゴールに置けばよさそうだね！";
+                                text.text = "今回のゴールはスタートのすぐそばだから「ごほうび」もゴールに置けばよさそうだね！";
+                                btnNext.interactable = true;
                                 yield break;
                             }
                             if (uiIdx == cnt++)
                             {
                                 text.text = "マウスでゴール（はたが立っているマス）をクリックしてみてね。";
                                 btnNext.interactable = false;
-                                yield return new WaitUntil(() => uiBoard.RewardCount > 0);
+                                yield return new WaitUntil(() =>
+                                    uiBoard.RewardCount == 0 &&
+                                    uiBoard.rewardList[0] == new Vector3Int(env.quest.goalRow, env.quest.goalCol, 0));
                                 btnNext.interactable = true;
                                 text.text = $"よし！それでは学習開始！{episodesTurn}回試行錯誤（しこうさくご）してみるよ！";
                                 yield break;
@@ -444,7 +458,7 @@ namespace toio.AI.meicu
                             }
                             if (uiIdx == cnt++)
                             {
-                                text.text = $"でも、ゴールが遠くなればなるほど、そこまでぐうぜん到達できる確率は減るんだ。";
+                                text.text = $"でも、ゴールが遠くなればなるほど、そこまでぐうぜんたどり着ける確率は減るんだ。";
                                 yield break;
                             }
                             if (uiIdx == cnt++)
@@ -459,12 +473,13 @@ namespace toio.AI.meicu
                             }
                             if (uiIdx == cnt++)
                             {
-                                text.text = $"でも、これってとっても時間が掛かっちゃうよね…";
+                                text.text = $"でも、これってとっても時間がかかっちゃうよね…";
                                 yield break;
                             }
                             if (uiIdx == cnt++)
                             {
                                 text.text = $"「長い1つの問題」を「短い2つの問題」に分けるように考えて...";
+                                btnNext.interactable = true;
                                 yield break;
                             }
                             if (uiIdx == cnt++)
@@ -483,7 +498,7 @@ namespace toio.AI.meicu
                             if (uiIdx == cnt++)
                             {
                                 btnNext.interactable = false;
-                                text.text = "「ごほうび♥」の場所を決めてね。";
+                                text.text = "「ごほうび」の場所を決めてね。";
                                 yield return new WaitUntil(() => uiBoard.RewardCount > 0);
                                 text.text = "よし！今回も「試行回数」は400回でやってみるよ！";
                                 btnNext.interactable = true;
@@ -494,11 +509,20 @@ namespace toio.AI.meicu
                     }
                     else if (stageIdx == 2)
                     {
-                        btnNext.interactable = false;
-                        text.text = "「ごほうび♥」の場所を決めてね。";
-                        yield return new WaitUntil(() => uiBoard.RewardCount > 0);
-                        text.text = "よし！それでは学習開始！";
-                        btnNext.interactable = true;
+                        while (true)
+                        {
+                            if (uiBoard.RewardCount == 0)
+                            {
+                                text.text = "「ごほうび」の場所を決めてね。";
+                                btnNext.interactable = false;
+                            }
+                            else
+                            {
+                                text.text = "よし！それでは学習開始！";
+                                btnNext.interactable = true;
+                            }
+
+                        }
                     }
                 }
                 else if (phase == Phase.Train)
@@ -660,32 +684,17 @@ namespace toio.AI.meicu
                         {
                             if (uiIdx == cnt++)
                             {
-                                text.text = "うまく学習できたね！";
+                                text.text = "AIを育てるには、「ごほうび」をあげたり、「試行回数」を変えたり、うまく育つようにいろんな事を考えて試す必要があるんだ。";
                                 yield break;
                             }
                             if (uiIdx == cnt++)
                             {
-                                text.text = "AIを育てるには、「ごほうび♥」をあげたり、「試行回数」を変えたり、うまく育つようにいろんな事を考えて試す必要があるんだ。";
-                                yield break;
-                            }
-                            if (uiIdx == cnt++)
-                            {
-                                text.text = "問題が難しくなればなるほど、育てるのも難しくなったり、時間が掛かったりする…";
+                                text.text = "問題が難しくなればなるほど、育てるのも難しくなったり、時間がかかったりする…";
                                 yield break;
                             }
                             if (uiIdx == cnt++)
                             {
                                 text.text = "だから「はやく・うまくAIを育てる」ためには、色んな工夫が必要なんだ。";
-                                yield break;
-                            }
-                            // if (uiIdx == cnt++)
-                            // {
-                            //     text.text = "今は「ごほうびをあげる」「回数を変えてみる」だけだったけど、本当は失敗したら怒ったり（マイナスのほうしゅうと言います）など...";
-                            //     yield break;
-                            // }
-                            if (uiIdx == cnt++)
-                            {
-                                text.text = "AIの学習には色々な調節するもの（パラメータと言います）があるんだ。これは難しいので、またの機会に説明するね！";
                                 yield break;
                             }
                             if (uiIdx == cnt++)
@@ -708,7 +717,7 @@ namespace toio.AI.meicu
                         {
                             if (uiIdx == cnt++)
                             {
-                                text.text = "「ごほうび♥」の場所が悪かったみたい。\n「ごほうび♥」の場所を変えて、もう一度やってみよう！";
+                                text.text = "「ごほうび」の場所が悪かったみたい。\n「ごほうび」の場所を変えて、もう一度やってみよう！";
                                 btnNext.gameObject.SetActive(false);
                                 btnBack.gameObject.SetActive(false);
                                 btnRetry.gameObject.SetActive(true);
@@ -723,7 +732,7 @@ namespace toio.AI.meicu
                         {
                             if (uiIdx == cnt++)
                             {
-                                text.text = "同じ問題でも、「ごほうび♥」や「試行回数」を変えると結果が変わるよ！";
+                                text.text = "同じ問題でも、「ごほうび」や「試行回数」を変えると結果が変わるよ！";
                                 yield break;
                             }
                             if (uiIdx == cnt++)
@@ -1037,6 +1046,9 @@ namespace toio.AI.meicu
             btnEntry0.interactable = false;
             btnEntry1.interactable = false;
             btnEntry2.interactable = false;
+
+            for (int i = 0; i < uiIndicators.childCount; i++)
+                uiIndicators.GetChild(i).gameObject.SetActive(false);
         }
         private void OnEnterIntro()
         {
@@ -1078,6 +1090,7 @@ namespace toio.AI.meicu
                 this.agent.lr = 0.1f;
                 this.maxRewards = 1;
                 this.episodesTurn = 50;
+                if (stageIdx == 0 && isSt0Failed) this.episodesTurn = 100;
                 this.episodesTurnLeft = this.episodesTurn;
             }
             else if (stageIdx == 1)
@@ -1276,15 +1289,16 @@ namespace toio.AI.meicu
                 if (Prefs.trainerStage == 0) max = 6;
                 if (Prefs.trainerStage == 1) max = 2;
                 if (Prefs.trainerStage == 2) max = 2;
+                if (Prefs.trainerStage == 3) max = 2;
                 if (uiIdx < max-1)
                     uiIdx ++;
             }
             else if (phase == Phase.Intro)
             {
                 int max = 1;
-                if (Prefs.trainerStage == 0) max = 7;
-                if (Prefs.trainerStage == 1) max = 9;
-                if (Prefs.trainerStage == 2) max = 3;
+                if (stageIdx == 0) max = 7;
+                if (stageIdx == 1) max = 9;
+                if (stageIdx == 2) max = 3;
                 uiIdx ++;
                 if (uiIdx >= max)
                 {
