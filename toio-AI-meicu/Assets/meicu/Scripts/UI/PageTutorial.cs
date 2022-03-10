@@ -356,7 +356,7 @@ namespace toio.AI.meicu
 
             else if (phase == 13)
             {
-                text.text = "まずは「スタート」のマスに、\nキミのキューブでタッチしてみて！\n「ピコン」と音が鳴ったらOKだよ！";
+                text.text = "まずは「スタート」のマスに、\nキミのキューブの青いランプで\nタッチしてみて！\n\n「ピコン」と音が鳴ったらOKだよ！";
                 yield return new WaitUntil(() => PlayerController.ins.IsAtCenter);
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StartConfirmed);
 
