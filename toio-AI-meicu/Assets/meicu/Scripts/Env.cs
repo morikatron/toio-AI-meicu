@@ -211,7 +211,7 @@ namespace toio.AI.meicu
             return obs;
         }
 
-        public Quest GenerateQuest(int size=2)
+        public Quest GenerateQuest(int size=2, bool strict=true)
         {
             var env = this.Clone();
 
@@ -221,20 +221,32 @@ namespace toio.AI.meicu
             List<Env.Space> colors = new List<Env.Space>(10);
             List<Env.Action> refActions = new List<Env.Action>();
 
-            while (colors.Count < size)
-            {
-                // Sample Action
-                var validActions = actions.Where(x => env.IsMoveable(x)).ToArray();
-                if (validActions.Length == 0) break;
-                var action = (Env.Action) validActions.OrderBy(_=>rand.NextDouble()).ToArray()[0];
+            do {
+                env.Reset();
+                colors.Clear();
+                refActions.Clear();
 
-                refActions.Add(action);
-                env.StepIgnoringQuest(action);
-                if (env.spaceBoard != Env.Space.W)
+                // Try to generate quest
+                while (colors.Count < size)
                 {
-                    colors.Add(env.spaceBoard);
+                    // Sample Action
+                    var validActions = actions.Where(x => env.IsMoveable(x)).ToArray();
+                    if (validActions.Length == 0) break;
+                    var action = (Env.Action) validActions.OrderBy(_=>rand.NextDouble()).ToArray()[0];
+
+                    refActions.Add(action);
+                    env.StepIgnoringQuest(action);
+                    if (env.spaceBoard != Env.Space.W)
+                    {
+                        colors.Add(env.spaceBoard);
+                    }
                 }
+
+                // If stuck at white, remove last step
+                if (!strict && refActions.Count % 2 == 0)
+                    refActions.RemoveAt(refActions.Count-1);
             }
+            while (colors.Count < size && strict);
 
             return new Quest(this.row, this.col, colors.ToArray(), env.row, env.col, refActions.ToArray());
         }
