@@ -64,22 +64,17 @@ namespace toio.AI.meicu
         }
 
         // Start ienumerator which trys TargetMove in loop until target reached or overwritten.
-        protected void RequestMoveWithSetting(Env.Action action)
+        internal void RequestMoveInGame(Env.Action action, byte spd = 0)
         {
             this.action = action;
             (var r, var c) = Env.Translate(action, game.envA.row, game.envA.col);
-            RequestMoveWithSetting(r, c);
-        }
 
-        // Start ienumerator which trys TargetMove in loop until target reached or overwritten.
-        protected void RequestMoveWithSetting(int row, int col)
-        {
-            if (ieMotion != null && !isPerforming && this.targetCoords.x == row && this.targetCoords.y == col)
+            if (ieMotion != null && !isPerforming && this.targetCoords.x == r && this.targetCoords.y == c)
                 return;
 
-            this.targetCoords = new Vector2Int(row, col);
+            this.targetCoords = new Vector2Int(r, c);
 
-            var spd = setting.speeds[game.envA.passedSpaceCnt];
+            spd = spd == 0? setting.speeds[game.envA.passedSpaceCnt] : spd;
             var confirmTime = setting.confirmTimes[game.envA.passedSpaceCnt];
 
             StopMotion();
@@ -92,6 +87,7 @@ namespace toio.AI.meicu
             yield return IE_Move(spd, confirmTime, timeCorrection);
             // Apply Step to game
             game.MoveA(action);
+            Debug.Log("game moveA" + action);
         }
 
         // Control Loop in Game
@@ -258,7 +254,7 @@ namespace toio.AI.meicu
             this.isActReceived = true;
 
             if (!isPredicting)
-                RequestMoveWithSetting(action);
+                RequestMoveInGame(action);
         }
 
         void ClearHeatmap()

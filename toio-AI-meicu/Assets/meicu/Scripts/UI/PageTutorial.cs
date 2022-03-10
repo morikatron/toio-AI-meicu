@@ -50,6 +50,7 @@ namespace toio.AI.meicu
                 // Pause controllers
                 PlayerController.ins.isPause = true;
                 AIController.ins.isPause = true;
+                AIController.ins.setting = Config.tutorialStageSetting;
 
                 Refresh();
             }
@@ -190,6 +191,7 @@ namespace toio.AI.meicu
         void OnGameStepA(Env.Response res)
         {
             var pos = game.GetPosA();
+            Debug.Log(pos);
             var traj = game.GetTrajA();
             uiBoard.ShowTrajA(traj);
             uiBoard.ShowKomaA(pos);
@@ -329,22 +331,22 @@ namespace toio.AI.meicu
             else if (phase == 12)
             {
                 text.text = "まずは「きいろ」";
-                AIController.ins.RequestMove(3, 4, spd:30);
+                AIController.ins.RequestMoveInGame(Env.Action.Left);
                 yield return new WaitUntil(() => !AIController.ins.isMoving);
                 yield return new WaitForSecondsRealtime(1.5f);
 
                 text.text = "つぎは「しろ」...";
-                AIController.ins.RequestMove(3, 5, spd:30);
+                AIController.ins.RequestMoveInGame(Env.Action.Down);
                 yield return new WaitUntil(() => !AIController.ins.isMoving);
                 yield return new WaitForSecondsRealtime(1.5f);
 
                 text.text = "つぎは「あか」...";
-                AIController.ins.RequestMove(3, 6, spd:30);
+                AIController.ins.RequestMoveInGame(Env.Action.Down);
                 yield return new WaitUntil(() => !AIController.ins.isMoving);
                 yield return new WaitForSecondsRealtime(1.5f);
 
                 text.text = "また「しろ」...";
-                AIController.ins.RequestMove(4, 6, spd:30);
+                AIController.ins.RequestMoveInGame(Env.Action.Right);
                 yield return new WaitUntil(() => !AIController.ins.isMoving);
                 yield return new WaitForSecondsRealtime(1.5f);
 

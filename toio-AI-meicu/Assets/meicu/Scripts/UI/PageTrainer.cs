@@ -1426,7 +1426,7 @@ namespace toio.AI.meicu
             uiPhaseTrain.Find("TextReturn").GetComponent<Text>().text = $"{returnAvg:F1}";
         }
 
-        private async void UpdatePhaseTest()
+        private void UpdatePhaseTest()
         {
             for (int i = 0; i < this.testGoals.Count; i++)
                 uiPhaseTest.Find("Slots").Find($"Slot ({i})").GetComponentInChildren<Text>().text = this.testGoals[i]? "O" : "X";

@@ -90,7 +90,7 @@ namespace toio.AI.meicu
         // Loop of moving to target
         protected IEnumerator IE_Move(byte spd, float confirmTime, bool timeCorrection = false)
         {
-            Debug.Log($"IE_Move : Begin");
+            // Debug.Log($"IE_Move : Begin");
             isMoving = true;
 
             float timeout = 3;
