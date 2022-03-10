@@ -79,6 +79,12 @@ namespace toio.AI.meicu
                 btnBattle.interactable = false;
                 btnLearn.interactable = false;
 
+                // Guide to click btnConnect, on first time opening App
+                if (!Prefs.isEverConnected)
+                    UIFinger.PointAt(btnConnect.transform, biasX:70);
+                else
+                    UIFinger.Hide();
+
                 // Only on App opened, make self introduction
                 if (!isHiSaid)
                 {
@@ -86,13 +92,14 @@ namespace toio.AI.meicu
                     yield return new WaitForSecondsRealtime(2f);
                     isHiSaid = true;
                 }
-                text.text = "キューブの電源を入れて\n「接続」ボタンから接続してね！";
 
-                // Guide to click btnConnect, on first time opening App
-                if (!Prefs.isEverConnected)
-                    UIFinger.PointAt(btnConnect.transform, biasX:70);
-                else
-                    UIFinger.Hide();
+                while (true)
+                {
+                    text.text = "キューブの電源を入れて\n「接続」ボタンから接続してね！";
+                    yield return new WaitForSecondsRealtime(2f);
+                    text.text = "コンソールの電源はオフにしておいてね！";
+                    yield return new WaitForSecondsRealtime(2f);
+                }
             }
             // One cube connected
             else if (Device.nConnected == 1)
