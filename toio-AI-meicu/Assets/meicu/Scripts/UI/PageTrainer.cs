@@ -327,7 +327,7 @@ namespace toio.AI.meicu
                         }
                         if (uiIdx == cnt++)
                         {
-                            text.text = "問題が長くなれば…さっきよりもたくさんの学習回数が必要になるんだ。";
+                            text.text = "問題が長くなれば…さっきよりもたくさんの試行回数が必要になるんだ。";
                             yield break;
                         }
                         if (uiIdx == cnt++)
@@ -418,7 +418,7 @@ namespace toio.AI.meicu
                         }
                         else
                         {
-                            text.text = "スライダーで試行回数を増やして再学習しよう。";
+                            text.text = "上の白いボタンを右に動かすと試行回数を変えられるよ。回数を増やしてから、もう一回学習させよう。";
                             btnNext.interactable = true;
                         }
                     }
@@ -472,7 +472,7 @@ namespace toio.AI.meicu
                                 btnNext.interactable = false;
                                 text.text = $"ゴールまでの間にもう一つ「ごほうび」を置いてみよう！";
                                 yield return new WaitUntil(() => uiBoard.RewardCount > 1);
-                                text.text = "よし！今回も「学習回数」は400回でやってみるよ！";
+                                text.text = "よし！今回も「試行回数」は400回でやってみるよ！";
                                 btnNext.interactable = true;
                                 yield break;
                             }
@@ -485,7 +485,7 @@ namespace toio.AI.meicu
                                 btnNext.interactable = false;
                                 text.text = "「ごほうび♥」の場所を決めてね。";
                                 yield return new WaitUntil(() => uiBoard.RewardCount > 0);
-                                text.text = "よし！今回も「学習回数」は400回でやってみるよ！";
+                                text.text = "よし！今回も「試行回数」は400回でやってみるよ！";
                                 btnNext.interactable = true;
                                 yield break;
                             }
@@ -519,17 +519,12 @@ namespace toio.AI.meicu
                     if (prevPhase != phase) OnEnterTest();
                     if (uiIdx == cnt++)
                     {
-                        text.text = "それでは、どれくらい学習できたか、実験で試してみよう！";
+                        text.text = "それでは、どれくらい学習できたのか、\n実際にキューブを動かしながら\n実験してみよう！";
                         yield break;
                     }
                     if (uiIdx == cnt++)
                     {
-                        text.text = "実験は、「5回のうち何回ゴールにたどりつけるか」で判定するよ。";
-                        yield break;
-                    }
-                    if (uiIdx == cnt++)
-                    {
-                        text.text = "3回以上が合格だよ！";
+                        text.text = "これから5回実験するから\n3回以上、ゴールに着いたら合格だよ！";
                         yield break;
                     }
                     if (uiIdx == cnt++)
@@ -593,7 +588,7 @@ namespace toio.AI.meicu
                         {
                             if (uiIdx == cnt++)
                             {
-                                text.text = $"「{episodesTurn}回」じゃ学習回数が足りなかったみたい。";
+                                text.text = $"「{episodesTurn}回」じゃ試行回数が足りなかったみたい。";
                                 yield break;
                             }
                             if (uiIdx == cnt++)
@@ -622,7 +617,7 @@ namespace toio.AI.meicu
                         {
                             if (uiIdx == cnt++)
                             {
-                                text.text = $"「50回」だとうまくいかなかったけど、「{episodesTurn}回」にしたらうまくいったね！";
+                                text.text = $"最初の「50回」だとうまくいかなかったけど、「{episodesTurn}回」にしたらうまくいったね！";
                                 yield break;
                             }
                             if (uiIdx == cnt++)
@@ -670,7 +665,7 @@ namespace toio.AI.meicu
                             }
                             if (uiIdx == cnt++)
                             {
-                                text.text = "AIを育てるには、「ごほうび♥」をあげたり、「学習回数」を変えたり、うまく育つようにいろんな事を考えて試す必要があるんだ。";
+                                text.text = "AIを育てるには、「ごほうび♥」をあげたり、「試行回数」を変えたり、うまく育つようにいろんな事を考えて試す必要があるんだ。";
                                 yield break;
                             }
                             if (uiIdx == cnt++)
@@ -728,7 +723,7 @@ namespace toio.AI.meicu
                         {
                             if (uiIdx == cnt++)
                             {
-                                text.text = "同じ問題でも、「ごほうび♥」や「学習回数」を変えると結果が変わるよ！";
+                                text.text = "同じ問題でも、「ごほうび♥」や「試行回数」を変えると結果が変わるよ！";
                                 yield break;
                             }
                             if (uiIdx == cnt++)
@@ -842,7 +837,7 @@ namespace toio.AI.meicu
             {
                 text.text = "かんりょうー！";
                 yield return WaitButton();
-                text.text = "やっぱり、学習回数が多い分、ちょっと時間がかかったね…";
+                text.text = "やっぱり、試行回数が多い分、ちょっと時間がかかったね…";
             }
             else
             {
@@ -1327,7 +1322,7 @@ namespace toio.AI.meicu
             }
             else if (phase == Phase.Test)
             {
-                int max = 5;
+                int max = 4;
                 uiIdx ++;
                 if (uiIdx >= max)
                 {
