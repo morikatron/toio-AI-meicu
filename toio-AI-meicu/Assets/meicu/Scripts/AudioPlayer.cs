@@ -11,23 +11,34 @@ namespace toio.AI.meicu
         public static AudioPlayer ins {get; private set;}
 
         [Header("Audio Sources")]
-        public AudioSource bgmTitle;
-        public AudioSource bgmTutorial;
-        public AudioSource bgmBattle;
+        public AudioSource srcBGM;
         public AudioSource srcPerform;
         public AudioSource srcSE;
 
-        [Header("Audio Clips")]
+        [Header("Audio Clips - BGM")]
+        public AudioClip bgmTitle;
+        public AudioClip bgmTutorial;
+        public AudioClip bgmBattle;
+
+        [Header("Audio Clips - Perform")]
+        public AudioClip win;
+        public AudioClip lose;
+        public AudioClip levelup;
+
+        [Header("Audio Clips - SE")]
         public AudioClip confirmed;
         public AudioClip confirming;
         public AudioClip countdown;
         public AudioClip start;
 
         public AudioClip wrong;
+        public AudioClip correct;
+        public AudioClip on;
+        public AudioClip off;
+        public AudioClip decide;
+        public AudioClip cancel;
+        public AudioClip transit;
 
-        public AudioClip win;
-        public AudioClip lose;
-        public AudioClip levelup;
 
         private bool _isBGMOn = false;
         internal bool isBGMOn { get { return _isBGMOn; }
@@ -36,15 +47,11 @@ namespace toio.AI.meicu
                 Prefs.isMute = !value;
                 if (value)
                 {
-                    bgmTitle.volume = 0.3f;
-                    bgmTutorial.volume = 0.3f;
-                    bgmBattle.volume = 0.3f;
+                    srcBGM.volume = 0.25f;
                 }
                 else
                 {
-                    bgmTitle.volume = 0;
-                    bgmTutorial.volume = 0;
-                    bgmBattle.volume = 0;
+                    srcBGM.volume = 0;
                 }
             }
         }
@@ -62,24 +69,18 @@ namespace toio.AI.meicu
         {
             if (page == PageManager.EPage.Title)
             {
-                bgmTutorial.Stop();
-                bgmBattle.Stop();
-                if (!bgmTitle.isPlaying)
-                    bgmTitle.Play();
+                srcBGM.clip = bgmTitle;
+                srcBGM.Play();
             }
             else if (page == PageManager.EPage.Battle)
             {
-                bgmTutorial.Stop();
-                bgmTitle.Stop();
-                if (!bgmBattle.isPlaying)
-                    bgmBattle.Play();
+                srcBGM.clip = bgmBattle;
+                srcBGM.Play();
             }
             else if (page == PageManager.EPage.Tutorial || page == PageManager.EPage.Learn)
             {
-                bgmTitle.Stop();
-                bgmBattle.Stop();
-                if (!bgmTutorial.isPlaying)
-                    bgmTutorial.Play();
+                srcBGM.clip = bgmTutorial;
+                srcBGM.Play();
             }
         }
 
@@ -88,7 +89,9 @@ namespace toio.AI.meicu
         {
             StartConfirmed, StartCount, Start,
             StepConfirmed, StepConfirming,
-            Wrong,
+            Wrong, Correct,
+            TurnOn, TurnOff,
+            Decide, Transit, Cancel,
             Win, Lose, Draw, LevelUp
         }
         internal void PlaySE(ESE se, float volume=0.5f)
@@ -132,6 +135,30 @@ namespace toio.AI.meicu
             else if (se == ESE.LevelUp)
             {
                 srcPerform.PlayOneShot(levelup, volume);
+            }
+            else if (se == ESE.Correct)
+            {
+                srcPerform.PlayOneShot(correct, volume);
+            }
+            else if (se == ESE.TurnOn)
+            {
+                srcPerform.PlayOneShot(on, volume);
+            }
+            else if (se == ESE.TurnOff)
+            {
+                srcPerform.PlayOneShot(off, volume);
+            }
+            else if (se == ESE.Decide)
+            {
+                srcPerform.PlayOneShot(decide, volume);
+            }
+            else if (se == ESE.Cancel)
+            {
+                srcPerform.PlayOneShot(cancel, volume);
+            }
+            else if (se == ESE.Transit)
+            {
+                srcPerform.PlayOneShot(transit, volume);
             }
         }
 

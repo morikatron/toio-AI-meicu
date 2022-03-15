@@ -81,6 +81,7 @@ namespace toio.AI.meicu
 
         public static void OnBtnHome()
         {
+            AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Cancel);
             SetPage(PageManager.EPage.Title);
         }
 

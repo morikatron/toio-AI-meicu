@@ -46,7 +46,6 @@ namespace toio.AI.meicu
         private int uiIdx = 0;
         private int stageIdx = 0;
         private bool isSt0Failed = false;
-        private bool isFail = false;
         private bool isRetry = false;
 
         private int episodesTurn;
@@ -73,7 +72,6 @@ namespace toio.AI.meicu
             {
                 btnBGM.isOn = AudioPlayer.ins.isBGMOn;
 
-
                 env.Reset();
                 uiBoard.Reset();
                 uiQuest.Reset();
@@ -85,8 +83,6 @@ namespace toio.AI.meicu
 
                 PlayerController.ins.targetMatCoordBias = new Vector2Int(0, 0);
 
-                // InitPhases();
-                // Refresh();
                 phase = Phase.Summary;
                 SetPhaseAndUpdateUI(Phase.Entry, 0);
             }
@@ -215,7 +211,7 @@ namespace toio.AI.meicu
                         }
                         if (uiIdx == cnt++)
                         {
-                            text.text = "え？「学習」ってどのようにするのかって？";
+                            text.text = "え？\n「学習」ってどのようにするのかって？";
                             yield break;
                         }
                         if (uiIdx == cnt++)
@@ -422,7 +418,7 @@ namespace toio.AI.meicu
                                 text.text = "マウスでゴール（はたが立っているマス）をクリックしてみてね。";
                                 btnNext.interactable = false;
                                 yield return new WaitUntil(() =>
-                                    uiBoard.RewardCount == 0 &&
+                                    uiBoard.RewardCount == 1 &&
                                     uiBoard.rewardList[0] == new Vector3Int(env.quest.goalRow, env.quest.goalCol, 0));
                                 btnNext.interactable = true;
                                 text.text = $"よし！それでは学習開始！{episodesTurn}回試行錯誤（しこうさくご）してみるよ！";
@@ -498,7 +494,7 @@ namespace toio.AI.meicu
                             if (uiIdx == cnt++)
                             {
                                 btnNext.interactable = false;
-                                text.text = "「ごほうび」の場所を決めてね。";
+                                text.text = $"「ごほうび」の場所を決めてね。\nここでは最大{this.maxRewards}個まで置けるよ";
                                 yield return new WaitUntil(() => uiBoard.RewardCount > 0);
                                 text.text = "よし！今回も「試行回数」は400回でやってみるよ！";
                                 btnNext.interactable = true;
@@ -513,7 +509,7 @@ namespace toio.AI.meicu
                         {
                             if (uiBoard.RewardCount == 0)
                             {
-                                text.text = "「ごほうび」の場所を決めてね。";
+                                text.text = "「ごほうび」の場所を決めてね。\nここでは最大{this.maxRewards}個まで置けるよ";
                                 btnNext.interactable = false;
                                 yield return new WaitForSeconds(0.2f);
                             }
@@ -543,20 +539,24 @@ namespace toio.AI.meicu
                 else if (phase == Phase.Test)
                 {
                     if (prevPhase != phase) OnEnterTest();
-                    if (uiIdx == cnt++)
+
+                    if (stageIdx == 0 && !isSt0Failed)
                     {
-                        text.text = "それでは、どれくらい学習できたのか、\n実際にキューブを動かしながら\n実験してみよう！";
-                        yield break;
-                    }
-                    if (uiIdx == cnt++)
-                    {
-                        text.text = "これから5回実験するから\n3回以上、ゴールに着いたら合格だよ！";
-                        yield break;
-                    }
-                    if (uiIdx == cnt++)
-                    {
-                        text.text = "実験は、マットの上で実際にキューブを動かして行うよ。";
-                        yield break;
+                        if (uiIdx == cnt++)
+                        {
+                            text.text = "それでは、どれくらい学習できたのか、\n実際にキューブを動かしながら\n実験してみよう！";
+                            yield break;
+                        }
+                        if (uiIdx == cnt++)
+                        {
+                            text.text = "これから5回実験するから\n3回以上、ゴールに着いたら合格だよ！";
+                            yield break;
+                        }
+                        if (uiIdx == cnt++)
+                        {
+                            text.text = "実験は、マットの上で実際にキューブを動かして行うよ。";
+                            yield break;
+                        }
                     }
                     if (uiIdx == cnt++)
                     {
@@ -620,9 +620,8 @@ namespace toio.AI.meicu
                             if (uiIdx == cnt++)
                             {
                                 text.text = $"今度は、回数を増やしてやってみよう！";
-                                btnNext.gameObject.SetActive(false);
+                                btnNext.gameObject.SetActive(true);
                                 btnBack.gameObject.SetActive(false);
-                                btnRetry.gameObject.SetActive(true);
                                 yield break;
                             }
                             Debug.LogWarning("Invalid uiIdx");
@@ -631,10 +630,14 @@ namespace toio.AI.meicu
                         {
                             if (uiIdx == cnt++)
                             {
-                                text.text = $"なんとぐうぜんに学習できた！けど回数を増やすとあんていして学習できるので試してみよう！";
-                                btnNext.gameObject.SetActive(false);
+                                text.text = $"「なんとぐうぜんに学習できた！";
+                                yield break;
+                            }
+                            if (uiIdx == cnt++)
+                            {
+                                text.text = $"けど回数を増やすとあんていして学習できるので試してみよう！";
+                                btnNext.gameObject.SetActive(true);
                                 btnBack.gameObject.SetActive(false);
-                                btnRetry.gameObject.SetActive(true);
                                 yield break;
                             }
                             Debug.LogWarning("Invalid uiIdx");
@@ -773,7 +776,9 @@ namespace toio.AI.meicu
         private List<bool> trainEpsGoals = new List<bool>();
         IEnumerator IE_Train()
         {
-            float stepTime = Mathf.Max(0.01f, 5f/this.episodesTurn);
+            float stepTime = 0.05f;
+            if (this.episodesTurn >= 200)
+                stepTime = Mathf.Max(0.01f, 5f/this.episodesTurn);
 
             while (this.episodesTurnLeft-- > 0)
             {
@@ -788,7 +793,7 @@ namespace toio.AI.meicu
 
                 yield return new WaitForSecondsRealtime(stepTime);
 
-                agent.e = QAgent.EpsilonScheduler(1f, 0.5f, episodesTurnLeft, episodesTurn);
+                agent.e = QAgent.EpsilonScheduler(stageIdx==2?0.5f:1f, 0.5f, episodesTurnLeft, episodesTurn);
 
                 float episodeReturn = 0;
                 bool episodeGoal = false;
@@ -879,7 +884,7 @@ namespace toio.AI.meicu
                 uiBoard.ShowKomaP(env.row, env.col);
                 uiBoard.HideTrajP();
                 uiQuest.ShowP(env.passedSpaceCnt);
-                text.text = $"実験 {ieps+1} 回目\n";
+                text.text = $"<size=40>　　　実験 {ieps+1} 回目</size>\n";
                 yield return new WaitForSecondsRealtime(delayStart);
 
                 bool episodeGoal = false;
@@ -894,14 +899,17 @@ namespace toio.AI.meicu
                     // Control cubes
                     PlayerController.ins.RequestMove(env.row, env.col, spd:50);
                     yield return new WaitUntil(() => !PlayerController.ins.isMoving);
-                    AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StepConfirmed);
 
                     // UI
                     traj.Add(new Vector2Int(env.row, env.col));
                     uiBoard.ShowKomaP(env.row, env.col);
                     uiBoard.ShowTrajP(traj.ToArray());
                     uiQuest.ShowP(env.passedSpaceCnt);
+                    // Audio
+                    if (!done) AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StepConfirmed);
+                    else AudioPlayer.ins.PlaySE(res == Env.Response.Goal? AudioPlayer.ESE.Correct : AudioPlayer.ESE.Wrong, 0.66f);
 
+                    // Analytics
                     if (done)
                     {
                         successCnt += res == Env.Response.Goal? 1: 0;
@@ -932,7 +940,8 @@ namespace toio.AI.meicu
                 // UI
                 text.text += $"\n{successCnt}回たどり着けたので…合格ー！";
                 yield return WaitButton();
-                text.text = "おめでとう！キミのAIも正しい道を学習できてきたね！";
+                text.text = "おめでとう！";
+                meicu.PerformThinkEnd();
             }
             // Fail
             else
@@ -941,7 +950,8 @@ namespace toio.AI.meicu
                 PlayerController.ins.PerformRegret();
 
                 // UI
-                text.text += $"\n\n{successCnt}回しかたどり着けなかったね…残念…";
+                text.text += $"\n{successCnt}回しかたどり着けなかったね…残念…";
+                meicu.PerformFail();
             }
         }
 
@@ -1028,6 +1038,8 @@ namespace toio.AI.meicu
         {
             isRetry = false;
 
+            isSt0Failed = false;
+
             // Init UI
             textCaption.text = "キミだけのAIを育てよう";
             uiPhaseEntry.gameObject.SetActive(true);
@@ -1048,6 +1060,8 @@ namespace toio.AI.meicu
             btnEntry0.interactable = false;
             btnEntry1.interactable = false;
             btnEntry2.interactable = false;
+
+            meicu.Reset();
 
             for (int i = 0; i < uiIndicators.childCount; i++)
                 uiIndicators.GetChild(i).gameObject.SetActive(false);
@@ -1083,6 +1097,8 @@ namespace toio.AI.meicu
             uiBoard.Reset();
             uiBoard.ShowGoal(env.quest.goalRow, env.quest.goalCol);
             uiBoard.ShowKomaP(4, 4);
+
+            meicu.Reset();
         }
         private void OnEnterPlan()
         {
@@ -1097,7 +1113,7 @@ namespace toio.AI.meicu
             }
             else if (stageIdx == 1)
             {
-                this.agent.lr = 0.2f;
+                this.agent.lr = 0.3f;
                 this.maxRewards = 2;
                 this.episodesTurn = 400;
                 this.episodesTurnLeft = this.episodesTurn;
@@ -1135,6 +1151,8 @@ namespace toio.AI.meicu
             uiBoard.HideKomaA();
             uiBoard.HideTrajA();
 
+            meicu.Reset();
+
             // Reset Agent
             agent.Reset();
         }
@@ -1152,6 +1170,8 @@ namespace toio.AI.meicu
             btnRetry.gameObject.SetActive(false);
             btnOK.gameObject.SetActive(false);
             btnNew.gameObject.SetActive(false);
+
+            meicu.Reset();
 
             trainEpsGoals.Clear();
             trainEpsReturns.Clear();
@@ -1173,6 +1193,8 @@ namespace toio.AI.meicu
             btnNext.interactable = true;
             btnBack.interactable = false;
 
+            meicu.Reset();
+
             this.testGoals.Clear();
             UpdatePhaseTest();
         }
@@ -1185,11 +1207,15 @@ namespace toio.AI.meicu
             uiPhaseTest.gameObject.SetActive(false);
             uiPhaseBattle.gameObject.SetActive(true);
 
+            meicu.Reset();
+
             btnNext.interactable = true;
             btnBack.interactable = false;
         }
         private void OnEnterSummary()
         {
+            meicu.Reset();
+
             btnNext.interactable = true;
             btnBack.interactable = false;
         }
@@ -1259,18 +1285,12 @@ namespace toio.AI.meicu
         {
             if (phase != Phase.Plan) return;
 
-            if (stageIdx == 0)
-            {
-                uiBoard.PutReward(rowCol.x, rowCol.y, type, this.maxRewards);
-            }
-            else if (stageIdx == 1)
-            {
-                uiBoard.PutReward(rowCol.x, rowCol.y, type, this.maxRewards);
-            }
-            else if (stageIdx == 2)
-            {
-                uiBoard.PutReward(rowCol.x, rowCol.y, type, this.maxRewards);
-            }
+            (bool isRewardExisted, bool isRewardAdded) = uiBoard.PutReward(rowCol.x, rowCol.y, type, this.maxRewards);
+            if (isRewardExisted)
+                AudioPlayer.ins.PlaySE(AudioPlayer.ESE.TurnOff);
+            else if (isRewardAdded)
+                AudioPlayer.ins.PlaySE(AudioPlayer.ESE.TurnOn);
+
             UpdatePhasePlan();
         }
 
@@ -1338,7 +1358,10 @@ namespace toio.AI.meicu
             }
             else if (phase == Phase.Test)
             {
-                int max = 4;
+                int max = 1;
+                if (stageIdx == 0 && !isSt0Failed) max = 4;
+                else max = 1;
+
                 uiIdx ++;
                 if (uiIdx >= max)
                 {
@@ -1359,6 +1382,12 @@ namespace toio.AI.meicu
             else if (phase == Phase.Summary)
             {
                 uiIdx ++;
+                if (stageIdx == 0 && !isSt0Failed && uiIdx >= 2)
+                {
+                    isSt0Failed = true;
+                    uiIdx = 0;
+                    phase = Phase.Plan;
+                }
             }
 
             UpdateUI(prevPhase, prevIdx);
@@ -1374,10 +1403,10 @@ namespace toio.AI.meicu
 
         public void OnBtnRetry()
         {
-            if (stageIdx == 0 && !isSt0Failed)
-            {
-                isSt0Failed = true;
-            }
+            // if (stageIdx == 0 && !isSt0Failed)
+            // {
+            //     isSt0Failed = true;
+            // }
             isRetry = true;
             SetPhaseAndUpdateUI(Phase.Plan, 0);
         }
@@ -1395,7 +1424,10 @@ namespace toio.AI.meicu
             if (phase == Phase.Entry)
                 PageManager.OnBtnHome();
             else
-                OnBtnOK();
+            {
+                SetPhaseAndUpdateUI(Phase.Entry, 0);
+                AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Cancel);
+            }
         }
 
         public void OnBtnEntry(int idx)
@@ -1432,9 +1464,9 @@ namespace toio.AI.meicu
             int goalPercent = this.trainEpsGoals.Where(x=>x).Count();
             float returnAvg = this.trainEpsReturns.Count>0? this.trainEpsReturns.Sum() / this.trainEpsReturns.Count : 0;
 
-            uiPhaseTrain.Find("TextSteps").GetComponent<Text>().text = $"{this.episodesTurn-this.episodesTurnLeft, 4}/{this.episodesTurn, -4}";
+            uiPhaseTrain.Find("TextSteps").GetComponent<Text>().text = $"{this.episodesTurn-this.episodesTurnLeft}/{this.episodesTurn}";
             uiPhaseTrain.Find("TextAccuracy").GetComponent<Text>().text = $"{goalPercent}%";
-            uiPhaseTrain.Find("TextReturn").GetComponent<Text>().text = $"{returnAvg:F1}";
+            // uiPhaseTrain.Find("TextReturn").GetComponent<Text>().text = $"{returnAvg:F1}";
         }
 
         private void UpdatePhaseTest()

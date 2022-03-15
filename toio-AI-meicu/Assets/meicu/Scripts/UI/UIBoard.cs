@@ -244,9 +244,9 @@ namespace toio.AI.meicu
         #region ======== Reward ========
         internal int RewardCount => rewards.Count;
         internal List<Vector3Int> rewardList => new List<Vector3Int>(rewards.Keys);
-        internal void PutReward(int row, int col, RewardPositionType type, int maxCount=1)
+        internal (bool, bool) PutReward(int row, int col, RewardPositionType type, int maxCount=1)
         {
-            if (!IsRewardPositionLegal(row, col, type)) return;
+            if (!IsRewardPositionLegal(row, col, type)) return (false, false);
 
             Vector3Int pos = new Vector3Int(row, col, (int)type);
             // Delete if exist
@@ -254,6 +254,7 @@ namespace toio.AI.meicu
             {
                 GameObject.Destroy(rewards[pos]);
                 rewards.Remove(pos);
+                return (true, false);
             }
             // Add if max not reached
             else if (rewards.Count < maxCount)
@@ -261,7 +262,9 @@ namespace toio.AI.meicu
                 var obj = GameObject.Instantiate(uiRewardPrefab, transform.Find("Rewards"));
                 (obj.transform as RectTransform).anchoredPosition = GetRewardUICoords(row, col, type);
                 rewards.Add(pos, obj);
+                return (false, true);
             }
+            return (false, false);
         }
         protected Vector2Int GetRewardUICoords(int row, int col, RewardPositionType type)
         {
@@ -347,8 +350,6 @@ namespace toio.AI.meicu
 
             var placeCenter = RowCol2UICoords(posPlace);
             Vector2 diff = new Vector2(local.x+45, local.y-45) - placeCenter;   // convert to top-left coords
-
-            Debug.Log($"local:{local}\n place:{posPlace}\n cen:{placeCenter} diff:{diff}");
 
             // Inside place
             if (Mathf.Abs(diff.x) <= 3.3f && Mathf.Abs(diff.y) <= 3.3f)
