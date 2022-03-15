@@ -17,6 +17,7 @@ namespace toio.AI.meicu
         public UIMeicu meicu;
         public UIBoard uiBoard;
         public UIQuest uiQuest;
+        public Transform uiResult;
         public Transform uiIndicators;
         public Text textCaption;
         public TMP_Text text;
@@ -65,6 +66,8 @@ namespace toio.AI.meicu
         {
             if (ui.activeSelf == active) return;
 
+            uiResult.gameObject.SetActive(false);
+
             phase = Phase.Entry;
             uiIdx = 0;
 
@@ -77,6 +80,7 @@ namespace toio.AI.meicu
                 uiQuest.Reset();
                 uiQuest.HideA();
 
+                game.startCallback += OnGameStarted;
                 game.stepCallbackP += OnGameStepP;
                 game.stepCallbackA += OnGameStepA;
                 game.overCallbackP += OnGameOverP;
@@ -89,6 +93,7 @@ namespace toio.AI.meicu
             else
             {
                 game.StopGame();
+                game.startCallback -= OnGameStarted;
                 game.stepCallbackP -= OnGameStepP;
                 game.stepCallbackA -= OnGameStepA;
                 game.overCallbackP -= OnGameOverP;
@@ -109,74 +114,6 @@ namespace toio.AI.meicu
         {
 
         }
-
-
-        // private PhaseIE phaseIE;
-        // internal void Refresh()
-        // {
-        //     StopAllCoroutines();
-        //     var ie = phaseIE.GetIE(phaseIE);
-        //     StartCoroutine(ie);
-        // }
-        // internal void NextPhase()
-        // {
-        //     if (phaseIE.next == null) return;
-
-        //     StopAllCoroutines();
-        //     var ie = phaseIE.next.GetIE(phaseIE);
-        //     phaseIE = phaseIE.next;
-        //     StartCoroutine(ie);
-        // }
-        // internal void PrevPhase()
-        // {
-        //     if (phaseIE.prev == null) return;
-
-        //     StopAllCoroutines();
-        //     var ie = phaseIE.prev.GetIE(phaseIE);
-        //     phaseIE = phaseIE.prev;
-        //     StartCoroutine(ie);
-        // }
-
-        // public class PhaseIE
-        // {
-        //     public PhaseIE prev = null;
-        //     public PhaseIE next = null;
-        //     public delegate IEnumerator IEFactory(PhaseIE from);
-        //     public IEFactory ieFactory = null;
-        //     public IEnumerator GetIE(PhaseIE from)
-        //     {
-        //         if (ieFactory == null) yield break;
-        //         yield return ieFactory(from);
-        //     }
-
-        //     public static PhaseIE CreateTextOnly(TMP_Text text, string content)
-        //     {
-        //         var p = new PhaseIE();
-        //         IEnumerator ie (PhaseIE from)
-        //         {
-        //             text.text = content;
-        //             yield break;
-        //         }
-        //         p.ieFactory = new IEFactory(ie);
-        //         return p;
-        //     }
-        //     public static void Connect(PhaseIE prev, PhaseIE next)
-        //     {
-        //         prev.next = next;
-        //         next.prev = prev;
-        //     }
-        // }
-
-        // private void InitPhases()
-        // {
-        //     var s0intro = PhaseIE.CreateTextOnly(text, "hello");
-        //     var phase2 = PhaseIE.CreateTextOnly(text, "bye");
-        //     PhaseIE.Connect(phase1, phase2);
-
-        //     var phase3 = 
-
-        //     phaseIE = phase1;
-        // }
 
         internal void SetPhaseAndUpdateUI(Phase phase, int idx)
         {
@@ -509,7 +446,7 @@ namespace toio.AI.meicu
                         {
                             if (uiBoard.RewardCount == 0)
                             {
-                                text.text = "「ごほうび」の場所を決めてね。\nここでは最大{this.maxRewards}個まで置けるよ";
+                                text.text = $"「ごほうび」の場所を決めてね。\nここでは最大{this.maxRewards}個まで置けるよ";
                                 btnNext.interactable = false;
                                 yield return new WaitForSeconds(0.2f);
                             }
@@ -593,14 +530,12 @@ namespace toio.AI.meicu
                         yield return IE_Battle();
                         btnNext.interactable = true;
 
-                        if (isBattleWin)
-                        {
+                        if (game.stateP == Game.PlayerState.Win)
                             text.text = "おめでとう！キミの勝ちだ！";
-                        }
+                        else if (game.stateP == Game.PlayerState.Draw)
+                            text.text = "ざんねん！ひきわけだね！";
                         else
-                        {
-                            text.text = "ざんねん！ボクの勝ちー！";
-                        }
+                            text.text = "ざんねん！ボクの勝ちだ！";
                         yield break;
                     }
                     Debug.LogWarning("Invalid uiIdx");
@@ -733,7 +668,7 @@ namespace toio.AI.meicu
                     }
                     else if (stageIdx == 2)
                     {
-                        if (isBattleWin)
+                        if (game.stateP == Game.PlayerState.Win)
                         {
                             if (uiIdx == cnt++)
                             {
@@ -955,7 +890,6 @@ namespace toio.AI.meicu
             }
         }
 
-        private bool isBattleWin = false;
         IEnumerator IE_Battle()
         {
             btnNext.interactable = false;
@@ -983,8 +917,10 @@ namespace toio.AI.meicu
 
                 // Start Game
                 game.InitGame(env.quest);
-                game.StartGame(0);
+                game.StartGame();
                 isGameOverP = false;
+
+                yield return new WaitUntil(() => game.inGame);
 
                 // Control loop for player cube
                 while (true)
@@ -1016,22 +952,9 @@ namespace toio.AI.meicu
 
                 // Count
                 if (game.stateP == Game.PlayerState.Win)
-                {
-                    // text.text += "O";
                     successCnt += 1;
-                }
-                else if (game.stateP == Game.PlayerState.Draw)
-                {
-                    // text.text += "-";
-                }
-                else
-                {
-                    // text.text += 'X';
-                }
                 // yield return new WaitForSecondsRealtime(1);
             }
-
-            this.isBattleWin = successCnt > 0;
         }
 
         private void OnEnterEntry()
@@ -1241,6 +1164,22 @@ namespace toio.AI.meicu
 
         #region ========== Game Callbacks ==========
 
+        private void OnGameStarted(int countDown)
+        {
+            // Countdown
+            if (countDown > 0)
+            {
+                text.text = $"　　　　　　　<size=120>{countDown}</size>";
+                AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StartCount);
+            }
+            // Start
+            else if (countDown == 0)
+            {
+                text.text = "　　　　<size=32>ゲームスタート！</size>";
+                AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Start);
+            }
+        }
+
         private bool isGameStepP = false;
         private void OnGameStepP(Env.Response res)
         {
@@ -1258,28 +1197,49 @@ namespace toio.AI.meicu
         private bool isGameOverP = false;
         private void OnGameOverP(Game.PlayerState state)
         {
-            isGameOverP = true;
             if (state == Game.PlayerState.Win)
             {
                 PlayerController.ins.PerformHappy();
+                AIController.ins.PerformSad();
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Win);
+
+                uiResult.GetComponentInChildren<UIMeicu>().SetFace(UIMeicu.Face.Regret);
+                uiResult.Find("Text").GetComponent<Text>().text = "おめでとう！キミの勝ちだ！";
+                uiResult.gameObject.SetActive(true);
             }
             else if (state == Game.PlayerState.Fail)
             {
                 PlayerController.ins.PerformRegret();
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Wrong);
             }
-            else if (state == Game.PlayerState.LoseFail || state == Game.PlayerState.LoseNotFail || state == Game.PlayerState.Draw)
+            else if (state == Game.PlayerState.LoseFail || state == Game.PlayerState.LoseNotFail)
             {
                 PlayerController.ins.PerformSad();
+                AIController.ins.PerformHappy();
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Lose);
+
+                uiResult.GetComponentInChildren<UIMeicu>().SetFace(UIMeicu.Face.Laugh);
+                uiResult.Find("Text").GetComponent<Text>().text = "ざんねん！ボクの勝ちだ！";
+                uiResult.gameObject.SetActive(true);
             }
+            else if (state == Game.PlayerState.Draw)
+            {
+                PlayerController.ins.PerformRegret();
+                AIController.ins.PerformRegret();
+                AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Draw);
+
+                uiResult.GetComponentInChildren<UIMeicu>().SetFace(UIMeicu.Face.Dull);
+                uiResult.Find("Text").GetComponent<Text>().text = "ざんねん！ひきわけだね！";
+                uiResult.gameObject.SetActive(true);
+            }
+            isGameOverP = true;
         }
 
         #endregion
 
 
         #region ========== UI Callbacks ==========
+
 
         private void OnSpaceClicked(Vector2Int rowCol, UIBoard.RewardPositionType type)
         {
@@ -1442,6 +1402,11 @@ namespace toio.AI.meicu
             AudioPlayer.ins.isBGMOn = btnBGM.isOn;
         }
 
+        public void OnBtnResult()
+        {
+            uiResult.gameObject.SetActive(false);
+        }
+
         public void OnSliderSteps()
         {
             int v = (int)uiPhasePlan.Find("SliderSteps").GetComponent<Slider>().value * 100;
@@ -1472,7 +1437,8 @@ namespace toio.AI.meicu
         private void UpdatePhaseTest()
         {
             for (int i = 0; i < this.testGoals.Count; i++)
-                uiPhaseTest.Find("Slots").Find($"Slot ({i})").GetComponentInChildren<Text>().text = this.testGoals[i]? "O" : "X";
+                uiPhaseTest.Find("Slots").Find($"Slot ({i})").GetComponentInChildren<Text>().text =
+                    this.testGoals[i]? "<color=#349DD1>O</color>" : "<color=#D23E2F>X</color>";
             for (int i = this.testGoals.Count; i < 5; i++)
                 uiPhaseTest.Find("Slots").Find($"Slot ({i})").GetComponentInChildren<Text>().text = "";
         }
