@@ -352,14 +352,20 @@ namespace toio.AI.meicu
                             }
                             if (uiIdx == cnt++)
                             {
-                                text.text = "マウスでゴール（はたが立っているマス）をクリックしてみてね。";
-                                btnNext.interactable = false;
-                                yield return new WaitUntil(() =>
-                                    uiBoard.RewardCount == 1 &&
-                                    uiBoard.rewardList[0] == new Vector3Int(env.quest.goalRow, env.quest.goalCol, 0));
-                                btnNext.interactable = true;
-                                text.text = $"よし！それでは学習開始！{episodesTurn}回試行錯誤（しこうさくご）してみるよ！";
-                                yield break;
+                                while (true)
+                                {
+                                    if (uiBoard.RewardCount == 1 && uiBoard.HasReward(env.quest.goalRow, env.quest.goalCol, 0))
+                                    {
+                                        text.text = $"よし！それでは学習開始！{episodesTurn}回試行錯誤（しこうさくご）してみるよ！";
+                                        btnNext.interactable = true;
+                                    }
+                                    else
+                                    {
+                                        text.text = "マウスでゴール（はたが立っているマス）をクリックしてみてね。";
+                                        btnNext.interactable = false;
+                                    }
+                                    yield return new WaitForSecondsRealtime(0.3f);
+                                }
                             }
                             Debug.LogWarning("Invalid uiIdx");
                         }
@@ -375,14 +381,20 @@ namespace toio.AI.meicu
                         {
                             if (uiIdx == cnt++)
                             {
-                                btnNext.interactable = false;
-                                text.text = $"まず、前の問題と同じように、最終的にたどり着きたいゴールに「ごほうび」を置いてみよう。";
-                                yield return new WaitUntil(() =>
-                                    uiBoard.RewardCount == 1 &&
-                                    uiBoard.rewardList[0] == new Vector3Int(env.quest.goalRow, env.quest.goalCol, 0));
-                                text.text = $"ここまでくればごほうびがもらえる、ってAIに覚えさせるんだ。";
-                                btnNext.interactable = true;
-                                yield break;
+                                while (true)
+                                {
+                                    if (uiBoard.RewardCount == 1 && uiBoard.HasReward(env.quest.goalRow, env.quest.goalCol, 0))
+                                    {
+                                        text.text = $"ここまでくればごほうびがもらえる、ってAIに覚えさせるんだ。";
+                                        btnNext.interactable = true;
+                                    }
+                                    else
+                                    {
+                                        text.text = $"まず、前の問題と同じように、最終的にたどり着きたいゴールに「ごほうび」を置いてみよう。";
+                                        btnNext.interactable = false;
+                                    }
+                                    yield return new WaitForSecondsRealtime(0.3f);
+                                }
                             }
                             if (uiIdx == cnt++)
                             {
@@ -417,12 +429,20 @@ namespace toio.AI.meicu
                             }
                             if (uiIdx == cnt++)
                             {
-                                btnNext.interactable = false;
-                                text.text = $"ゴールまでの間にもう一つ「ごほうび」を置いてみよう！";
-                                yield return new WaitUntil(() => uiBoard.RewardCount > 1);
-                                text.text = "よし！今回も「試行回数」は400回でやってみるよ！";
-                                btnNext.interactable = true;
-                                yield break;
+                                while (true)
+                                {
+                                    if (uiBoard.RewardCount == 2 && uiBoard.HasReward(env.quest.goalRow, env.quest.goalCol, 0))
+                                    {
+                                        text.text = "よし！今回も「試行回数」は400回でやってみるよ！";
+                                        btnNext.interactable = true;
+                                    }
+                                    else
+                                    {
+                                        text.text = $"ゴールまでの間にもう一つ「ごほうび」を置いてみよう！";
+                                        btnNext.interactable = false;
+                                    }
+                                    yield return new WaitForSecondsRealtime(0.3f);
+                                }
                             }
                             Debug.LogWarning("Invalid uiIdx");
                         }
@@ -430,33 +450,51 @@ namespace toio.AI.meicu
                         {
                             if (uiIdx == cnt++)
                             {
-                                btnNext.interactable = false;
-                                text.text = $"「ごほうび」の場所を決めてね。\nここでは最大{this.maxRewards}個まで置けるよ";
-                                yield return new WaitUntil(() => uiBoard.RewardCount > 0);
-                                text.text = "よし！今回も「試行回数」は400回でやってみるよ！";
-                                btnNext.interactable = true;
-                                yield break;
+                                var lastRewards = uiBoard.rewardList;
+                                while (true)
+                                {
+                                    if (uiBoard.RewardCount == 0)
+                                    {
+                                        text.text = $"「ごほうび」の場所を決めてね。\nここでは最大{this.maxRewards}個まで置けるよ";
+                                        btnNext.interactable = false;
+                                    }
+                                    else if (uiBoard.rewardList.Count == lastRewards.Count && lastRewards.TrueForAll(r=>uiBoard.rewardList.Contains(r)))
+                                    {
+                                        text.text = $"ちがう「ごほうび」の置き方に変えてみよう";
+                                        btnNext.interactable = false;
+                                    }
+                                    else
+                                    {
+                                        text.text = "よし！今回も「試行回数」は400回でやってみるよ！";
+                                        btnNext.interactable = true;
+                                    }
+                                    yield return new WaitForSecondsRealtime(0.3f);
+                                }
                             }
                             Debug.LogWarning("Invalid uiIdx");
                         }
                     }
                     else if (stageIdx == 2)
                     {
+                        var lastRewards = uiBoard.rewardList;
                         while (true)
                         {
                             if (uiBoard.RewardCount == 0)
                             {
                                 text.text = $"「ごほうび」の場所を決めてね。\nここでは最大{this.maxRewards}個まで置けるよ";
                                 btnNext.interactable = false;
-                                yield return new WaitForSeconds(0.2f);
+                            }
+                            else if (isRetry && uiBoard.rewardList.Count == lastRewards.Count && lastRewards.TrueForAll(r=>uiBoard.rewardList.Contains(r)))
+                            {
+                                text.text = $"「ちがう「ごほうび」の置き方に変えてみよう";
+                                btnNext.interactable = false;
                             }
                             else
                             {
                                 text.text = "よし！それでは学習開始！";
                                 btnNext.interactable = true;
-                                yield return new WaitForSeconds(0.1f);
                             }
-
+                            yield return new WaitForSecondsRealtime(0.3f);
                         }
                     }
                 }
@@ -660,6 +698,7 @@ namespace toio.AI.meicu
                                 text.text = "「ごほうび」の場所が悪かったみたい。\n「ごほうび」の場所を変えて、もう一度やってみよう！";
                                 btnNext.gameObject.SetActive(false);
                                 btnBack.gameObject.SetActive(false);
+                                btnOK.gameObject.SetActive(true);
                                 btnRetry.gameObject.SetActive(true);
                                 yield break;
                             }

@@ -244,6 +244,11 @@ namespace toio.AI.meicu
         #region ======== Reward ========
         internal int RewardCount => rewards.Count;
         internal List<Vector3Int> rewardList => new List<Vector3Int>(rewards.Keys);
+        internal bool HasReward(int row, int col, RewardPositionType type)
+        {
+            Vector3Int pos = new Vector3Int(row, col, (int)type);
+            return rewards.ContainsKey(pos);
+        }
         internal (bool, bool) PutReward(int row, int col, RewardPositionType type, int maxCount=1)
         {
             if (!IsRewardPositionLegal(row, col, type)) return (false, false);
