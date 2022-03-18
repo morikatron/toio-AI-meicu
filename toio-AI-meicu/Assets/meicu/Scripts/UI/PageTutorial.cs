@@ -202,7 +202,7 @@ namespace toio.AI.meicu
 
         void NextPhase()
         {
-            if (phase == 22)
+            if (phase == 23)
             {
                 PageManager.SetPage(PageManager.EPage.Title);
             }
@@ -356,7 +356,7 @@ namespace toio.AI.meicu
 
             else if (phase == 13)
             {
-                text.text = "まずは「スタート」のマスに、\nキミのキューブの青いランプで\nタッチしてみて！\n\n「ピコン」と音が鳴ったらOKだよ！";
+                text.text = "まずは「スタート」(真ん中)のマスに、\nキミのキューブの青いランプで\nタッチしてみて！\n\n「ピコン」と音が鳴ったらOKだよ！";
                 yield return new WaitUntil(() => PlayerController.ins.IsAtCenter);
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StartConfirmed);
 
@@ -367,7 +367,7 @@ namespace toio.AI.meicu
             }
             else if (phase == 14)
             {
-                text.text = "次は「きいろ」のマスをタッチするよ。\nボクが進んだ道をよく見てタッチして！\n\n「プープープープー・ピッ」\nという音が鳴り終わったらOKだよ。";
+                text.text = "次は「きいろ」のマスをタッチするよ。\nボクが進んだ道をよく見てタッチして！\n\n「プープープープー・ピッ」という\n音が鳴り終わるまでタッチしてね。";
                 yield break;
             }
             else if (phase == 15)
@@ -408,6 +408,13 @@ namespace toio.AI.meicu
             else if (phase == 22)
             {
                 text.text = "それじゃぁ、\nボクと「バトル」で勝負しよう！";
+            }
+            else if (phase == 23)
+            {
+                text.text = "左上のホーム⌂ボタンを押して、\nホーム画面に戻ってね！";
+                UIFinger.PointAt(ui.transform.Find("BtnHome"), biasX:25, biasY:-25);
+                yield return new WaitForSecondsRealtime(0.1f);
+                yield break;
             }
 
             yield return new WaitForSecondsRealtime(0.1f);

@@ -65,8 +65,8 @@ namespace toio.AI.meicu
         internal void SetActive(bool active)
         {
             if (ui.activeSelf == active) return;
-
             uiResult.gameObject.SetActive(false);
+            ui.SetActive(active);
 
             phase = Phase.Entry;
             uiIdx = 0;
@@ -107,7 +107,6 @@ namespace toio.AI.meicu
                 StopAllCoroutines();
             }
 
-            ui.SetActive(active);
         }
 
         internal void Pause()
@@ -268,25 +267,25 @@ namespace toio.AI.meicu
                         if (uiIdx == cnt++)
                         {
                             text.text = "問題が長くなれば…さっきよりもたくさんの試行回数が必要になるんだ。";
-                            uiIndicators.Find("Quest").gameObject.SetActive(false);
+                            uiIndicators.Find("Quest2").gameObject.SetActive(false);
                             yield break;
                         }
                         if (uiIdx == cnt++)
                         {
                             text.text = "この問題を見て！さっきよりも長くなっているでしょ？さっきの問題をクリアするには、400回学習必要だったけど…";
-                            uiIndicators.Find("Quest").gameObject.SetActive(true);
+                            uiIndicators.Find("Quest2").gameObject.SetActive(true);
                             yield break;
                         }
                         if (uiIdx == cnt++)
                         {
                             text.text = "この問題の場合（通過する色のマスが3つある場合）、だいたい1000回は学習しないと、うまくゴールまでの道を覚えられないんだ…";
-                            uiIndicators.Find("Quest").gameObject.SetActive(true);
+                            uiIndicators.Find("Quest2").gameObject.SetActive(true);
                             yield break;
                         }
                         if (uiIdx == cnt++)
                         {
                             text.text = "つまり「学習にかかる時間」がとっても長くなっちゃうんだ…";
-                            uiIndicators.Find("Quest").gameObject.SetActive(false);
+                            uiIndicators.Find("Quest2").gameObject.SetActive(false);
                             yield break;
                         }
                         if (uiIdx == cnt++)
@@ -320,7 +319,7 @@ namespace toio.AI.meicu
                         }
                         if (uiIdx == cnt++)
                         {
-                            text.text = "ここでは、「ごほうび」の置き方、「学習」の回数はキミ次第！";
+                            text.text = "ここでは、「ごほうび」の置き方、\n「学習」の回数はキミ次第！";
                             yield break;
                         }
                         if (uiIdx == cnt++)
@@ -356,12 +355,12 @@ namespace toio.AI.meicu
                                 {
                                     if (uiBoard.RewardCount == 1 && uiBoard.HasReward(env.quest.goalRow, env.quest.goalCol, 0))
                                     {
-                                        text.text = $"よし！それでは学習開始！{episodesTurn}回試行錯誤（しこうさくご）してみるよ！";
+                                        text.text = $"よし！それでは学習開始！\n{episodesTurn}回試行錯誤してみるよ！";
                                         btnNext.interactable = true;
                                     }
                                     else
                                     {
-                                        text.text = "マウスでゴール（はたが立っているマス）をクリックしてみてね。";
+                                        text.text = "マウスでゴール（はたが立っているマス）をクリックしてみてね。\n間違えたらごほうびマークをクリックすると直せるよ";
                                         btnNext.interactable = false;
                                     }
                                     yield return new WaitForSecondsRealtime(0.3f);
@@ -924,7 +923,10 @@ namespace toio.AI.meicu
                 PlayerController.ins.PerformRegret();
 
                 // UI
-                text.text += $"\n{successCnt}回しかたどり着けなかったね…残念…";
+                if (successCnt > 0)
+                    text.text += $"\n{successCnt}回しかたどり着けなかったね…残念…";
+                else
+                    text.text += "1回もたどりつかなかったね…残念…";
                 meicu.PerformFail();
             }
         }

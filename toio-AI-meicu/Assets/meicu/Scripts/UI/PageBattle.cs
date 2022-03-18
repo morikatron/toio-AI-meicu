@@ -75,6 +75,8 @@ namespace toio.AI.meicu
                 resultObj.SetActive(false);
                 swHint.isOn = false;
 
+                SetQuestIndicator(false);
+
                 meicu.Reset();
                 SetIntroText();
                 UpdateStageText();
@@ -226,6 +228,16 @@ namespace toio.AI.meicu
                 ui.transform.Find("ImgThink").gameObject.SetActive(false);
                 uiBoard.HideHeatmap();
             }
+        }
+
+        void SetQuestIndicator(bool active, int questSize = 1)
+        {
+            var q = ui.transform.Find("Indicators").Find("Quest") as RectTransform;
+
+            if (active)
+                q.sizeDelta = new Vector2(questSize * 2 * 38 + 134, q.sizeDelta.y);
+
+            q.gameObject.SetActive(active);
         }
 
         #endregion
@@ -420,9 +432,10 @@ namespace toio.AI.meicu
             if (ready)
             {
                 Debug.Log("PageBattle.OnGameReady: Ready");
-                SetText("スタートにタッチしてゲームスタート！\n\nボクがいても強引にタッチしていいよ。", minDuration:0);
+                SetText("スタートにタッチしてゲームスタート！\n\nボクがいても強引にタッチしていいよ。\nタッチすると「問題」が表示されるから見ててね！", minDuration:0);
                 uiBoard.ShowKomaA(new Vector2Int(4, 4));
                 uiBoard.ShowKomaP(new Vector2Int(4, 4));
+                SetQuestIndicator(true, game.quest.Length);
 
                 IEnumerator Wait2Start()
                 {
@@ -460,6 +473,8 @@ namespace toio.AI.meicu
             {
                 Debug.Log("Game Started");
                 SetText("　　　　<size=32>ゲームスタート！</size>\n\nお題の順番に合わせて\nキューブを動かそう！", minDuration:1f, force:true);
+
+                SetQuestIndicator(false);
 
                 // Play SE
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Start);

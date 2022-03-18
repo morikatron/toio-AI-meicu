@@ -77,7 +77,7 @@ namespace toio.AI.meicu
                 srcBGM.clip = bgmBattle;
                 srcBGM.Play();
             }
-            else if (page == PageManager.EPage.Tutorial || page == PageManager.EPage.Learn)
+            else if (page == PageManager.EPage.Tutorial || page == PageManager.EPage.Learn || page == PageManager.EPage.Trainer)
             {
                 srcBGM.clip = bgmTutorial;
                 srcBGM.Play();

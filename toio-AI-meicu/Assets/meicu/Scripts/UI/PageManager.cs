@@ -122,7 +122,7 @@ namespace toio.AI.meicu
 
         void UpdateDebugSliderLv()
         {
-            uiDebug.Find("TextLv").GetComponent<Text>().text = $"Level {Prefs.level}";
+            uiDebug.Find("TextLv").GetComponent<Text>().text = $"レベル {Prefs.level}";
             uiDebug.Find("SliderLv").GetComponent<Slider>().value = Prefs.level;
         }
 
