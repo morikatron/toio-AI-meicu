@@ -371,6 +371,7 @@ namespace toio.AI.meicu
                         else
                         {
                             text.text = "上の白いボタンを右に動かすと試行回数を変えられるよ。回数を増やしてから、もう一回学習させよう。";
+                            uiIndicators.Find("Slider").gameObject.SetActive(true);
                             btnNext.interactable = true;
                         }
                     }
@@ -1106,6 +1107,7 @@ namespace toio.AI.meicu
 
             UpdatePhasePlan();
             uiPhasePlan.Find("SliderSteps").gameObject.SetActive(stageIdx == 0 && isSt0Failed || stageIdx == 2);
+            UpdateSliderByValue(this.episodesTurn);
 
             // Reset board and quest
             uiQuest.ShowP(0);
@@ -1134,6 +1136,8 @@ namespace toio.AI.meicu
             btnRetry.gameObject.SetActive(false);
             btnOK.gameObject.SetActive(false);
             btnNew.gameObject.SetActive(false);
+
+            uiIndicators.Find("Slider").gameObject.SetActive(false);
 
             meicu.Reset();
 
@@ -1448,9 +1452,13 @@ namespace toio.AI.meicu
             uiResult.gameObject.SetActive(false);
         }
 
+        int[] sliderStepsList = new int[]{100, 200, 400, 600, 800, 1200, 1600, 2400, 3200};
         public void OnSliderSteps()
         {
-            int v = (int)uiPhasePlan.Find("SliderSteps").GetComponent<Slider>().value * 100;
+            uiIndicators.Find("Slider").gameObject.SetActive(false);
+
+            int v = (int)uiPhasePlan.Find("SliderSteps").GetComponent<Slider>().value;
+            v = sliderStepsList[v];
             this.episodesTurnLeft = v;
             this.episodesTurn = v;
             UpdatePhasePlan();
@@ -1458,11 +1466,17 @@ namespace toio.AI.meicu
         #endregion
 
 
+        private void UpdateSliderByValue(int value)
+        {
+            int i = 0;
+            while (i < sliderStepsList.Length && sliderStepsList[i] <= value) i++;
+            uiPhasePlan.Find("SliderSteps").GetComponent<Slider>().value = Mathf.Max(0, i - 1);
+        }
+
         private void UpdatePhasePlan()
         {
             uiPhasePlan.Find("TextSteps").GetComponent<Text>().text = $"{this.episodesTurn}";
             uiPhasePlan.Find("TextRewards").GetComponent<Text>().text = $"{uiBoard.RewardCount}個 (最大{this.maxRewards}個)";
-            uiPhasePlan.Find("SliderSteps").GetComponent<Slider>().value = episodesTurn/100;
         }
 
         private void UpdatePhaseTrain()

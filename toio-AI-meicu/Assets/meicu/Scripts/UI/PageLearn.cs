@@ -236,7 +236,7 @@ namespace toio.AI.meicu
                 // Hide Arrow
                 ui.transform.Find("Indicators").Find("Arrow").gameObject.SetActive(false);
 
-                text.text = "でもボクは、最初はそれすら分からないんだ。\nだから、上下左右のどこにも動く可能性があるんだよ。";
+                text.text = "でもボクは、\n最初はそれすら分からないんだ。\nだから、上下左右のどこにも動く可能性があるんだよ。";
                 btnNext.gameObject.SetActive(true);
             }
             else if (phase == 7)
@@ -286,6 +286,13 @@ namespace toio.AI.meicu
                     uiBoard.ShowHeatmap(heatmap);
                     yield return new WaitForSecondsRealtime(interval);
 
+                    // Show hint for t==11
+                    if (t == 11)
+                    {
+                        text.text = $"　　　　　　試行 {t+1} 回目\n\nだんだん明るさが変わっていくから見ててね！";
+                        yield return WaitButtonNext();
+                    }
+
                     // Sample action
                     var action = SampleIdx(probs);
                     if (t == 0 || t == 99) action = 0;
@@ -327,13 +334,9 @@ namespace toio.AI.meicu
                         uiQuest.ShowA(1);
                         // Update text
                         if (t < 2)
-                        {
                             text.text = $"　　　　　　試行 {t+1} 回目\n「上」に動いてみたらゴールに成功！\nこの時AIは\n「上に行けばゴールの可能性がアップ」\nと学習するんだ。";
-                        }
                         else
-                        {
                             text.text = $"　　　　　　試行 {t+1} 回目\n\nゴール成功\n「上」の可能性  アップ\n";
-                        }
                     }
                     else    // Fail
                     {
@@ -343,25 +346,16 @@ namespace toio.AI.meicu
                         if (action == 2) actionStr = "下";
                         if (action == 3) actionStr = "左";
                         if (t < 2)
-                        {
                             text.text = $"　　　　　　試行 {t+1} 回目\n「{actionStr}」に行ってみたら、今度はゴールに\n失敗しちゃった！\nこの時AIは\n「{actionStr}に行けばゴールの可能性がダウン」\nと学習するんだ。";
-                        }
                         else
-                        {
                             text.text = $"　　　　　　試行 {t+1} 回目\n\nゴール失敗\n「{actionStr}」の可能性 ダウン\n";
-                        }
                     }
 
                     yield return new WaitForSecondsRealtime(interval);
 
                     // Request button interaction
                     if (t < 2)
-                    {
-                        requestBtnNext = true;
-                        btnNext.interactable = true;
-                        yield return new WaitUntil(()=>!requestBtnNext);
-                        btnNext.interactable = false;
-                    }
+                        yield return WaitButtonNext();
                 }
                 text.text = "ほら「上」のマスが明るくなってきたでしょ？";
             }
@@ -597,6 +591,14 @@ namespace toio.AI.meicu
 
             if (phase > 0)
                 btnBack.interactable = true;
+        }
+
+        private IEnumerator WaitButtonNext()
+        {
+            requestBtnNext = true;
+            btnNext.interactable = true;
+            yield return new WaitUntil(()=>!requestBtnNext);
+            btnNext.interactable = false;
         }
 
         static int SampleIdx(float[] probs)
