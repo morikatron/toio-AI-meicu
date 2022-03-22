@@ -72,6 +72,7 @@ namespace toio.AI.meicu
 
             if (active)
             {
+                Prefs.SetTrainerAccessed();
                 btnBGM.isOn = AudioPlayer.ins.isBGMOn;
 
                 env.Reset();

@@ -263,6 +263,14 @@ namespace toio.AI.meicu
                     // btnStart will jump to PageTitle
                     resultToTitle = true;
                 }
+                // Lv.2 cleared
+                else if (Prefs.level == 2)
+                {
+                    textResult.text = $"おめでとう！レベル {Prefs.level} クリアだよ！";
+                    textResultQuit.text = "「キミだけのAIを育てよう」が開放されたよ。\n見てみてね！";
+                    // btnStart will jump to PageTitle
+                    resultToTitle = true;
+                }
                 // All Lv cleared
                 else if (Prefs.level == Config.nLevels)
                 {

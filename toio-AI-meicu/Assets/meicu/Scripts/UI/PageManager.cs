@@ -49,9 +49,6 @@ namespace toio.AI.meicu
                 uiDebug.gameObject.SetActive(isDebug);
                 UpdateDebugSliderLv();
             }
-
-            // TODO FIXME temporary
-            uiDebug.Find("BtnTrainer").GetComponent<Button>().interactable = Device.nConnected == 2;
         }
 
         internal enum EPage
@@ -153,10 +150,6 @@ namespace toio.AI.meicu
 
             UpdateDebugSliderLv();
             if (page == EPage.Title) pageTitle.Refresh();
-        }
-        public void OnDebugBtnTrainer()
-        {
-            SetPage(EPage.Trainer);
         }
 
         #endregion

@@ -16,6 +16,7 @@ namespace toio.AI.meicu
         public Button btnTutorial;
         public Button btnBattle;
         public Button btnLearn;
+        public Button btnTrainer;
         public UISwitch btnBGM;
         public TMP_Text text;
 
@@ -61,6 +62,7 @@ namespace toio.AI.meicu
                 btnTutorial.interactable = false;
                 btnBattle.interactable = false;
                 btnLearn.interactable = false;
+                btnTrainer.interactable = false;
 
                 text.text = "接続できない場合は\nブラウザーを再起動してみてね";
 
@@ -78,6 +80,7 @@ namespace toio.AI.meicu
                 btnTutorial.interactable = false;
                 btnBattle.interactable = false;
                 btnLearn.interactable = false;
+                btnTrainer.interactable = false;
 
                 // Guide to click btnConnect, on first time opening App
                 if (!Prefs.isEverConnected)
@@ -109,6 +112,7 @@ namespace toio.AI.meicu
                 btnTutorial.interactable = false;
                 btnBattle.interactable = false;
                 btnLearn.interactable = false;
+                btnTrainer.interactable = false;
 
                 // Guide to click btnConnect, on first time opening App
                 if (!Prefs.isEverConnected)
@@ -137,7 +141,7 @@ namespace toio.AI.meicu
                     if (!Prefs.isTutorialAccessed)
                     {
                         // Guide to click btnTutorial
-                        UIFinger.PointAt(btnTutorial.transform, biasX:130);
+                        UIFinger.PointAt(btnTutorial.transform, biasX:120);
 
                         text.text = "まずは迷路パズルのルールを\n説明するよ！";
                     }
@@ -149,7 +153,7 @@ namespace toio.AI.meicu
                     {
                         // Guide to click btnBattle
                         if (!Prefs.isBattleAccessed)
-                            UIFinger.PointAt(btnBattle.transform, biasX:130);
+                            UIFinger.PointAt(btnBattle.transform, biasX:120);
 
                         while (true)
                         {
@@ -165,29 +169,49 @@ namespace toio.AI.meicu
                 {
                     // Learn open
                     btnLearn.interactable = true;
+                    btnTrainer.interactable = Prefs.level > 2;
 
                     // Learn NOT cleared
                     if (!Prefs.isLearnCleared)
                     {
                         // Guide to Learn
-                        UIFinger.PointAt(btnLearn.transform, biasX:130);
+                        UIFinger.PointAt(btnLearn.transform, biasX:120);
 
                         while (true)
                         {
-                            text.text = "レベル1のクリア、おめでとう！";
-                            yield return new WaitForSecondsRealtime(2f);
+                            if (Prefs.level == 2)
+                            {
+                                text.text = "レベル1のクリア、おめでとう！";
+                                yield return new WaitForSecondsRealtime(2f);
+                            }
                             text.text = "かいせつボタンを押すと、\nボクの強さのひみつが分かるよ";
                             yield return new WaitForSecondsRealtime(2f);
                         }
                     }
-                    // Learn Cleared
+                    // Learn Cleared BUT Trainer NOT Accessed
+                    else if (Prefs.level > 2 && !Prefs.isTrainerAccessed)
+                    {
+                        // Guide to Trainer
+                        UIFinger.PointAt(btnTrainer.transform, biasX:120);
+
+                        while (true)
+                        {
+                            if (Prefs.level == 3)
+                            {
+                                text.text = "レベル2のクリア、おめでとう！";
+                                yield return new WaitForSecondsRealtime(2f);
+                            }
+                            text.text = "キミだけのAIを育ててみようか！";
+                            yield return new WaitForSecondsRealtime(2f);
+                        }
+                    }
                     else
                     {
                         // Right after Learn cleared
                         if (!Prefs.isBattleEnteredAfterLearn)
                         {
                             // Guide to Battle again
-                            UIFinger.PointAt(btnBattle.transform, biasX:130);
+                            UIFinger.PointAt(btnBattle.transform, biasX:120);
                         }
 
                         while (true)
@@ -232,6 +256,11 @@ namespace toio.AI.meicu
         public void OnBtnLearn()
         {
             PageManager.SetPage(PageManager.EPage.Learn);
+        }
+
+        public void OnBtnTrainer()
+        {
+            PageManager.SetPage(PageManager.EPage.Trainer);
         }
 
         public void OnBtnBGM()
