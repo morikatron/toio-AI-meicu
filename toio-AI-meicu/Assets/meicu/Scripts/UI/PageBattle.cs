@@ -181,7 +181,8 @@ namespace toio.AI.meicu
             else if ((state == BattleState.NotStarted || state == BattleState.PWin) && stage == 1)
             {
                 int n = new int[]{0, 1, 10, 50, 100, 200, 500, 700, 900, 1000, 1500, 2000}[Prefs.level];
-                var content = $"ボクは【迷キュー・{classNames[Prefs.level]}】だよ\n試行錯誤を<color=red>{n}万回以上</color>したんだ。\n\nどうだい？勝てるかな？";
+                int p = new int[]{0, 80, 99, 60, 80, 99, 60, 80, 90, 60, 85, 70}[Prefs.level];
+                var content = $"ボクは【迷キュー・{classNames[Prefs.level]}】だよ\n試行錯誤を<color=red>{n}万回以上</color>したんだ。\nこのレベルでのゴール率は<color=red>{p}%</color>だよ。\n\nどうだい？勝てるかな？";
                 if (Prefs.level == 3)
                     content += "\n（ここからリセットボタン使えないから\n間違えないように気をつけてね）";
                 else if (Prefs.level == 4)
