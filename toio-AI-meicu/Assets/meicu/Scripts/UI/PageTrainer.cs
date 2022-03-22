@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -87,8 +86,12 @@ namespace toio.AI.meicu
 
                 PlayerController.ins.targetMatCoordBias = new Vector2Int(0, 0);
 
+                AIController.ins.thinkCallback += OnAIThink;
+
                 phase = Phase.Summary;
                 SetPhaseAndUpdateUI(Phase.Entry, 0);
+
+                ClearIEText();
             }
             else
             {
@@ -100,10 +103,12 @@ namespace toio.AI.meicu
 
                 PlayerController.ins.targetMatCoordBias = new Vector2Int(10, -10);
 
+                AIController.ins.thinkCallback -= OnAIThink;
                 AIController.ins.StopMotion();
                 AIController.ins.StopAllCoroutines();
                 PlayerController.ins.Stop();
 
+                ClearIEText();
                 StopAllCoroutines();
             }
 
@@ -742,6 +747,7 @@ namespace toio.AI.meicu
                     }
                 }
             }
+            ClearIEText();
             StopAllCoroutines();
             StartCoroutine(ie());
         }
@@ -1229,15 +1235,27 @@ namespace toio.AI.meicu
         private void OnGameStepP(Env.Response res)
         {
             isGameStepP = true;
-            uiQuest.ShowP(game.envP.passedSpaceCnt);
+            var traj = game.GetTrajP();
             uiBoard.ShowKomaP(game.envP.row, game.envP.col);
-            uiBoard.ShowTrajP(game.GetTrajP());
+            uiBoard.ShowTrajP(traj);
+            uiQuest.ShowP(traj.Length - (Env.IsResponseFail(res)?1:0));
+
+            if (Env.IsResponseFail(res) && game.stateA == Game.PlayerState.InGame)
+            {
+                StartIEText("あっ、まちがえたね");
+            }
         }
         private void OnGameStepA(Env.Response res)
         {
-            uiQuest.ShowA(game.envA.passedSpaceCnt);
+            var traj = game.GetTrajA();
             uiBoard.ShowKomaA(game.envA.row, game.envA.col);
-            uiBoard.ShowTrajA(game.GetTrajA());
+            uiBoard.ShowTrajA(traj);
+            uiQuest.ShowA(traj.Length - (Env.IsResponseFail(res)?1:0));
+
+            if (Env.IsResponseFail(res) && game.stateP == Game.PlayerState.InGame)
+            {
+                StartIEText("あっ、しまった");
+            }
         }
         private bool isGameOverP = false;
         private void OnGameOverP(Game.PlayerState state)
@@ -1278,6 +1296,23 @@ namespace toio.AI.meicu
                 uiResult.gameObject.SetActive(true);
             }
             isGameOverP = true;
+        }
+
+        void OnAIThink(int phase)
+        {
+            if (phase == 1)
+            {
+                meicu.PerformThinkBegin();
+                AIController.ins.PerformThink();
+                var content = Random.Range(0f, 1f) < 0.5f? "考え中…" : "次は…どっちだろう？";
+                StartIEText(content, wait:false);
+            }
+            else if (phase == 2)
+            {
+                meicu.PerformThinkEnd();
+                var content = Random.Range(0f, 1f) < 0.5f? "そっちか！" : "わかったぞ！";
+                StartIEText(content, wait:false);
+            }
         }
 
         #endregion
@@ -1465,6 +1500,46 @@ namespace toio.AI.meicu
         }
         #endregion
 
+
+        private bool isIETextBusy = false;
+        private IEnumerator ie_text = null;
+        // Coordinate setting text
+        void StartIEText(string content, float minDuration = 0.8f, bool wait = true, bool force = false)
+        {
+            if (!wait && isIETextBusy)
+                return;
+
+            IEnumerator IE()
+            {
+                if (isIETextBusy)
+                {
+                    yield return new WaitUntil(()=>!isIETextBusy);
+                }
+                isIETextBusy = true;
+                text.text = content;
+                yield return new WaitForSecondsRealtime(minDuration);
+                isIETextBusy = false;
+                ie_text = null;
+            }
+
+            if (force)
+            {
+                if (ie_text != null)
+                {
+                    StopCoroutine(ie_text);
+                    ie_text = null;
+                }
+                isIETextBusy = false;
+            }
+            ie_text = IE();
+            StartCoroutine(ie_text);
+        }
+        private void ClearIEText()
+        {
+            if (ie_text != null) StopCoroutine(ie_text);
+            ie_text = null;
+            isIETextBusy = false;
+        }
 
         private void UpdateSliderByValue(int value)
         {
