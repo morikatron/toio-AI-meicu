@@ -411,7 +411,7 @@ namespace toio.AI.meicu
             }
             else if (phase == 23)
             {
-                text.text = "左上のホーム⌂ボタンを押して、\nホーム画面に戻ってね！";
+                text.text = "左上のホームボタンを押して、\nホーム画面に戻ってね！";
                 UIFinger.PointAt(ui.transform.Find("BtnHome"), biasX:25, biasY:-25);
                 yield return new WaitForSecondsRealtime(0.1f);
                 yield break;

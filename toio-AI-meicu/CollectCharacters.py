@@ -50,6 +50,10 @@ for scene in scenes:
 # chas.remove('\u3000')
 # chas.add('　')
 
+# Sort
+chas = list(chas)
+chas.sort()
+
 chas = ''.join(chas)
 print('=> Find {} characters.'.format(len(chas)))
 print(chas)

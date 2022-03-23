@@ -278,7 +278,7 @@ namespace toio.AI.meicu
                         }
                         if (uiIdx == cnt++)
                         {
-                            text.text = "この問題を見て！さっきよりも長くなっているでしょ？さっきの問題をクリアするには、400回学習必要だったけど…";
+                            text.text = "この問題を見て！さっきよりも長くなっているでしょ？\nさっきの問題をクリアするには、\n400回の学習が必要だったんだけど…";
                             uiIndicators.Find("Quest2").gameObject.SetActive(true);
                             yield break;
                         }
@@ -376,7 +376,7 @@ namespace toio.AI.meicu
                         }
                         else
                         {
-                            text.text = "上の白いボタンを右に動かすと試行回数を変えられるよ。回数を増やしてから、もう一回学習させよう。";
+                            text.text = "上の白いボタンを右に動かすと試行回数を変えられるよ。\n回数を増やしてから、もう一回学習させよう。";
                             uiIndicators.Find("Slider").gameObject.SetActive(true);
                             btnNext.interactable = true;
                         }
@@ -404,32 +404,7 @@ namespace toio.AI.meicu
                             }
                             if (uiIdx == cnt++)
                             {
-                                text.text = $"ゴールがすぐ横にある場合は、何も学習しなくても1/4のかくりつでゴールにたどり着けるよね。";
-                                yield break;
-                            }
-                            if (uiIdx == cnt++)
-                            {
-                                text.text = $"でも、ゴールが遠くなればなるほど、そこまでぐうぜんたどり着ける確率は減るんだ。";
-                                yield break;
-                            }
-                            if (uiIdx == cnt++)
-                            {
-                                text.text = $"これが「問題が長くなると、学習に時間がかかる」ことの理由。";
-                                yield break;
-                            }
-                            if (uiIdx == cnt++)
-                            {
-                                text.text = $"ゴール（ごほうび）にたどり着くまで、何度も何度も試さなきゃならないんだ。";
-                                yield break;
-                            }
-                            if (uiIdx == cnt++)
-                            {
-                                text.text = $"でも、これってとっても時間がかかっちゃうよね…";
-                                yield break;
-                            }
-                            if (uiIdx == cnt++)
-                            {
-                                text.text = $"「長い1つの問題」を「短い2つの問題」に分けるように考えて...";
+                                text.text = $"そして次のごほうびは\n「長い1つの問題」を「短い2つの問題」に分けるように考えて...";
                                 btnNext.interactable = true;
                                 yield break;
                             }
@@ -911,6 +886,7 @@ namespace toio.AI.meicu
 
             this.isTestPassed = successCnt > 2;
 
+            // TODO move to UpdateUI
             if (isTestPassed)
             {
                 Prefs.trainerStage = Mathf.Max(Prefs.trainerStage, stageIdx+1);
@@ -921,7 +897,8 @@ namespace toio.AI.meicu
                 // UI
                 text.text += $"\n{successCnt}回たどり着けたので…合格ー！";
                 yield return WaitButton();
-                text.text = "おめでとう！";
+                if (stageIdx == 0) text.text = "おめでとう！";
+                if (stageIdx == 1) text.text = "やったー！\n2個のごほうびをうまく使って、\n学習回数を減らす事ができたね！";
                 meicu.PerformThinkEnd();
             }
             // Fail
@@ -1186,6 +1163,8 @@ namespace toio.AI.meicu
 
             btnNext.interactable = true;
             btnBack.interactable = false;
+
+            PlayerController.ins.targetMatCoordBias = new Vector2Int(10, -10);
         }
         private void OnEnterSummary()
         {
@@ -1193,6 +1172,8 @@ namespace toio.AI.meicu
 
             btnNext.interactable = true;
             btnBack.interactable = false;
+
+            PlayerController.ins.targetMatCoordBias = new Vector2Int(0, 0);
         }
 
 
@@ -1374,7 +1355,7 @@ namespace toio.AI.meicu
                 int max = 1;
                 if (stageIdx == 0 && !isSt0Failed) max = 3;
                 if (stageIdx == 0 && isSt0Failed) max = 1;
-                if (stageIdx == 1 && !isRetry) max = 8;
+                if (stageIdx == 1 && !isRetry) max = 3;
                 if (stageIdx == 1 && isRetry) max = 1;
                 if (stageIdx == 2) max = 1;
                 uiIdx ++;
