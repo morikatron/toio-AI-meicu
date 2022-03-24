@@ -467,7 +467,7 @@ namespace toio.AI.meicu
                             }
                             else if (isRetry && uiBoard.rewardList.Count == lastRewards.Count && lastRewards.TrueForAll(r=>uiBoard.rewardList.Contains(r)))
                             {
-                                text.text = $"「ちがう「ごほうび」の置き方に変えてみよう";
+                                text.text = $"ちがう「ごほうび」の置き方に変えてみよう";
                                 btnNext.interactable = false;
                             }
                             else
@@ -1447,6 +1447,16 @@ namespace toio.AI.meicu
                 PageManager.OnBtnHome();
             else
             {
+                game.StopGame();
+
+                PlayerController.ins.targetMatCoordBias = new Vector2Int(10, -10);
+                PlayerController.ins.Stop();
+
+                AIController.ins.StopMotion();
+                AIController.ins.StopAllCoroutines();
+
+                ClearIEText();
+
                 SetPhaseAndUpdateUI(Phase.Entry, 0);
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Cancel);
             }
