@@ -188,7 +188,7 @@ namespace toio.AI.meicu
                 else if (Prefs.level == 4)
                     content += "\n（ここから負けた時には、\nちがうお題が出るんだよ）";
                 else if (Prefs.level == 11)
-                    content += "\n（このレベルは5連勝しないとクリアできないよ）";
+                    content += "\n<size=21>※このレベルは5連勝しないとクリアできない</size>";
                 SetText(content);
             }
             // New Stage enterd
