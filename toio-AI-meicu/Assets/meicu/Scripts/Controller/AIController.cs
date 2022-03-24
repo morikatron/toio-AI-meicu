@@ -15,7 +15,7 @@ namespace toio.AI.meicu
         public Game game;
         public int heatmapPredictSteps = 8;
 
-        protected override int id => 1;
+        internal override int id => 1;
 
         internal bool isPredicting { get; private set; } = false;
         internal event Action heatmapCallback;
@@ -84,10 +84,10 @@ namespace toio.AI.meicu
 
         IEnumerator IE_MoveInGame(byte spd, float confirmTime, bool timeCorrection = false)
         {
-            yield return IE_Move(spd, confirmTime, timeCorrection);
+            yield return IE_Navi(spd, confirmTime, timeCorrection);
             // Apply Step to game
             game.MoveA(action);
-            Debug.Log("game moveA" + action);
+            Debug.Log("game.moveA : " + action);
         }
 
         // Control Loop in Game

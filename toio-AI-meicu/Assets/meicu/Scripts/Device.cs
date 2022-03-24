@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using toio;
+using toio.Navigation;
 
 
 namespace toio.AI.meicu
@@ -23,6 +24,7 @@ namespace toio.AI.meicu
             }
         }
         private static List<Cube> cubes => cubeManager.cubes;
+        private static List<CubeNavigator> navigators => cubeManager.navigators;
         private static Dictionary<int, int> IdxTable = new Dictionary<int, int>();
 
 
@@ -51,6 +53,14 @@ namespace toio.AI.meicu
             int idx = IdxTable[id];
             if (cubes.Count <= idx || idx < 0) return null;
             return cubes[idx];
+        }
+        internal static CubeNavigator GetNavi(int id)
+        {
+            if (!IdxTable.ContainsKey(id)) return null;
+
+            int idx = IdxTable[id];
+            if (navigators.Count <= idx || idx < 0) return null;
+            return navigators[idx];
         }
 
         internal static bool isTwoConnected => nConnected >= 2;
@@ -131,6 +141,21 @@ namespace toio.AI.meicu
                 cube.TurnLedOn(color.r, color.g, color.b, 0);
             }
             return 0;
+        }
+
+        internal static bool TargetMoveByID(int id, int x, int y, byte maxSpd=80)
+        {
+            if (!IdxTable.ContainsKey(id)) return false;
+            int idx = IdxTable[id];
+            if (cubeManager.cubes.Count < idx+1) return false;
+
+            cubeManager.cubes[idx].TargetMove(
+                x, y, 0,
+                timeOut: 2,
+                maxSpd: maxSpd,
+                targetMoveType:Cube.TargetMoveType.RoundBeforeMove,
+                targetRotationType:Cube.TargetRotationType.NotRotate);
+            return true;
         }
 
         internal static bool TargetMove(int id, int row, int col, int biasX=0, int biasY=0, byte maxSpd=80)

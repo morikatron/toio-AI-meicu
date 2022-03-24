@@ -13,13 +13,14 @@ namespace toio.AI.meicu
 
         public Game game;
 
-        protected override int id => 0;
+        internal override int id => 0;
 
         internal bool isPause = false;
 
         IEnumerator ie_ChantActionP = null;
         Env.Action candidateActionP;
         bool isGameRunning = false;
+        Env.Action action;
 
 
         protected override void Awake()
@@ -45,6 +46,28 @@ namespace toio.AI.meicu
             lstCoord = new Vector2Int(-1, -1);
         }
 
+        internal void RequestMoveInGame(Env.Action action, byte spd = 80)
+        {
+            this.action = action;
+            (var r, var c) = Env.Translate(action, game.envP.row, game.envP.col);
+
+            if (ieMotion != null && !isPerforming && this.targetCoords.x == r && this.targetCoords.y == c)
+                return;
+
+            this.targetCoords = new Vector2Int(r, c);
+
+            StopMotion();
+            ieMotion = IE_MoveInGame(spd, 0f);
+            StartCoroutine(ieMotion);
+        }
+
+        IEnumerator IE_MoveInGame(byte spd, float confirmTime, bool timeCorrection = false)
+        {
+            yield return IE_Navi(spd, confirmTime, timeCorrection);
+            // Apply Step to game
+            game.MoveP(action);
+            Debug.Log("game.moveP : " + action);
+        }
 
         #region ======== Cube Callbacks ========
         Vector2Int lstCoord = new Vector2Int(-1, -1);
@@ -52,6 +75,7 @@ namespace toio.AI.meicu
         {
             if (!isGameRunning) return;
             if (isPause) return;
+            if (isMoving) return;
 
             var pos = game.GetPosP();
 

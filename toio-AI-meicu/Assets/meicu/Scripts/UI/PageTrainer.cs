@@ -928,10 +928,11 @@ namespace toio.AI.meicu
             // for (int ieps=0; ieps < 5; ieps++)
             {
                 // Control Cubes
-                AIController.ins.RequestMove(4, 4, 80, 0);
-                PlayerController.ins.RequestMove(4, 4, 80, 0);
-                yield return new WaitUntil(() => AIController.ins.IsAtCenter);
-                yield return new WaitUntil(() => PlayerController.ins.IsAtCenter);
+                while (!AIController.ins.IsAtCenter || !PlayerController.ins.IsAtCenter)
+                {
+                    (Vector2Int tarP, Vector2Int tarA) = CubeCoordinater.MoveAllHome();
+                    yield return new WaitForSecondsRealtime(1);
+                }
 
                 // UI
                 uiBoard.ShowKomaP(4, 4);
@@ -954,15 +955,17 @@ namespace toio.AI.meicu
                     // Get action with trained agent
                     var row = game.envP.row; var col = game.envP.col;
                     var action = agent.GetActionStochastic(row, col);
+                    var prob = agent.Q[row, col, (int)action];
 
                     // Delay
-                    yield return new WaitForSecondsRealtime(0.5f);
+                    float delay = (1 - prob) * 1f + 1;    // [1, 2]
+                    byte spd = (byte)(prob * 30 + 30);    // [30, 60]
+                    yield return new WaitForSecondsRealtime(delay);
 
                     if (game.stateP == Game.PlayerState.InGame)
                     {
                         // Move cube
-                        (var tarRow, var tarCol) = Env.Translate(action, row, col);
-                        PlayerController.ins.RequestMove(tarRow, tarCol, spd:80);  // TODO speed depends on probs
+                        PlayerController.ins.RequestMoveInGame(action, spd);
 
                         // Wait step complete or game over
                         isGameStepP = false;
