@@ -58,6 +58,10 @@ namespace toio.AI.meicu
         {
             agent.LoadModelByName(Config.levelSettings[lv-1].modelName);
         }
+        internal void LoadModelByName(string name)
+        {
+            agent.LoadModelByName(name);
+        }
         internal void LoadBestModel()
         {
             agent.LoadModelByName(Config.bestModelName);

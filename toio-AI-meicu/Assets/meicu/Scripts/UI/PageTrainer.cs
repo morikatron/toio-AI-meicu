@@ -530,11 +530,28 @@ namespace toio.AI.meicu
                     if (uiIdx == cnt++)
                     {
                         text.text = "それでは、ボクとバトルしよう！";
+                        uiPhaseBattle.Find("BtnModel0").gameObject.SetActive(false);
+                        uiPhaseBattle.Find("BtnModel1").gameObject.SetActive(false);
+                        uiPhaseBattle.Find("BtnModel2").gameObject.SetActive(false);
+                        btnNext.interactable = true;
+                        yield break;
+                    }
+                    if (uiIdx == cnt++)
+                    {
+                        text.text = "どのボクとバトルする？\n\n\n\n\n";
+                        uiPhaseBattle.Find("BtnModel0").gameObject.SetActive(true);
+                        uiPhaseBattle.Find("BtnModel1").gameObject.SetActive(true);
+                        uiPhaseBattle.Find("BtnModel2").gameObject.SetActive(true);
+                        btnNext.interactable = false;
                         yield break;
                     }
                     if (uiIdx == cnt++)
                     {
                         text.text = "どちらが先に、間違えずにゴールにたどりつけるかな？";
+                        uiPhaseBattle.Find("BtnModel0").gameObject.SetActive(false);
+                        uiPhaseBattle.Find("BtnModel1").gameObject.SetActive(false);
+                        uiPhaseBattle.Find("BtnModel2").gameObject.SetActive(false);
+                        btnNext.interactable = true;
                         yield break;
                     }
                     if (uiIdx == cnt++)
@@ -923,7 +940,6 @@ namespace toio.AI.meicu
 
             int successCnt = 0;
             game.StopGame();
-            AIController.ins.setting = Config.trainerStageSetting;
 
             // for (int ieps=0; ieps < 5; ieps++)
             {
@@ -1396,7 +1412,7 @@ namespace toio.AI.meicu
             }
             else if (phase == Phase.Battle)
             {
-                int max = 4;
+                int max = 5;
                 uiIdx ++;
                 if (uiIdx >= max)
                 {
@@ -1470,6 +1486,14 @@ namespace toio.AI.meicu
             if (phase != Phase.Entry) return;
             this.stageIdx = idx;
             SetPhaseAndUpdateUI(Phase.Intro, 0);
+        }
+
+        public void OnBtnModel(int idx)
+        {
+            var lvSetting = Config.trainerLevelSettings[idx];
+            AIController.ins.LoadModelByName(lvSetting.modelName);
+            AIController.ins.setting = lvSetting.stageSettings[0];
+            OnBtnNext();
         }
 
         public void OnBtnBGM()

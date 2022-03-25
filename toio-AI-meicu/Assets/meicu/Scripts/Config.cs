@@ -96,7 +96,7 @@ namespace toio.AI.meicu
         public static readonly string bestModelName = "meicu-models\\M1024x2_L3to8_b1_2e7\\meicu-20000014";
         public static List<LevelSetting> levelSettings = new List<LevelSetting>();
         public static StageSetting tutorialStageSetting = null;
-        public static StageSetting trainerStageSetting = null;
+        public static List<LevelSetting> trainerLevelSettings = new List<LevelSetting>();
 
 
         public enum FailBehaviour
@@ -285,7 +285,38 @@ namespace toio.AI.meicu
             }
 
             tutorialStageSetting = StageSetting.CreatePattern1(11, 30, 30, 3.0f, 10, 3.0f);
-            trainerStageSetting = StageSetting.CreatePattern1(11, 70, 80, 4.0f, 10, 1.0f);
+
+            // Trainer level settings
+            {
+                var lv = new LevelSetting(
+                    questSize: 4,
+                    modelName: "meicu-models\\M1024x2_L3to8_b1_2e7\\meicu-999999",  // acc = 0.621
+                    nStages: 1,
+                    failBehaviour: FailBehaviour.KeepQuest
+                );
+                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 70, 80, 3.0f, 7, 1.2f));
+                trainerLevelSettings.Add(lv);
+            }
+            {
+                var lv = new LevelSetting(
+                    questSize: 4,
+                    modelName: "meicu-models\\M1024x2_L3to8_b1_2e7\\meicu-1999996",  // acc = 0.814
+                    nStages: 1,
+                    failBehaviour: FailBehaviour.KeepStage
+                );
+                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 70, 80, 2.5f, 6, 1.0f));
+                trainerLevelSettings.Add(lv);
+            }
+            {
+                var lv = new LevelSetting(
+                    questSize: 4,
+                    modelName: "meicu-models\\M1024x2_L3to8_b1_2e7\\meicu-20000014",  // acc = 0.989
+                    nStages: 1,
+                    failBehaviour: FailBehaviour.KeepStage
+                );
+                lv.stageSettings.Add(StageSetting.CreatePattern1(7, 80, 80, 2.5f, 4, 1.0f));
+                trainerLevelSettings.Add(lv);
+            }
         }
 
     }
