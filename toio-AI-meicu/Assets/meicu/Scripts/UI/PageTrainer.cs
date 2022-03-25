@@ -824,13 +824,13 @@ namespace toio.AI.meicu
             btnNext.interactable = true;
             if (stageIdx == 0 && isSt0Failed)
             {
-                text.text = "かんりょうー！";
+                text.text = "かんりょうー！\n\nやっぱり、試行回数が多い分、\nちょっと時間がかかったね…";
                 yield return WaitButton();
-                text.text = "やっぱり、試行回数が多い分、ちょっと時間がかかったね…";
+                text.text = "ではまた実験するよ！";
             }
             else
             {
-                text.text = "かんりょうー！";
+                text.text = "かんりょうー！\n\nではまた実験するよ！";
             }
         }
 
