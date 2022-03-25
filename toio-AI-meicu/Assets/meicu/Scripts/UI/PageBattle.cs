@@ -259,7 +259,7 @@ namespace toio.AI.meicu
                 if (Prefs.level == 1)
                 {
                     textResult.text = $"おめでとう！レベル {Prefs.level} クリアだよ！";
-                    textResultQuit.text = "「かいせつ」が開放されたよ。\n見てみてね！";
+                    textResultQuit.text = "　　「かいせつ」が開放されたよ。\n　　見てみてね！";
                     // btnStart will jump to PageTitle
                     resultToTitle = true;
                 }
@@ -267,15 +267,15 @@ namespace toio.AI.meicu
                 else if (Prefs.level == 2)
                 {
                     textResult.text = $"おめでとう！レベル {Prefs.level} クリアだよ！";
-                    textResultQuit.text = "「キミだけのAIを育てよう」が開放されたよ。\n見てみてね！";
+                    textResultQuit.text = "　　「キミだけのAIを育てよう」が\n　　開放されたよ。見てみてね！";
                     // btnStart will jump to PageTitle
                     resultToTitle = true;
                 }
                 // All Lv cleared
                 else if (Prefs.level == Config.nLevels)
                 {
-                    textResult.text = "おめでとう！すべてクリアだよ！\n今のボクはキミにかなわない…\nボクももっと「学習」して、もっと強くなったら、また勝負してね！";
-                    textResultQuit.text = "";
+                    textResult.text = "すごい！！\nキミは、ついに迷キューマスターのボクを倒したんだ！\n\nこれからは、キミが迷キューマスターだ！！";
+                    textResultQuit.text = "おめでとうございます。\nあなたは、全ステージクリアしました！\n\n最後まで遊んでいただいて\nありがとうございました。";
                 }
                 else
                 {
