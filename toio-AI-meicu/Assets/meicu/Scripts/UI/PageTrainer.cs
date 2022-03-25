@@ -974,7 +974,7 @@ namespace toio.AI.meicu
                     var prob = agent.Q[row, col, (int)action];
 
                     // Delay
-                    float delay = (1 - prob) * 1f + 1;    // [1, 2]
+                    float delay = (1 - prob) * 2f + 2f;    // [2, 4]
                     byte spd = (byte)(prob * 30 + 30);    // [30, 60]
                     yield return new WaitForSecondsRealtime(delay);
 

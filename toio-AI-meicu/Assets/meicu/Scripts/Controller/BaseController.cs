@@ -361,7 +361,7 @@ namespace toio.AI.meicu
 
             cons.Add(con);
             CNavigator navi = new CNavigator();
-            navi.avoid.margin = 16;
+            navi.avoid.margin = 15;
             navi.ClearWall();
             navi.Update(con.cube, 0, 0);
             conNaviDict.Add(con, navi);
