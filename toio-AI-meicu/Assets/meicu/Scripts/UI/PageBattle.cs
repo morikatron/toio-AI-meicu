@@ -181,8 +181,7 @@ namespace toio.AI.meicu
             else if ((state == BattleState.NotStarted || state == BattleState.PWin) && stage == 1)
             {
                 int n = new int[]{0, 1, 10, 50, 100, 200, 500, 700, 900, 1000, 1500, 2000}[Prefs.level];
-                int p = new int[]{0, 80, 99, 60, 80, 99, 60, 80, 90, 60, 85, 70}[Prefs.level];
-                var content = $"ボクは【迷キュー・{classNames[Prefs.level]}】だよ\n試行錯誤を<color=red>{n}万回以上</color>したんだ。\nこのレベルでのゴール率は<color=red>{p}%</color>だよ。\n\nどうだい？勝てるかな？";
+                var content = $"ボクは【迷キュー・{classNames[Prefs.level]}】だよ\n試行錯誤を<color=red>{n}万回以上</color>したんだ。\n\nどうだい？勝てるかな？";
                 if (Prefs.level == 3)
                     content += "\n（ここからリセットボタン使えないから\n間違えないように気をつけてね）";
                 else if (Prefs.level == 4)
@@ -194,7 +193,7 @@ namespace toio.AI.meicu
             // New Stage enterd
             if (state == BattleState.PWin && stage > 1)
             {
-                SetText("次のステージに行こう！\nボクはもっと早くなるぞ！");
+                SetText("次のステージに行こう！\nボクはもっと速くなるぞ！");
             }
             // P Lose
             else if (state == BattleState.AWin)
@@ -248,6 +247,9 @@ namespace toio.AI.meicu
 
         void ProcPlayerWin()
         {
+            // meicu emotion
+            meicuResult.SetFace(UIMeicu.Face.Regret);
+
             // Level Clear
             if (stage == Config.levelSettings[Prefs.level - 1].nStages)
             {
@@ -267,16 +269,19 @@ namespace toio.AI.meicu
                 else if (Prefs.level == 2)
                 {
                     textResult.text = $"おめでとう！レベル {Prefs.level} クリアだよ！";
-                    textResultQuit.text = "　　「キミだけのAIを育てよう」が\n　　開放されたよ。見てみてね！";
+                    textResultQuit.text = "　「チャレンジ」が開放されたよ。\n　見てみてね！";
                     // btnStart will jump to PageTitle
                     resultToTitle = true;
                 }
-                // All Lv cleared
+                // Lv.11 cleared
                 else if (Prefs.level == Config.nLevels)
                 {
                     textResult.text = "すごい！！\nキミは、ついに迷キューマスターのボクを倒したんだ！\n\nこれからは、キミが迷キューマスターだ！！";
                     textResultQuit.text = "おめでとうございます。\nあなたは、全ステージクリアしました！\n\n最後まで遊んでいただいて\nありがとうございました。";
+
+                    meicuResult.SetFace(UIMeicu.Face.Laugh);
                 }
+                // Other Lv. cleared
                 else
                 {
                     textResult.text = $"おめでとう！レベル {Prefs.level} クリアだよ！";
@@ -299,9 +304,6 @@ namespace toio.AI.meicu
                 // Stage up
                 stage += 1;
             }
-
-            // meicu emotion
-            meicuResult.SetFace(UIMeicu.Face.Regret);
 
             // show result
             resultObj.SetActive(true);

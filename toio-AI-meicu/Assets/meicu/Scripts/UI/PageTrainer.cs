@@ -410,6 +410,9 @@ namespace toio.AI.meicu
                             }
                             if (uiIdx == cnt++)
                             {
+                                this.maxRewards = 2;
+                                UpdatePhasePlan();
+
                                 while (true)
                                 {
                                     if (uiBoard.RewardCount == 2 && uiBoard.HasReward(env.quest.goalRow, env.quest.goalCol, 0))
@@ -419,7 +422,7 @@ namespace toio.AI.meicu
                                     }
                                     else
                                     {
-                                        text.text = $"ゴールまでの間にもう一つ「ごほうび」を置いてみよう！";
+                                        text.text = $"ゴールまでの間にもう一つ「ごほうび」を置いてみよう！\n\nもう一つのごほうびの場所をマウスでクリックしてごらん。";
                                         btnNext.interactable = false;
                                     }
                                     yield return new WaitForSecondsRealtime(0.3f);
@@ -472,7 +475,7 @@ namespace toio.AI.meicu
                             }
                             else
                             {
-                                text.text = "よし！それでは学習開始！";
+                                text.text = "「ごほうび」と「試行回数」の場所は\n決まったかな？\n\n右の矢印ボタンで学習開始だよ！";
                                 btnNext.interactable = true;
                             }
                             yield return new WaitForSecondsRealtime(0.3f);
@@ -486,6 +489,7 @@ namespace toio.AI.meicu
                     if (uiIdx == cnt++)
                     {
                         btnNext.interactable = false;
+                        text.text = $"ただいま、学習中～！";
                         yield return IE_Train();
                         btnNext.interactable = true;
                         yield break;
@@ -500,7 +504,7 @@ namespace toio.AI.meicu
                     {
                         if (uiIdx == cnt++)
                         {
-                            text.text = "それでは、どれくらい学習できたのか、\n実際にキューブを動かしながら\n実験してみよう！";
+                            text.text = "それでは、どれくらい学習できたのか、\nキューブを動かしながら\n実験してみよう！";
                             yield break;
                         }
                         if (uiIdx == cnt++)
@@ -567,7 +571,7 @@ namespace toio.AI.meicu
                         btnNext.interactable = true;
 
                         if (game.stateP == Game.PlayerState.Win)
-                            text.text = "おめでとう！キミの勝ちだ！";
+                            text.text = "おめでとう！キミのAIの勝ちだ！";
                         else if (game.stateP == Game.PlayerState.Draw)
                             text.text = "ざんねん！ひきわけだね！";
                         else
@@ -912,7 +916,7 @@ namespace toio.AI.meicu
                 PlayerController.ins.PerformHappy();
 
                 // UI
-                text.text += $"\n{successCnt}回たどり着けたので…合格ー！";
+                text.text += $"\n　　{successCnt}回たどり着けたので…合格ー！";
                 yield return WaitButton();
                 if (stageIdx == 0) text.text = "おめでとう！";
                 if (stageIdx == 1) text.text = "やったー！\n2個のごほうびをうまく使って、\n学習回数を減らす事ができたね！";
@@ -928,7 +932,7 @@ namespace toio.AI.meicu
                 if (successCnt > 0)
                     text.text += $"\n{successCnt}回しかたどり着けなかったね…残念…";
                 else
-                    text.text += "1回もたどりつかなかったね…残念…";
+                    text.text += " 1回もたどりつかなかったね…残念…";
                 meicu.PerformFail();
             }
         }
@@ -974,7 +978,7 @@ namespace toio.AI.meicu
                     var prob = agent.Q[row, col, (int)action];
 
                     // Delay
-                    float delay = (1 - prob) * 2f + 2f;    // [2, 4]
+                    float delay = (1 - prob) * 3f + 1.5f;    // [1.5, 4.5]
                     byte spd = (byte)(prob * 30 + 30);    // [30, 60]
                     yield return new WaitForSecondsRealtime(delay);
 
@@ -990,8 +994,7 @@ namespace toio.AI.meicu
 
                     if (game.stateP == Game.PlayerState.InGame)
                         continue;
-                    if (game.stateP == Game.PlayerState.Fail)
-                        yield return new WaitUntil(() => game.stateP == Game.PlayerState.LoseFail);
+                    yield return new WaitWhile(() => game.inGame);
                     break;
                 }
 
@@ -1082,7 +1085,7 @@ namespace toio.AI.meicu
             else if (stageIdx == 1)
             {
                 this.agent.lr = 0.3f;
-                this.maxRewards = 2;
+                this.maxRewards = 1;
                 this.episodesTurn = 400;
                 this.episodesTurnLeft = this.episodesTurn;
             }
@@ -1268,7 +1271,7 @@ namespace toio.AI.meicu
                 AudioPlayer.ins.PlaySE(AudioPlayer.ESE.Win);
 
                 uiResult.GetComponentInChildren<UIMeicu>().SetFace(UIMeicu.Face.Regret);
-                uiResult.Find("Text").GetComponent<Text>().text = "おめでとう！キミの勝ちだ！";
+                uiResult.Find("Text").GetComponent<Text>().text = "おめでとう！キミのAIの勝ちだ！";
                 uiResult.gameObject.SetActive(true);
             }
             else if (state == Game.PlayerState.Fail)

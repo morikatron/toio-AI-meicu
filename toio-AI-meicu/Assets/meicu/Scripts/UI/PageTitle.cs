@@ -137,6 +137,7 @@ namespace toio.AI.meicu
                 {
                     // Learn NOT available
                     btnLearn.interactable = false;
+                    btnTrainer.interactable = false;
 
                     if (!Prefs.isTutorialAccessed)
                     {
@@ -220,6 +221,11 @@ namespace toio.AI.meicu
                             yield return new WaitForSecondsRealtime(2f);
                             text.text = "ボクと迷路パズルでバトルしよう！";
                             yield return new WaitForSecondsRealtime(2f);
+                            if (Prefs.level == 2)
+                            {
+                                text.text = "レベルが上がると\n【チャレンジ】が解放されるよ。";
+                                yield return new WaitForSecondsRealtime(2f);
+                            }
                         }
                     }
                 }

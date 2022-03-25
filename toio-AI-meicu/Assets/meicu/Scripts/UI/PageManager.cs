@@ -138,7 +138,8 @@ namespace toio.AI.meicu
             Prefs.SetLearnAccessed();
             Prefs.SetLearnCleared();
             Prefs.SetBattleEnteredAfterLearn();
-            if (Prefs.level == 1) Prefs.level = 2;
+            Prefs.SetTrainerAccessed();
+            if (Prefs.level == 1) Prefs.level = 3;
             Prefs.trainerStage = 2;
 
             UpdateDebugSliderLv();
