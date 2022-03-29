@@ -187,7 +187,7 @@ namespace toio.AI.meicu
                 else if (Prefs.level == 4)
                     content += "\n（ここから負けた時には、\nちがうお題が出るんだよ）";
                 else if (Prefs.level == 11)
-                    content += "\n<size=21>※このレベルは5連勝しないとクリアできない</size>";
+                    content += "\n<size=22>※マスターに勝つには5連勝が必要だよ！</size>";
                 SetText(content);
             }
             // New Stage enterd
@@ -422,7 +422,6 @@ namespace toio.AI.meicu
                 btnStart.gameObject.SetActive(true);
                 meicu.Reset();
                 SetIntroText();
-                UpdateStageText();
             }
         }
 

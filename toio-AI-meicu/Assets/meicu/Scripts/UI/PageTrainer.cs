@@ -366,7 +366,7 @@ namespace toio.AI.meicu
                                     }
                                     else
                                     {
-                                        text.text = "マウスでゴール（はたが立っているマス）をクリックしてみてね。\n間違えたらごほうびマークをクリックすると直せるよ";
+                                        text.text = "マウスでゴール（はたが立っているマス）をクリックしてみてね。\n間違えたらごほうびマークをクリックすると直せるよ。";
                                         btnNext.interactable = false;
                                     }
                                     yield return new WaitForSecondsRealtime(0.3f);
@@ -470,12 +470,12 @@ namespace toio.AI.meicu
                             }
                             else if (isRetry && uiBoard.rewardList.Count == lastRewards.Count && lastRewards.TrueForAll(r=>uiBoard.rewardList.Contains(r)))
                             {
-                                text.text = $"ちがう「ごほうび」の置き方に変えてみよう";
+                                text.text = $"「ごほうび」の場所や「試行回数」を変えてみよう";
                                 btnNext.interactable = false;
                             }
                             else
                             {
-                                text.text = "「ごほうび」と「試行回数」の場所は\n決まったかな？\n\n右の矢印ボタンで学習開始だよ！";
+                                text.text = "「ごほうび」の場所と「試行回数」は\n決まったかな？\n\n右の矢印ボタンで学習開始だよ！";
                                 btnNext.interactable = true;
                             }
                             yield return new WaitForSecondsRealtime(0.3f);
@@ -585,6 +585,7 @@ namespace toio.AI.meicu
                     if (prevPhase != phase) OnEnterSummary();
                     if (stageIdx == 0)
                     {
+                        // 1回目で失敗
                         if (!isSt0Failed && !isTestPassed)
                         {
                             if (uiIdx == cnt++)
@@ -601,11 +602,12 @@ namespace toio.AI.meicu
                             }
                             Debug.LogWarning("Invalid uiIdx");
                         }
+                        // 1回目で成功 (例外)
                         else if (!isSt0Failed && isTestPassed)
                         {
                             if (uiIdx == cnt++)
                             {
-                                text.text = $"「なんとぐうぜんに学習できた！";
+                                text.text = $"なんとぐうぜんに学習できた！";
                                 yield break;
                             }
                             if (uiIdx == cnt++)
@@ -617,6 +619,7 @@ namespace toio.AI.meicu
                             }
                             Debug.LogWarning("Invalid uiIdx");
                         }
+                        // 2回目で成功
                         else if (isSt0Failed && isTestPassed)
                         {
                             if (uiIdx == cnt++)
@@ -645,11 +648,12 @@ namespace toio.AI.meicu
                             }
                             Debug.LogWarning("Invalid uiIdx");
                         }
+                        // 2回目も失敗
                         else if (isSt0Failed && !isTestPassed)
                         {
                             if (uiIdx == cnt++)
                             {
-                                text.text = "報酬をちゃんとゴールに置いたかな？\nリトライしよう";
+                                text.text = "あれ？まだ足りなかったみたい。\n学習回数を増やしてみよう！";
                                 btnNext.gameObject.SetActive(false);
                                 btnBack.gameObject.SetActive(false);
                                 btnRetry.gameObject.SetActive(true);
@@ -1085,7 +1089,7 @@ namespace toio.AI.meicu
             else if (stageIdx == 1)
             {
                 this.agent.lr = 0.3f;
-                this.maxRewards = 1;
+                this.maxRewards = this.isRetry? 2:1;
                 this.episodesTurn = 400;
                 this.episodesTurnLeft = this.episodesTurn;
             }

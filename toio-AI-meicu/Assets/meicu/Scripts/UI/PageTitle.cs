@@ -54,6 +54,9 @@ namespace toio.AI.meicu
             icons.Find("IconP").gameObject.SetActive(PlayerController.ins.isConnected);
             icons.Find("IconA").gameObject.SetActive(AIController.ins.isConnected);
 
+            // Update level view
+            ui.GetComponentInChildren<UILevelView>().ShowLevel(Prefs.level);
+
             // Connection error
             if (isError && Device.nConnected < 2)
             {
