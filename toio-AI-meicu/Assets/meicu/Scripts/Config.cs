@@ -108,7 +108,7 @@ namespace toio.AI.meicu
         {
             levelSettings.Clear();
 
-            // Lv 0
+            // Lv 1
             {
                 var lv = new LevelSetting(
                     questSize: 3,
@@ -124,7 +124,7 @@ namespace toio.AI.meicu
                 levelSettings.Add(lv);
             }
 
-            // Lv 1
+            // Lv 2
             {
                 var lv = new LevelSetting(
                     questSize: 3,
@@ -140,7 +140,7 @@ namespace toio.AI.meicu
                 levelSettings.Add(lv);
             }
 
-            // Lv 2
+            // Lv 3
             {
                 var lv = new LevelSetting(
                     questSize: 4,
@@ -156,7 +156,7 @@ namespace toio.AI.meicu
                 levelSettings.Add(lv);
             }
 
-            // Lv 3
+            // Lv 4
             {
                 var lv = new LevelSetting(
                     questSize: 4,
@@ -172,7 +172,7 @@ namespace toio.AI.meicu
                 levelSettings.Add(lv);
             }
 
-            // Lv 4
+            // Lv 5
             {
                 var lv = new LevelSetting(
                     questSize: 4,
@@ -188,7 +188,7 @@ namespace toio.AI.meicu
                 levelSettings.Add(lv);
             }
 
-            // Lv 5
+            // Lv 6
             {
                 var lv = new LevelSetting(
                     questSize: 5,
@@ -204,7 +204,7 @@ namespace toio.AI.meicu
                 levelSettings.Add(lv);
             }
 
-            // Lv 6
+            // Lv 7
             {
                 var lv = new LevelSetting(
                     questSize: 5,
@@ -220,7 +220,7 @@ namespace toio.AI.meicu
                 levelSettings.Add(lv);
             }
 
-            // Lv 7
+            // Lv 8
             {
                 var lv = new LevelSetting(
                     questSize: 5,
@@ -236,7 +236,7 @@ namespace toio.AI.meicu
                 levelSettings.Add(lv);
             }
 
-            // Lv 8
+            // Lv 9
             {
                 var lv = new LevelSetting(
                     questSize: 6,
@@ -252,7 +252,7 @@ namespace toio.AI.meicu
                 levelSettings.Add(lv);
             }
 
-            // Lv 9
+            // Lv 10
             {
                 var lv = new LevelSetting(
                     questSize: 6,
@@ -268,7 +268,7 @@ namespace toio.AI.meicu
                 levelSettings.Add(lv);
             }
 
-            // Lv 10
+            // Lv 11
             {
                 var lv = new LevelSetting(
                     questSize: 7,

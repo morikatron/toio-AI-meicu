@@ -276,10 +276,12 @@ namespace toio.AI.meicu
                 // Lv.11 cleared
                 else if (Prefs.level == Config.nLevels)
                 {
-                    textResult.text = "すごい！！\nキミは、ついに迷キューマスターのボクを倒したんだ！\n\nこれからは、キミが迷キューマスターだ！！";
+                    textResult.text = "すごい！！\nキミは、ついに迷キューマスターのボクを倒したんだ！\n\nこれからは、キミが迷キューマスターだ！！\n";
                     textResultQuit.text = "おめでとうございます。\nあなたは、全ステージクリアしました！\n\n最後まで遊んでいただいて\nありがとうございました。";
 
                     meicuResult.SetFace(UIMeicu.Face.Laugh);
+                    // btnStart will jump to PageTitle
+                    resultToTitle = true;
                 }
                 // Other Lv. cleared
                 else
