@@ -24,6 +24,7 @@ namespace toio.AI.meicu
             }
         }
         private static List<Cube> cubes => cubeManager.cubes;
+        private static List<CubeHandle> handles => cubeManager.handles;
         private static List<CubeNavigator> navigators => cubeManager.navigators;
         private static Dictionary<int, int> IdxTable = new Dictionary<int, int>();
 
@@ -53,6 +54,14 @@ namespace toio.AI.meicu
             int idx = IdxTable[id];
             if (cubes.Count <= idx || idx < 0) return null;
             return cubes[idx];
+        }
+        internal static CubeHandle GetHandle(int id)
+        {
+            if (!IdxTable.ContainsKey(id)) return null;
+
+            int idx = IdxTable[id];
+            if (handles.Count <= idx || idx < 0) return null;
+            return handles[idx];
         }
         internal static CubeNavigator GetNavi(int id)
         {
@@ -111,6 +120,8 @@ namespace toio.AI.meicu
             if (cube == null) return 1;
             var cubeIdx = cubes.FindIndex(c => c == cube);
             cubeManager.handles[cubeIdx].SetBorderRect(new RectInt(545, 45, 410, 410));
+            cubeManager.navigators[cubeIdx].ClearWall();
+            cubeManager.navigators[cubeIdx].AddBorder(10, new RectInt(545, 45, 410, 410));
 
             UpdateAssign();
 

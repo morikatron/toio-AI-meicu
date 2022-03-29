@@ -13,6 +13,7 @@ namespace toio.AI.meicu
     {
         internal virtual int id => -1;
         internal Cube cube => Device.GetCube(id);
+        internal CubeHandle handle => Device.GetHandle(id);
         protected IEnumerator ieMotion;
         internal bool isPerforming { get; private set; } = false;
         internal bool isMoving { get; private set; } = false;
@@ -47,10 +48,13 @@ namespace toio.AI.meicu
             {
                 cube.idCallback.ClearListener();
                 cube.idMissedCallback.ClearListener();
+                cube.targetMoveCallback.ClearListener();
                 cube.idCallback.AddListener(id.ToString(), OnCubeID);
                 cube.idMissedCallback.AddListener(id.ToString(), OnCubeIDMissed);
                 cube.targetMoveCallback.AddListener(id.ToString(), OnCubeTargetMove);
             }
+
+            PerformWake();
         }
         protected virtual void OnCubeID(Cube cube) {}
         protected virtual void OnCubeIDMissed(Cube cube) {}
@@ -284,6 +288,21 @@ namespace toio.AI.meicu
             isPerforming = false;
         }
 
+        internal virtual void PerformWake()
+        {
+            StopMotion();
+            IEnumerator ie()
+            {
+                isPerforming = true;
+                cube.Move(-80, 80, 500, order: Cube.ORDER_TYPE.Strong);
+                yield return new WaitForSecondsRealtime(0.5f);
+                ieMotion = null;
+                isPerforming = false;
+            }
+            ieMotion = ie();
+            StartCoroutine(ieMotion);
+        }
+
         internal virtual void PerformHappy()
         {
             StopMotion();
@@ -300,9 +319,11 @@ namespace toio.AI.meicu
             for (int i = 0; i < 3; i++)
             {
                 yield return new WaitForSecondsRealtime(interval);
-                cube.Move(u, u, durationMs, Cube.ORDER_TYPE.Strong);    // TODO use handle instead
+                handle.Update();
+                handle.Move(u, 0, durationMs, order: Cube.ORDER_TYPE.Strong);
                 yield return new WaitForSecondsRealtime(interval);
-                cube.Move(-u, -u, durationMs, Cube.ORDER_TYPE.Strong);
+                handle.Update();
+                handle.Move(-u, 0, durationMs, order: Cube.ORDER_TYPE.Strong);
             }
             ieMotion = null;
             isPerforming = false;
@@ -370,6 +391,7 @@ namespace toio.AI.meicu
             CNavigator navi = new CNavigator();
             navi.avoid.margin = 15;
             navi.ClearWall();
+            navi.AddBorder(10, 545, 955, 45, 455);
             navi.Update(con.cube, 0, 0);
             conNaviDict.Add(con, navi);
         }
