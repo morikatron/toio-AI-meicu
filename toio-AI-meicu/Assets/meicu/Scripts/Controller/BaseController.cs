@@ -157,11 +157,13 @@ namespace toio.AI.meicu
 
             bool waitResponse = false;
 
-            float timeout = 2.5f;
+            float timeout = 1f;
             float retryTime = timeout + 1;
             float t = Time.realtimeSinceStartup;
             int stuckCnt = 0;
-            Vector2 target = Device.SpaceCoords2ID(targetCoords.x, targetCoords.y) + targetMatCoordBias;
+            Vector2 target_center = Device.SpaceCoords2ID(targetCoords.x, targetCoords.y);
+            Vector2 target_original = target_center + targetMatCoordBias;
+            Vector2 target = target_original;
             Vector2 waypoint = default;
 
             // Wait Cube to Arrive
@@ -194,10 +196,10 @@ namespace toio.AI.meicu
                     if (Vector2.Distance(target, waypoint) < 5 && targetMoveResponse == Cube.TargetMoveRespondType.Normal)
                         break;
 
-                    retryTime = timeout + 1;
                     // Avoid sending command too frequently
                     if (retryTime < 0.5f)
                         yield return new WaitForSecondsRealtime(0.5f - retryTime);
+                    retryTime = timeout + 1;
                     continue;
                 }
 
@@ -207,31 +209,36 @@ namespace toio.AI.meicu
                     // Update states
                     CubeCoordinater.UpdateAllNaviPos();
 
-                    // Calc. Target
-                    Vector2 bias = targetMatCoordBias;
-                    // Try to change direction of bias
-                    bias = new Vector2((stuckCnt/4%4<2?1:-1) * bias.x, (stuckCnt/4%2<1?1:-1) * bias.y);
-                    // Try to increase range of bias
-                    bias = bias * (1 + (stuckCnt/4/4) * 0.5f);
-                    target = Device.SpaceCoords2ID(targetCoords.x, targetCoords.y) + bias;
+                    // // Calc. Target
+                    // Vector2 bias = targetMatCoordBias;
+                    // // Try to change direction of bias
+                    // bias = new Vector2((stuckCnt/4%4<2?1:-1) * bias.x, (stuckCnt/4%2<1?1:-1) * bias.y);
+                    // // Try to increase range of bias
+                    // bias = bias * (1 + (stuckCnt/4/4) * 0.5f);
+                    // target = target_center + bias;
+
+                    target = CubeCoordinater.GetBestTargetInSpace(this, target_center, target_original);
 
                     // Run Avoid Algo.
                     (Vector wp, bool isCol, double spdLimit) = CubeCoordinater.RunAvoid(this, target, spd);
-                    int wx = Mathf.RoundToInt((float)wp.x) + cube.x;
-                    int wy = Mathf.RoundToInt((float)wp.y) + cube.y;
-                    waypoint = new Vector2(wx, wy);
+                    waypoint = new Vector2((float)wp.x, (float)wp.y);
 
                     // Stuck
-                    if (Vector2.Distance(cube.pos, new Vector2(wx, wy)) < 5)
-                    {
+                    if (Vector2.Distance(cube.pos, waypoint) < 10 && Vector2.Distance(target, waypoint) > 5
+                        && !CubeCoordinater.IsAnyOtherMoving(this))
                         stuckCnt ++;
-                        // yield return new WaitForSecondsRealtime(0.5f);
-                        // continue;
-                    }
                     else stuckCnt = 0;
 
+                    // Handle Stuck
+                    if (stuckCnt >= 2)
+                    {
+                        waypoint = CubeCoordinater.GetWaypointAroundOther(this, target);
+                    }
+
                     // TargetMove to Waypoint
-                    Debug.Log($"[{id}]IE_Navi : TargetMoveByID({wx}, {wy})");
+                    int wx = Mathf.RoundToInt(waypoint.x) + cube.x;
+                    int wy = Mathf.RoundToInt(waypoint.y) + cube.y;
+                    // Debug.Log($"[{id}]IE_Navi : TargetMoveByID({wx}, {wy}) stucked={stuckCnt >= 2}");
                     Device.TargetMoveByID(id, wx, wy, maxSpd:spd);
                     waitResponse = true;
                     hasResponseTargetMove = false;
@@ -418,6 +425,55 @@ namespace toio.AI.meicu
                 if (IsSegCollideSeg(pos, tar, opos, otar, minDistance)) return false;
             }
             return true;
+        }
+
+        internal static Vector2 GetBestTargetInSpace(BaseController con, Vector2 center, Vector2 prefer)
+        {
+            BaseController other = null;
+            foreach (var o in cons)
+                if (o != con)
+                    other = o;
+
+            Vector2 opos = new Vector2(other.cube.x, other.cube.y);
+            if (Vector2.Distance(opos, prefer) > 30 || other.isMoving)
+                return prefer;
+
+            var dir = (center - opos).normalized;
+            return center + dir * 10;
+        }
+        internal static bool IsAnyOtherMoving(BaseController con)
+        {
+            foreach (var o in cons)
+            {
+                if (o != con)
+                {
+                    if (o.isMoving) return true;
+                }
+            }
+            return false;
+        }
+        internal static Vector2 GetWaypointAroundOther(BaseController con, Vector2 target)
+        {
+            BaseController other = null;
+            foreach (var o in cons)
+                if (o != con)
+                    other = o;
+            Vector2 opos = new Vector2(other.cube.x, other.cube.y);
+            Vector2 pos = new Vector2(con.cube.x, con.cube.y);
+
+            var self_o = opos - pos;
+            var left = new Vector2(-self_o.y, self_o.x).normalized;
+            var wp_left = (-self_o).normalized * 32 + left * 64 + opos;
+            var wp_right = (-self_o).normalized * 32 - left * 64 + opos;
+
+            if (wp_left.x < 545 || wp_left.x > 955 || wp_left.y < 45 || wp_left.y > 455)
+                return wp_right;
+            if (wp_right.x < 545 || wp_right.x > 955 || wp_right.y < 45 || wp_right.y > 455)
+                return wp_left;
+            if (Vector2.Dot(target - pos, left) > 0)
+                return wp_left;
+            else
+                return wp_right;
         }
 
         internal static (Vector2Int, Vector2Int) MoveAllHome()
