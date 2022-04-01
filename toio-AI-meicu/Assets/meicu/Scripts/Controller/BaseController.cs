@@ -15,6 +15,7 @@ namespace toio.AI.meicu
         internal Cube cube => Device.GetCube(id);
         internal CubeHandle handle => Device.GetHandle(id);
         protected IEnumerator ieMotion;
+        internal bool isAvoidEnabled = false;
         internal bool isPerforming { get; private set; } = false;
         internal bool isMoving { get; private set; } = false;
         public Vector2Int targetCoords {get; protected set;}
@@ -99,7 +100,7 @@ namespace toio.AI.meicu
             this.targetCoords = new Vector2Int(row, col);
 
             StopMotion();
-            ieMotion = IE_Navi(spd, confirmTime);
+            ieMotion = isAvoidEnabled? IE_Navi(spd, confirmTime) : IE_Move(spd, confirmTime);
             StartCoroutine(ieMotion);
         }
 

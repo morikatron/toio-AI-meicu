@@ -49,8 +49,11 @@ namespace toio.AI.meicu
 
                 // Pause controllers
                 PlayerController.ins.isPause = true;
+                PlayerController.ins.isAvoidEnabled = false;
+
                 AIController.ins.isPause = true;
                 AIController.ins.setting = Config.tutorialStageSetting;
+                AIController.ins.isAvoidEnabled = false;
 
                 Refresh();
             }

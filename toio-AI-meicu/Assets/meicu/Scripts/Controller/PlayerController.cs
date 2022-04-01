@@ -63,7 +63,7 @@ namespace toio.AI.meicu
 
         IEnumerator IE_MoveInGame(byte spd, float confirmTime, bool timeCorrection = false)
         {
-            yield return IE_Navi(spd, confirmTime, timeCorrection);
+            yield return isAvoidEnabled? IE_Navi(spd, confirmTime, timeCorrection) : IE_Move(spd, confirmTime, timeCorrection);
             // Apply Step to game
             game.MoveP(action);
             Debug.Log("game.moveP : " + action);

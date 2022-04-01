@@ -86,8 +86,10 @@ namespace toio.AI.meicu
                 game.overCallbackP += OnGameOverP;
 
                 PlayerController.ins.targetMatCoordBias = new Vector2Int(0, 0);
+                PlayerController.ins.isAvoidEnabled = true;
 
                 AIController.ins.thinkCallback += OnAIThink;
+                AIController.ins.isAvoidEnabled = true;
 
                 phase = Phase.Summary;
                 SetPhaseAndUpdateUI(Phase.Entry, 0);

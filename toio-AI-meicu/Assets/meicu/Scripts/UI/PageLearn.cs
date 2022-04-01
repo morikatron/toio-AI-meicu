@@ -52,6 +52,9 @@ namespace toio.AI.meicu
 
                 btnBGM.isOn = AudioPlayer.ins.isBGMOn;
 
+                PlayerController.ins.isAvoidEnabled = false;
+                AIController.ins.isAvoidEnabled = false;
+
                 uiQuest.Reset();
                 uiBoard.Reset();
                 swHint.GetComponent<Button>().interactable = false;

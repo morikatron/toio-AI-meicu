@@ -52,8 +52,13 @@ namespace toio.AI.meicu
 
                 uiQuest.Reset();
                 uiBoard.Reset();
+
+                PlayerController.ins.isAvoidEnabled = false;
+
+                AIController.ins.isAvoidEnabled = false;
                 AIController.ins.heatmapCallback += OnAIHeatmap;
                 AIController.ins.thinkCallback += OnAIThink;
+
                 game.initedCallback += OnGameInited;
                 game.readyCallback += OnGameReady;
                 game.startCallback += OnGameStarted;
