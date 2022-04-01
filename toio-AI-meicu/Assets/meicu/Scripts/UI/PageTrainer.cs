@@ -169,7 +169,7 @@ namespace toio.AI.meicu
                         }
                         if (uiIdx == cnt++)
                         {
-                            text.text += "まずは最初、「ごほうびを使ってAIを育てよう」を選択してみよう！";
+                            text.text = "まずは最初、「ごほうびを使ってAIを育てよう」を選択してみよう！";
                             btnEntry0.interactable = true;
                             btnNext.interactable = false;
                             yield break;
@@ -330,7 +330,7 @@ namespace toio.AI.meicu
                         }
                         if (uiIdx == cnt++)
                         {
-                            text.text = "自由に学習させて、学習が終わったら「バトル」ボタンを押してみてね！";
+                            text.text = "自由に学習させて、学習が終わったら\nボクと対決だよ！";
                             yield break;
                         }
                         Debug.LogWarning("Invalid uiIdx");
@@ -391,7 +391,7 @@ namespace toio.AI.meicu
                                 {
                                     if (uiBoard.RewardCount == 1 && uiBoard.HasReward(env.quest.goalRow, env.quest.goalCol, 0))
                                     {
-                                        text.text = $"ここまでくればごほうびがもらえる、ってAIに覚えさせるんだ。";
+                                        text.text = $"ここまでくればごほうびがもらえる、\nってAIに覚えさせるんだ。";
                                         btnNext.interactable = true;
                                     }
                                     else
@@ -461,6 +461,7 @@ namespace toio.AI.meicu
                     else if (stageIdx == 2)
                     {
                         var lastRewards = uiBoard.rewardList;
+                        var lastEpisodes = this.episodesTurn;
                         while (true)
                         {
                             if (uiBoard.RewardCount == 0)
@@ -468,7 +469,9 @@ namespace toio.AI.meicu
                                 text.text = $"「ごほうび」の場所を決めてね。\nここでは最大{this.maxRewards}個まで置けるよ";
                                 btnNext.interactable = false;
                             }
-                            else if (isRetry && uiBoard.rewardList.Count == lastRewards.Count && lastRewards.TrueForAll(r=>uiBoard.rewardList.Contains(r)))
+                            else if (isRetry && uiBoard.rewardList.Count == lastRewards.Count
+                                && lastRewards.TrueForAll(r=>uiBoard.rewardList.Contains(r))
+                                && lastEpisodes == this.episodesTurn)
                             {
                                 text.text = $"「ごほうび」の場所や「試行回数」を変えてみよう";
                                 btnNext.interactable = false;
@@ -492,6 +495,11 @@ namespace toio.AI.meicu
                         text.text = $"ただいま、学習中～！";
                         yield return IE_Train();
                         btnNext.interactable = true;
+
+                        if (stageIdx == 0 && isSt0Failed)
+                            text.text = "かんりょうー！\n\nやっぱり、試行回数が多い分、\nちょっと時間がかかったね…";
+                        else
+                            text.text = "かんりょうー！";
                         yield break;
                     }
                     Debug.LogWarning("Invalid uiIdx");
@@ -518,6 +526,15 @@ namespace toio.AI.meicu
                             yield break;
                         }
                     }
+                    else
+                    {
+                        if (uiIdx == cnt++)
+                        {
+                            text.text = "ではまた実験するよ！";
+                            yield break;
+                        }
+                    }
+
                     if (uiIdx == cnt++)
                     {
                         btnBack.interactable = false;
@@ -774,7 +791,7 @@ namespace toio.AI.meicu
 
                 yield return new WaitForSecondsRealtime(stepTime);
 
-                agent.e = QAgent.EpsilonScheduler(stageIdx==2?0.5f:1f, 0.5f, episodesTurnLeft, episodesTurn);
+                agent.UpdateEpsilon(episodesTurnLeft, episodesTurn);
 
                 float episodeReturn = 0;
                 bool episodeGoal = false;
@@ -829,17 +846,6 @@ namespace toio.AI.meicu
             }
             uiBoard.ResetRewardGot();
 
-            btnNext.interactable = true;
-            if (stageIdx == 0 && isSt0Failed)
-            {
-                text.text = "かんりょうー！\n\nやっぱり、試行回数が多い分、\nちょっと時間がかかったね…";
-                yield return WaitButton();
-                text.text = "ではまた実験するよ！";
-            }
-            else
-            {
-                text.text = "かんりょうー！\n\nではまた実験するよ！";
-            }
         }
 
         private bool isTestPassed = false;
@@ -863,6 +869,7 @@ namespace toio.AI.meicu
                 // UI
                 List<Vector2Int> traj = new List<Vector2Int>();
                 uiBoard.ShowKomaP(env.row, env.col);
+                uiBoard.HideFail();
                 uiBoard.HideTrajP();
                 uiQuest.ShowP(env.passedSpaceCnt);
                 text.text = $"<size=40>　　　実験 {ieps+1} 回目</size>\n";
@@ -886,6 +893,8 @@ namespace toio.AI.meicu
                     uiBoard.ShowKomaP(env.row, env.col);
                     uiBoard.ShowTrajP(traj.ToArray());
                     uiQuest.ShowP(env.passedSpaceCnt);
+                    if (Env.IsResponseFail(res)) uiBoard.ShowFailP();
+
                     // Audio
                     if (!done) AudioPlayer.ins.PlaySE(AudioPlayer.ESE.StepConfirmed);
                     else AudioPlayer.ins.PlaySE(res == Env.Response.Goal? AudioPlayer.ESE.Correct : AudioPlayer.ESE.Wrong, 0.66f);
@@ -957,14 +966,6 @@ namespace toio.AI.meicu
                     (Vector2Int tarP, Vector2Int tarA) = CubeCoordinater.MoveAllHome();
                     yield return new WaitForSecondsRealtime(1);
                 }
-
-                // UI
-                uiBoard.ShowKomaP(4, 4);
-                uiBoard.ShowKomaA(4, 4);
-                uiBoard.HideTrajP();
-                uiBoard.HideTrajA();
-                uiQuest.ShowP(0);
-                uiQuest.ShowA(0);
 
                 // Start Game
                 game.InitGame(env.quest);
@@ -1062,16 +1063,7 @@ namespace toio.AI.meicu
             btnNew.gameObject.SetActive(false);
             btnOK.gameObject.SetActive(false);
 
-            uiQuest.gameObject.SetActive(true);
-            uiQuest.Reset();
-            uiQuest.HideA();
-            uiQuest.ShowP(0);
-            uiQuest.ShowQuest(env.quest);
-
-            uiBoard.gameObject.SetActive(true);
-            uiBoard.Reset();
-            uiBoard.ShowGoal(env.quest.goalRow, env.quest.goalCol);
-            uiBoard.ShowKomaP(4, 4);
+            ResetQuestUI(keepRewards:false);
 
             meicu.Reset();
         }
@@ -1080,7 +1072,7 @@ namespace toio.AI.meicu
             // Stage Settings
             if (stageIdx == 0)
             {
-                this.agent.lr = 0.1f;
+                this.agent.lr = 0.1f; this.agent.eStart = 1; this.agent.eEnd = 0.6f;
                 this.maxRewards = 1;
                 this.episodesTurn = 50;
                 if (stageIdx == 0 && isSt0Failed) this.episodesTurn = 100;
@@ -1088,14 +1080,14 @@ namespace toio.AI.meicu
             }
             else if (stageIdx == 1)
             {
-                this.agent.lr = 0.3f;
+                this.agent.lr = 0.3f; this.agent.eStart = 0.5f; this.agent.eEnd = 0.5f;
                 this.maxRewards = this.isRetry? 2:1;
                 this.episodesTurn = 400;
                 this.episodesTurnLeft = this.episodesTurn;
             }
             else if (stageIdx == 2)
             {
-                this.agent.lr = 0.3f;
+                this.agent.lr = 0.3f; this.agent.eStart = 0.5f; this.agent.eEnd = 0.5f;
                 this.maxRewards = 4;
                 this.episodesTurn = 100;
                 this.episodesTurnLeft = this.episodesTurn;
@@ -1119,13 +1111,7 @@ namespace toio.AI.meicu
             uiPhasePlan.Find("SliderSteps").gameObject.SetActive(stageIdx == 0 && isSt0Failed || stageIdx == 2);
             UpdateSliderByValue(this.episodesTurn);
 
-            // Reset board and quest
-            uiQuest.ShowP(0);
-            uiQuest.HideA();
-            uiBoard.ShowKomaP(4, 4);
-            uiBoard.HideTrajP();
-            uiBoard.HideKomaA();
-            uiBoard.HideTrajA();
+            ResetQuestUI();
 
             meicu.Reset();
 
@@ -1165,11 +1151,7 @@ namespace toio.AI.meicu
             uiPhaseTest.gameObject.SetActive(true);
             uiPhaseBattle.gameObject.SetActive(false);
 
-            uiQuest.ShowP(0);
-            uiBoard.HideTrajP();
-            uiBoard.ShowKomaP(4, 4);
-            btnNext.interactable = true;
-            btnBack.interactable = false;
+            ResetQuestUI();
 
             meicu.Reset();
 
@@ -1184,6 +1166,8 @@ namespace toio.AI.meicu
             uiPhaseTrain.gameObject.SetActive(false);
             uiPhaseTest.gameObject.SetActive(false);
             uiPhaseBattle.gameObject.SetActive(true);
+
+            ResetQuestUI(2);
 
             meicu.Reset();
 
@@ -1248,6 +1232,9 @@ namespace toio.AI.meicu
             uiBoard.ShowTrajP(traj);
             uiQuest.ShowP(traj.Length - (Env.IsResponseFail(res)?1:0));
 
+            if (Env.IsResponseFail(res))
+                uiBoard.ShowFailP();
+
             if (Env.IsResponseFail(res) && game.stateA == Game.PlayerState.InGame)
             {
                 StartIEText("あっ、まちがえたね");
@@ -1259,6 +1246,9 @@ namespace toio.AI.meicu
             uiBoard.ShowKomaA(game.envA.row, game.envA.col);
             uiBoard.ShowTrajA(traj);
             uiQuest.ShowA(traj.Length - (Env.IsResponseFail(res)?1:0));
+
+            if (Env.IsResponseFail(res))
+                uiBoard.ShowFailA();
 
             if (Env.IsResponseFail(res) && game.stateP == Game.PlayerState.InGame)
             {
@@ -1408,7 +1398,7 @@ namespace toio.AI.meicu
             {
                 int max = 1;
                 if (stageIdx == 0 && !isSt0Failed) max = 4;
-                else max = 1;
+                else max = 2;
 
                 uiIdx ++;
                 if (uiIdx >= max)
@@ -1460,7 +1450,11 @@ namespace toio.AI.meicu
         }
         public void OnBtnNew()
         {
-            SetPhaseAndUpdateUI(Phase.Intro, 0);
+            env.Reset();
+            GenerateQuest();
+            uiBoard.ClearRewards();
+
+            SetPhaseAndUpdateUI(Phase.Plan, 0);
         }
         public void OnBtnOK()
         {
@@ -1597,6 +1591,26 @@ namespace toio.AI.meicu
                     this.testGoals[i]? "<color=#349DD1>O</color>" : "<color=#D23E2F>X</color>";
             for (int i = this.testGoals.Count; i < 5; i++)
                 uiPhaseTest.Find("Slots").Find($"Slot ({i})").GetComponentInChildren<Text>().text = "";
+        }
+
+        private void ResetQuestUI(int nplayers = 1, bool keepRewards = true)
+        {
+            uiQuest.gameObject.SetActive(true);
+            uiBoard.gameObject.SetActive(true);
+
+            uiQuest.ShowP(0);
+            if (nplayers > 1) uiQuest.ShowA(0);
+            else uiQuest.HideA();
+            uiQuest.ShowQuest(env.quest);
+
+            uiBoard.ShowGoal(env.quest.goalRow, env.quest.goalCol);
+            uiBoard.ShowKomaP(4, 4);
+            if (nplayers > 1) uiBoard.ShowKomaA(4, 4);
+            else uiBoard.HideKomaA();
+            uiBoard.HideTrajP();
+            uiBoard.HideTrajA();
+            uiBoard.HideFail();
+            if (!keepRewards) uiBoard.ClearRewards();
         }
 
         private bool isWaitButton = false;

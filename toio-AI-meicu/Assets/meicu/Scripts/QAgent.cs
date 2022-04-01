@@ -13,7 +13,9 @@ namespace toio.AI.meicu
     internal class QAgent
     {
         public float[,,] Q;
-        public float e = 0.8f;
+        public float eStart = 0.5f;
+        public float eEnd = 0.5f;
+        public float e { get; private set; }
         public float lr = 0.2f;
         public float gamma = 0.95f;
 
@@ -28,7 +30,7 @@ namespace toio.AI.meicu
             for (int r = 0; r < 9; r++)
                 for (int c = 0; c < 9; c++)
                     for (int a = 0; a < 4; a++)
-                        this.Q[r, c, a] = UnityEngine.Random.Range(0.1f, 0.2f);
+                        this.Q[r, c, a] = UnityEngine.Random.Range(0.1f, 0.15f);
 
             this.rowBuffer.Clear();
             this.colBuffer.Clear();
@@ -37,6 +39,11 @@ namespace toio.AI.meicu
             this.doneBuffer.Clear();
             this.row_Buffer.Clear();
             this.col_Buffer.Clear();
+        }
+
+        public void UpdateEpsilon(int epsLeft, int epsMax)
+        {
+            this.e = QAgent.EpsilonScheduler(this.eStart, this.eEnd, epsLeft, epsMax);
         }
 
         public Env.Action GetBestAction(int row, int col)
