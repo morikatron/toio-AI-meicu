@@ -65,8 +65,10 @@ crashlytics-build.properties
 /Assets/toio-sdk.meta
 /Assets/TextMesh Pro/
 /Assets/TextMesh Pro.meta
-/Assets/WebGLTemplates/
-/Assets/WebGLTemplates.meta
+/Assets/WebGLTemplates/webble/
+/Assets/WebGLTemplates/webble.meta
+/Assets/WebGLTemplates/webble.unity2019/
+/Assets/WebGLTemplates/webble.unity2019.meta
 /Assets/Plugins/
 /Assets/Plugins.meta
 /Assets/ML-Agents/
