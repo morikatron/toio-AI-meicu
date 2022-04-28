@@ -21,7 +21,7 @@ namespace toio.AI.meicu
         internal static readonly string KeyTrainerStage = "MeicuTrSt";
         // internal static readonly string KeyStage = "MeicuStage";
 
-        internal static bool isMute
+        internal static bool isBGMOn
         {
             get {
                 return PlayerPrefs.HasKey(KeyMute);

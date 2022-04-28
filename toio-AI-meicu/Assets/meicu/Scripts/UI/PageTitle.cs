@@ -105,6 +105,8 @@ namespace toio.AI.meicu
                     yield return new WaitForSecondsRealtime(2f);
                     text.text = "コンソールの電源はオフにしておいてね！";
                     yield return new WaitForSecondsRealtime(2f);
+                    text.text = "右下のボタンで音楽のオン・オフを切り替えられるよ!";
+                    yield return new WaitForSecondsRealtime(2f);
                 }
             }
             // One cube connected

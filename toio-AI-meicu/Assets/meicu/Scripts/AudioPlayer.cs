@@ -44,7 +44,7 @@ namespace toio.AI.meicu
         internal bool isBGMOn { get { return _isBGMOn; }
             set {
                 _isBGMOn = value;
-                Prefs.isMute = !value;
+                Prefs.isBGMOn = value;
                 if (value)
                 {
                     srcBGM.volume = 0.25f;
@@ -62,7 +62,7 @@ namespace toio.AI.meicu
             ins = this;
 
             // Init isBGMOn
-            isBGMOn = !Prefs.isMute;
+            isBGMOn = Prefs.isBGMOn;
         }
 
         internal void PlayBGM(PageManager.EPage page)
