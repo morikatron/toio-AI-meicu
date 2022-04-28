@@ -103,9 +103,9 @@ namespace toio.AI.meicu
                 {
                     text.text = "キューブの電源を入れて\n「接続」ボタンから接続してね！";
                     yield return new WaitForSecondsRealtime(2f);
-                    text.text = "コンソールの電源はオフにしておいてね！";
+                    text.text = "コンソールの電源は\nオフにしておいてね！";
                     yield return new WaitForSecondsRealtime(2f);
-                    text.text = "右下のボタンで音楽のオン・オフを切り替えられるよ!";
+                    text.text = "右下のボタンで\n音楽のオン・オフを\n切り替えられるよ!";
                     yield return new WaitForSecondsRealtime(2f);
                 }
             }
