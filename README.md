@@ -1,18 +1,18 @@
 # toio-AI-meicu
 
+toio SDK for Unityで開発したAI体験コンテンツ『toioのAIジム　AIロボ「迷キュー」に挑戦（ベータ版）』です。
 
+ビルド済みのウェブアプリが[【コチラ】](https://morikatron.github.io/meicu/)です。
 
 ## 動作環境
 
 ### システム環境
 
-> toio SDK for Unity v1.4.0 と一致しています。
+> toio SDK for Unity v1.5.0 と一致しています。
 
-- Unity（2020.3.17f1 LTS 推奨）
+- Unity（2021.3.0f1 LTS 推奨）
 - Mac（macOS ver.10.14以上）
 - Windows 10（64 ビット版のみ）
-- iOS端末（iOS ver.12以上）
-- Android端末（Android OS 9.0以上）
 
 ### ハードウェア
 
@@ -21,8 +21,8 @@
 
 ### 依存パッケージ
 
-- [toio SDK for Unity v1.4.0](https://github.com/morikatron/toio-sdk-for-unity)
-- [ml-agents (Morikatron's fork) release 18](https://github.com/morikatron/ml-agents/tree/r18_additional_outputs)
+- [toio SDK for Unity v1.5.0](https://github.com/morikatron/toio-sdk-for-unity)
+- [ml-agents (Morikatron's fork)](https://github.com/morikatron/ml-agents/tree/r18_additional_outputs) （release 18 を改造したものとなります。）
 
 
 ## セットアップ
@@ -31,9 +31,9 @@
 
 本レポジトリをクローンまたはダウンロードして、サブフォルダの `toio-AI-meicu` を Unity で開きます。
 
-#### toio SDK for Unity v1.4.0 を導入
+#### toio SDK for Unity v1.5.0 を導入
 
-[toio SDK for Unity v1.4.0](https://github.com/morikatron/toio-sdk-for-unity/releases/tag/v1.4.0) の unitypackage をダウンロードして、Unity にドラッグ&ドロップします。
+toio SDK for Unityの[【ドキュメント】](https://github.com/morikatron/toio-sdk-for-unity/blob/main/docs/download_sdk.md)を参考にしてください。
 
 #### ml-agents (Morikatron's fork) を導入
 
@@ -44,13 +44,12 @@
 
 ml-agents (Morikatron's fork) の [r18_additional_outputs ブランチ](https://github.com/morikatron/ml-agents/tree/r18_additional_outputs) をダウンロードして、中の `com.unity.ml-agents` フォルダを丸ごと `toio-AI-meicu/Packages/` にコピーペーストします。
 
-学習を行う場合には、`mlagents (python package)` をもインストールしてください。詳しくは ml-agents の [【ドキュメント】](https://github.com/Unity-Technologies/ml-agents/blob/main/docs/Installation.md#install-the-mlagents-python-package) を参照してください。
+学習を行う場合には、`mlagents (python package)` もインストールしてください。詳しくは ml-agents の [【ドキュメント】](https://github.com/Unity-Technologies/ml-agents/blob/main/docs/Installation.md#install-the-mlagents-python-package) を参照してください。
 
 
 ## ビルド
 
 ビルドの方法や注意事項は toio SDK for Unity の [【ドキュメント】](https://github.com/morikatron/toio-sdk-for-unity/tree/v1.3.0/docs#-3-ビルド) に詳しく記載してありますので、そちらを参照してください。
-
 
 
 ## Unity プロジェクト構成
@@ -80,9 +79,6 @@ ml-agents (Morikatron's fork) の [r18_additional_outputs ブランチ](https://
 
 
 ## ライセンス
-
-
-### Third Party Notices
 
 - [toio SDK for Unity](https://github.com/morikatron/toio-sdk-for-unity) (MIT License)
 - [ml-agents](https://github.com/Unity-Technologies/ml-agents) (Apache License 2.0)
