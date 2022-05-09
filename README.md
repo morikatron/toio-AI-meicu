@@ -73,7 +73,7 @@ ml-agents (Morikatron's fork) の [r18_additional_outputs ブランチ](https://
 - Script：学習用スクリプト
 
 
-## 迷キューを学習
+## 迷キューを学習させる
 
 [【コチラ】](training/Readme.md) を参照してください。
 
