@@ -6,7 +6,7 @@ mlagents (python package) を利用した学習は2つの方法があります�
   - 設定が簡単
   - 学習過程を眺めることができる
 - 学習環境をバイナリにビルドして、バックグラウンドでバイナリを複数立ち上げて学習を回す
-  - マルチプロセス且つレンダリングも省けるため、学習が早い
+  - マルチプロセス且つレンダリングも省けるため、学習が速い
   - 設定に手間がかかる
 
 ### Unity Editor で学習
@@ -26,7 +26,7 @@ mlagents-learn config\quest4.yaml --run-id=quest4
 
 4. Unity Editor のプレイボタンを押して、学習を始めます。
 
-1. 問題がなければ、Unity Editor 上迷キューが高速度で試行錯誤を始めて、ターミナルの方では学習の進捗が定期的に報告されます。
+1. 問題がなければ、Unity Editor 上、迷キューが高速で試行錯誤を始めて、ターミナル上では学習の進捗が定期的に報告されます。
 
 ### バイナリで学習
 
@@ -47,7 +47,7 @@ mlagents-learn config\quest4.yaml --run-id=quest4
 mlagents-learn config\quest4.yaml --env=env --run-id=quest4 --num-envs=8 --no-graphics
 ```
 
-5. 問題がなければ、学習が始まって、ターミナルの方では学習の進捗が定期的に報告されます。
+5. 問題がなければ、学習が始まって、ターミナル上では学習の進捗が定期的に報告されます。
 
 <br>
 
@@ -57,7 +57,7 @@ mlagents-learn config\quest4.yaml --env=env --run-id=quest4 --num-envs=8 --no-gr
 
 #### Train.unity で確認
 
-1. onnx ファイルを Unity プロジェクトの Assets 下の任意の位置にコピーペーストします。
+1. onnx ファイルを Unity プロジェクトの Assets 下の任意の位置にコピー＆ペーストします。
 
 1. Unity Editor のヒエラルキーウィンドウでゲームオブジェクト `Script` を選択し、プロジェクトウィンドウから onnx ファイルを見つけて、インスペクタで表示された Behavior Parameters -> Model にドラッグ&ドロップします。
 
@@ -78,7 +78,7 @@ mlagents-learn config\quest4.yaml --env=env --run-id=quest4 --num-envs=8 --no-gr
 1. `Softmax` 層を見つけてクリックし、右側のプロパティで input の名前を確認します。（アプリ内蔵のモデルの場合は`40`になります）
 1. Unity Editor のヒエラルキーで、Scripts -> Controller -> AI を選択し、インスペクタの Game Agent -> Additional Output Names の Element 0 に、名前を入れます。
 
-> 注意：現在の実装では、全てのモデルのSoftmaxのinput名が統一しなければなりません。
+> 注意：現在の実装では、全てのモデルのSoftmaxのinput名を統一する必要があります。
 
 <br>
 
@@ -88,7 +88,7 @@ mlagents-learn config\quest4.yaml --env=env --run-id=quest4 --num-envs=8 --no-gr
 
 `Train.unity` で定義された環境パラメータは3つとなります。
 - `questMaxScale`：ランダムに生成されるお題の長さ（色マス数）の上限
-- `questMinScale`：ランダムに生成されるお題の長さ（色マス数）の上限
+- `questMinScale`：ランダムに生成されるお題の長さ（色マス数）の下限
 - `colorReward`：お題を解けた報酬が1固定なのに対し、初期の学習を加速させるために、お題通りに色マスを1つ踏む度に追加の報酬を設定します。既定値が `0.1` です。
 - `randomStart`（bool）：スタート位置がランダムか中央固定かを設定します。アプリで推論時は中央固定になりますが、ランダムで学習したほうが精度が良い場合もあります。既定値が `false` です。
 

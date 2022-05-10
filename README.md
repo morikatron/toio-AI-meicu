@@ -2,9 +2,14 @@
 
 toio SDK for Unityで開発したAI体験コンテンツ『toioのAIジム　AIロボ「迷キュー」に挑戦（ベータ版）』です。
 
-ビルド済みのウェブアプリが[【コチラ】](https://morikatron.github.io/meicu/)です。
+ビルド済みのWebアプリおよびコンテンツ説明については以下のURLにアクセスしてください。
+- [『toioのAIジム AIロボ「迷キュー」に挑戦』](https://morikatron.github.io/meicu/)
+- [コンテンツ説明ページ](https://toio.io/blog/detail/20220511_meicu_release.html)
+
 
 ## 動作環境
+
+当コンテンツをビルドするために必要となるものは以下の通りです。
 
 ### システム環境
 
@@ -42,7 +47,7 @@ toio SDK for Unityの[【ドキュメント】](https://github.com/morikatron/to
 行動確率からサンプリングされた行動のインデックスになっています。
 行動確率を取得し迷キューの「思考」を可視化するために、ml-agents を簡単に改造しました。
 
-ml-agents (Morikatron's fork) の [r18_additional_outputs ブランチ](https://github.com/morikatron/ml-agents/tree/r18_additional_outputs) をダウンロードして、中の `com.unity.ml-agents` フォルダを丸ごと `toio-AI-meicu/Packages/` にコピーペーストします。
+ml-agents (Morikatron's fork) の [r18_additional_outputs ブランチ](https://github.com/morikatron/ml-agents/tree/r18_additional_outputs) をダウンロードして、中の `com.unity.ml-agents` フォルダを丸ごと `toio-AI-meicu/Packages/` にコピー＆ペーストします。
 
 学習を行う場合には、`mlagents (python package)` もインストールしてください。詳しくは ml-agents の [【ドキュメント】](https://github.com/Unity-Technologies/ml-agents/blob/main/docs/Installation.md#install-the-mlagents-python-package) を参照してください。
 
@@ -64,7 +69,7 @@ ml-agents (Morikatron's fork) の [r18_additional_outputs ブランチ](https://
     - Player：プレイヤーのキューブの状態に応じて、ゲーム操作とキューブ制御を行うスクリプト
     - AI：迷キューのAIがキューブ状態とゲーム状態に応じて、ゲーム操作とキューブ制御を行うスクリプト
   - Game：ゲームコード
-  - Video：かいせつ用の動画が格納されています
+  - Video：かいせつ用の動画
   - Audio：BGMとSEを管理するスクリプト
 - Canvas：各画面とUIの要素が格納されています、`Script/UI`と名称が対応しています。
 
@@ -75,7 +80,8 @@ ml-agents (Morikatron's fork) の [r18_additional_outputs ブランチ](https://
 
 ## 迷キューを学習させる
 
-[【コチラ】](training/Readme.md) を参照してください。
+mlagents (python package) を利用してAIロボ「迷キュー」に学習をさせることができます。
+詳しくは[【コチラ】](training/Readme.md) を参照してください。
 
 
 ## ライセンス
