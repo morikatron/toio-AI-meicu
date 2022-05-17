@@ -28,7 +28,9 @@
           <div id="unity-progress-bar-full"></div>
         </div>
       </div>
-      <div id="unity-warning"> </div>
+      <div id="unity-warning">
+        <p id="unity-warning-p"></p>
+      </div>
       <div id="unity-footer">
         <div id="meicu-footer">
           ▶ はじめての方は<a href="https://toio.io/blog/detail/20220511_meicu_release.html" target="_blank">こちら</a>へ
@@ -44,6 +46,7 @@
       var progressBarFull = document.querySelector("#unity-progress-bar-full");
       var fullscreenButton = document.querySelector("#unity-fullscreen-button");
       var warningBanner = document.querySelector("#unity-warning");
+      var warningBannerP = document.querySelector("#unity-warning-p");
       var progressBarEmpty = document.querySelector("#unity-progress-bar-empty");
 
       var buildUrl = "Build";
@@ -87,8 +90,10 @@
         canvas.style.width = window.innerWidth + 'px';
         canvas.style.height = window.innerHeight + 'px';
 
+        loadingBar.style.top = '35%';
+        warningBanner.style.top = '35%';
         warningBanner.style.display = 'block';
-        warningBanner.innerHTML = 'このページはPC専用サイトです。お手数おかけしますが、WindowsまたはMacでご閲覧ください。';
+        warningBannerP.innerHTML = 'このページはPC専用サイトです。お手数おかけしますが、WindowsまたはMacでご閲覧ください。<br><br>くわしくは<a href="https://toio.io/blog/detail/20220511_meicu_release.html">こちら</a>へ';
         progressBarEmpty.style.display = 'none';
       } else {
         canvas.style.width = "{{{ WIDTH }}}px";
